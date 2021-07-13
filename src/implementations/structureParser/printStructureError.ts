@@ -6,6 +6,12 @@ function assertUnreachable<RT>(_x: never): RT {
 
 export function printStructureError($$: StructureErrorType): string {
     switch ($$[0]) {
+        case "unknown punctuation": {
+            return `unknown punctuation`
+        }
+        case "unexpected '!'": {
+            return `unexpected '!'`
+        }
         case "expected rootvalue": {
             return `expected rootvalue`
         }

@@ -1,9 +1,9 @@
-import {
-    createJSONFormatter,
-} from "astn-core";
-import { formatCLI } from "./formatCLI";
+// import {
+//     createJSONFormatter,
+// } from "../src/core";
+// import { formatCLI } from "./formatCLI";
 
-formatCLI(
-    createJSONFormatter("   ", "\r\n"),
-    "\r\n",
-)
+// formatCLI(
+//     createJSONFormatter("   ", "\r\n"),
+//     "\r\n",
+// )

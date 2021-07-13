@@ -1,5 +1,4 @@
-import * as astncore from "astn-core"
-import * as p from "pareto"
+import * as astncore from "../../core"
 
 import { getEndLocationFromRange } from "../../generic"
 import { TokenizerAnnotationData } from "../../interfaces"
@@ -9,7 +8,7 @@ export function createCodeCompletionFinder(
     completionPositionLine: number,
     completionPositionCharacter: number,
     callback: (codeCompletion: string) => void
-): astncore.RootHandler<TokenizerAnnotationData, p.IValue<null>> {
+): astncore.TypedTreeHandler<TokenizerAnnotationData, null> {
     let positionAlreadyFound = false
     let previousAfter: null | (() => string[]) = null
     //console.log("FINDING COMPLETIONS", line, character)
@@ -50,7 +49,6 @@ export function createCodeCompletionFinder(
             if (!positionAlreadyFound) {
                 generate(previousAfter)
             }
-            return p.value(null)
         }
     )
 }

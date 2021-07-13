@@ -2,7 +2,6 @@
 
 import * as p from "pareto"
 
-
 export type RetrievalError =
 	| ["not found", {
 		//

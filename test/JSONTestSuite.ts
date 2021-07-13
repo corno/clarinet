@@ -1,11 +1,11 @@
-import * as fs from "fs"
 import * as p from "pareto"
+import * as fs from "fs"
 import { describe } from "mocha"
 import assert from "assert"
 import * as path from "path"
 import * as p20 from "pareto-20"
-import { dummyParserEventConsumer } from "./dummyParserEventConsumer"
 import { createErrorStreamHandler, createParserStack } from "../src"
+import { createDummyTreeHandler } from "../src/core"
 
 function tokenizeStrings(
     strings: string[],
@@ -14,12 +14,15 @@ function tokenizeStrings(
     p20.createArray(strings).streamify().handle(
         null,
         createParserStack({
-            onEmbeddedSchema: () => dummyParserEventConsumer,
+            onEmbeddedSchema: () => createDummyTreeHandler(),
             onSchemaReference: () => {
+                return p.value(false)
+            },
+            onBody: () => createDummyTreeHandler(),
+            errorStreams: createErrorStreamHandler(false, () => onError()),
+            onEnd: () => {
                 return p.value(null)
             },
-            onBody: () => dummyParserEventConsumer,
-            errorStreams: createErrorStreamHandler(false, () => onError()),
         })
     )
 }

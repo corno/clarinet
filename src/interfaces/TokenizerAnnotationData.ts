@@ -20,7 +20,7 @@ export type Comment = {
 //     TaggedUnionHandler,
 //     TreeHandler,
 //     ValueHandler,
-// } from "astn-core"
+// } from "../core"
 
 export type BeforeContextData = {
     comments: Comment[]

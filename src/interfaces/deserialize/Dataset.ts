@@ -9,8 +9,8 @@ export type SerializationStyle =
     | ["expanded", { omitPropertiesWithDefaultValues: boolean }]
     | ["compact"]
 
-export type ContextSchema<Annotation, ReturnType> =
+export type ContextSchema<TokenAnnotation, NonTokenAnnotation> =
     | ["ignored"]
     | ["not available"]
     | ["has errors"]
-    | ["available", SchemaAndSideEffects<Annotation, ReturnType>]
+    | ["available", SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation>]

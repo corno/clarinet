@@ -6,9 +6,8 @@ import * as p from "pareto"
 import { Location, Range, getEndLocationFromRange, createRangeFromSingleLocation, createRangeFromLocations } from "../../generic/location"
 import { RangeError } from "../../generic/errors"
 import { IPreTokenStreamConsumer } from "../../interfaces/IPreTokenStreamConsumer"
-import { TokenConsumer } from "../../interfaces/ITokenConsumer"
+import { TokenConsumer, TokenType } from "../../interfaces/ITokenConsumer"
 import { PreToken, PreTokenDataType, WrappedStringType } from "../../interfaces/IPreTokenStreamConsumer"
-import { TokenType } from "../../interfaces/ITreeParser"
 import { TokenizerAnnotationData } from "../../interfaces"
 
 function assertUnreachable<RT>(_x: never): RT {

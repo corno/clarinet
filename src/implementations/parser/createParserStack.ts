@@ -1,5 +1,5 @@
 import * as p from "pareto"
-import * as core from "astn-core"
+import * as core from "../../core"
 import {
     createStructureParser, printStructureError, StructureErrorType,
 } from "../structureParser"
@@ -15,8 +15,8 @@ import {
 } from "../tokenizer"
 import { TokenizerAnnotationData } from "../../interfaces"
 import { TokenError, printPreTokenizerError } from "../pretokenizer"
-import { printTreeParserError, TreeParserError } from "../treeParser"
-import { SimpleStringData } from "astn-core"
+import { TreeParserErrorType } from "../../core"
+import { printTreeParserError } from "../../core/implementations/treeParser/printTreeParserErrorError"
 
 export function createErrorStreamHandler(withRange: boolean, callback: (stringifiedError: string) => void): ErrorStreamsHandler {
     function printRange2(range: Range) {
@@ -29,7 +29,7 @@ export function createErrorStreamHandler(withRange: boolean, callback: (stringif
         onTokenizerError: $ => {
             callback(`${printPreTokenizerError($.error)}${printRange2($.range)}`)
         },
-        onTextParserError: $ => {
+        onStructureParserError: $ => {
             callback(`${printStructureError($.error)}${printRange2($.annotation.range)}`)
         },
         onTreeParserError: $ => {
@@ -43,12 +43,12 @@ export type ErrorStreamsHandler = {
         error: TokenError
         range: Range
     }) => void
-    onTextParserError: ($: {
+    onStructureParserError: ($: {
         error: StructureErrorType
         annotation: TokenizerAnnotationData
     }) => void
     onTreeParserError: ($: {
-        error: TreeParserError
+        error: TreeParserErrorType
         annotation: TokenizerAnnotationData
     }) => void
 }
@@ -62,9 +62,10 @@ export type ErrorStreamsHandler = {
  * @param onHeaderOverheadToken an optional callback for handling overhead tokens in the header (comments, whitespace, newlines).
  */
 export function createParserStack($: {
-    onEmbeddedSchema: (schemaSchemaName: string, firstTokenAnnotation: TokenizerAnnotationData) => core.ITreeBuilder<TokenizerAnnotationData>
-    onSchemaReference: (token: SimpleStringData, tokenAnnotation: TokenizerAnnotationData) => p.IValue<null>
-    onBody: (annotation: TokenizerAnnotationData) => core.ITreeBuilder<TokenizerAnnotationData>
+    onEmbeddedSchema: (schemaSchemaName: string, firstTokenAnnotation: TokenizerAnnotationData) => core.TreeHandler<TokenizerAnnotationData, null>
+    onSchemaReference: (token: core.SimpleStringToken<TokenizerAnnotationData>) => p.IValue<boolean>
+    onBody: (annotation: TokenizerAnnotationData) => core.TreeHandler<TokenizerAnnotationData, null>
+    onEnd: (endAnnotation: TokenizerAnnotationData) => p.IValue<null>
     errorStreams: ErrorStreamsHandler
 }): p.IStreamConsumer<string, null, null> {
     return createStreamPreTokenizer(
@@ -73,8 +74,9 @@ export function createParserStack($: {
                 onEmbeddedSchema: $.onEmbeddedSchema,
                 onSchemaReference: $.onSchemaReference,
                 onBody: $.onBody,
-                onTextParserError: $.errorStreams.onTextParserError,
-                onTreeParserError: $.errorStreams.onTreeParserError,
+                onTreeError: $.errorStreams.onTreeParserError,
+                onStructureError: $.errorStreams.onStructureParserError,
+                onEnd: $.onEnd,
             }),
         ),
         $.errorStreams.onTokenizerError,

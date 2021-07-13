@@ -1,10 +1,10 @@
 /* eslint
     "max-classes-per-file": off,
 */
-import * as astncore from "astn-core"
+import * as astncore from "../../core"
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
 import { DeserializeError, ExternalSchemaResolvingError } from "../../interfaces/deserialize/Errors"
-import { printPreTokenizerError, printStructureError, printTreeParserError } from ".."
+import { printPreTokenizerError, printStructureError } from ".."
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -27,13 +27,13 @@ export function printExternalSchemaResolvingError(error: ExternalSchemaResolving
 
 export function printDeserializationDiagnostic($: DeserializeError): string {
     switch ($[0]) {
-        case "stacked": {
+        case "tree": {
             const $$ = $[1]
             return $$[0]
         }
         case "deserialize": {
             const $$ = $[1]
-            return astncore.printDeserializeError($$)
+            return astncore.printUnmarshallError($$)
         }
         case "tokenizer": {
             const $$ = $[1]
@@ -42,10 +42,6 @@ export function printDeserializationDiagnostic($: DeserializeError): string {
         case "structure": {
             const $$ = $[1]
             return printStructureError($$)
-        }
-        case "tree": {
-            const $$ = $[1]
-            return printTreeParserError($$)
         }
         case "embedded schema error": {
             const $$ = $[1]

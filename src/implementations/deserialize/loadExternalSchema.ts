@@ -1,117 +1,84 @@
 /* eslint
     "max-classes-per-file": off,
 */
-
 import * as p from "pareto"
-
-
 import { SchemaAndSideEffects } from "../../interfaces/deserialize/SchemaAndSideEffects"
 
-import * as astncore from "astn-core"
+import * as astncore from "../../core"
 import { RetrievalError, SchemaSchemaBuilder } from "../../interfaces/deserialize"
 import { ExternalSchemaResolvingError, SchemaError } from "../../interfaces/deserialize/Errors"
-import { TokenizerAnnotationData } from "../../interfaces"
-import { createParserStack } from "../parser"
-import { Range } from "../../generic"
+import { TokenConsumer, TokenizerAnnotationData } from "../../interfaces"
+import { createStructureParser } from "../structureParser"
+import { createTokenizer } from "../tokenizer"
+import { createStreamPreTokenizer } from "../streamPretokenizer"
 
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
 
-export function createSchemaDeserializer(
+export function createSchemaDeserializer<TokenAnnotation>(
     getSchemaSchemaBuilder: (
         name: string,
-    ) => SchemaSchemaBuilder<TokenizerAnnotationData, p.IValue<null>> | null,
-    onError: (error: SchemaError, range: Range) => void,
-    onSchema: (schema: SchemaAndSideEffects<TokenizerAnnotationData, p.IValue<null>> | null) => p.IValue<null>,
-    //SchemaAndSideEffects<TokenizerAnnotationData>,
-): p.IStreamConsumer<string, null, null> {
+    ) => SchemaSchemaBuilder<TokenAnnotation, null> | null,
+    onError: (error: SchemaError, annotation: TokenAnnotation) => void,
+    onSchema: (schema: SchemaAndSideEffects<TokenAnnotation, null> | null) => void,
+    //SchemaAndSideEffects<TokenAnnotation>,
+): TokenConsumer<TokenAnnotation> {
     let foundError = false
 
     let schemaDefinitionFound = false
-    let schemaSchemaBuilder: null | SchemaSchemaBuilder<TokenizerAnnotationData, p.IValue<null>> = null
-    function onSchemaError(error: SchemaError, range: Range) {
-        onError(error, range)
+    let schemaSchemaBuilder: null | SchemaSchemaBuilder<TokenAnnotation, null> = null
+    function onSchemaError(error: SchemaError, annotation: TokenAnnotation) {
+        onError(error, annotation)
         foundError = true
     }
 
-    //console.log("SCHEMA DESER")
-    return createParserStack({
+    return createStructureParser({
         onEmbeddedSchema: (_schemaSchemaName, annotation) => {
-            onSchemaError(["schema schema cannot be embedded"], annotation.range)
-            return astncore.createStackedParser(
-                astncore.createSemanticState({
-                    treeHandler: astncore.createDummyTreeHandler(() => p.value(null)),
-                    raiseError: _$ => {
-                        return p.value(false)
-                    },
-                    createReturnValue: () => {
-                        return p.value(null)
-                    },
-                    createUnexpectedValueHandler: () => astncore.createDummyValueHandler(() => p.value(null)),
-                    onEnd: () => {
-                        return p.value(null)
-                    },
-                })
-            )
+            onSchemaError(["schema schema cannot be embedded"], annotation)
+            return astncore.createDummyTreeHandler()
         },
-        onSchemaReference: (schemaSchemaReference, annotation) => {
+        onSchemaReference: schemaSchemaReference => {
             schemaDefinitionFound = true
-            schemaSchemaBuilder = getSchemaSchemaBuilder(schemaSchemaReference.value)
+            schemaSchemaBuilder = getSchemaSchemaBuilder(schemaSchemaReference.data.value)
             if (schemaSchemaBuilder === null) {
-                console.error(`unknown schema schema '${schemaSchemaReference.value}'`)
-                onSchemaError(["unknown schema schema", { name: schemaSchemaReference.value }], annotation.range)
+                console.error(`unknown schema schema '${schemaSchemaReference.data.value}'`)
+                onSchemaError(["unknown schema schema", { name: schemaSchemaReference.data.value }], schemaSchemaReference.annotation)
             }
-            return p.value(null)
+            return p.value(false)
         },
         onBody: annotation => {
             if (!schemaDefinitionFound) {
                 //console.error("missing schema schema types")
-                onSchemaError(["missing schema schema definition"], annotation.range)
-                return {
-                    onData: () => {
-                        return p.value(false) //FIXME should be 'true', to abort
-                    },
-                    onEnd: () => {
-                        return p.value(null)
-                    },
-                }
+                onSchemaError(["missing schema schema definition"], annotation)
+                return astncore.createDummyTreeHandler()
             } else {
                 if (schemaSchemaBuilder === null) {
                     if (!foundError) {
                         throw new Error("UNEXPECTED: SCHEMA PROCESSOR NOT SUBSCRIBED AND NO ERRORS")
                     }
-                    return {
-                        onData: () => {
-                            return p.value(true)
-                        },
-                        onEnd: () => {
-                            return p.value(null)
-                        },
-                    }
+                    return astncore.createDummyTreeHandler()
                 } else {
                     return schemaSchemaBuilder(
                         (error, annotation2) => {
-                            onError(["schema processing", error], annotation2.range)
+                            onError(["schema processing", error], annotation2)
                         },
                         schemaAndSideEffects => {
-                            return onSchema(schemaAndSideEffects)
+                            onSchema(schemaAndSideEffects)
                         }
                     )
                 }
             }
         },
-        errorStreams: {
-            onTokenizerError: $ => {
-                onSchemaError(["tokenizer", $.error], $.range)
-            },
-            onTextParserError: $ => {
-                onSchemaError(["structure", $.error], $.annotation.range)
-            },
-            onTreeParserError: $ => {
-                onSchemaError(["tree", $.error], $.annotation.range)
-            },
+        onTreeError: _$ => {
+            //FIXME onSchemaError(["tree", $.error], $.annotation)
+        },
+        onStructureError: $ => {
+            onSchemaError(["structure", $.error], $.annotation)
+        },
+        onEnd: () => {
+            return p.value(null)
         },
     })
 }
@@ -120,11 +87,11 @@ export function loadPossibleExternalSchema(
     possibleStream: p.IUnsafeValue<p.IStream<string, null>, RetrievalError>,
     getSchemaSchemaBuilder: (
         name: string,
-    ) => SchemaSchemaBuilder<TokenizerAnnotationData, p.IValue<null>> | null,
+    ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null,
     onError: (
         error: ExternalSchemaResolvingError
     ) => void,
-): p.IUnsafeValue<SchemaAndSideEffects<TokenizerAnnotationData, p.IValue<null>>, null> {
+): p.IUnsafeValue<SchemaAndSideEffects<TokenizerAnnotationData, null>, null> {
 
     return possibleStream.mapError(error => {
         switch (error[0]) {
@@ -159,24 +126,31 @@ export function loadExternalSchema(
     stream: p.IStream<string, null>,
     getSchemaSchemaBuilder: (
         name: string,
-    ) => SchemaSchemaBuilder<TokenizerAnnotationData, p.IValue<null>> | null,
+    ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null,
     onError: (
         error: ExternalSchemaResolvingError
     ) => void,
-): p.IUnsafeValue<SchemaAndSideEffects<TokenizerAnnotationData, p.IValue<null>>, null> {
+): p.IUnsafeValue<SchemaAndSideEffects<TokenizerAnnotationData, null>, null> {
     let foundErrors = false
-    let schema: SchemaAndSideEffects<TokenizerAnnotationData, p.IValue<null>> | null = null
+    let schema: SchemaAndSideEffects<TokenizerAnnotationData, null> | null = null
     return stream.consume<null>(
         null,
-        createSchemaDeserializer(
-            getSchemaSchemaBuilder,
+        createStreamPreTokenizer(
+            createTokenizer(
+                createSchemaDeserializer(
+                    getSchemaSchemaBuilder,
+                    _error => {
+                        foundErrors = true
+                        //console.error("SCHEMA ERROR", error)
+                    },
+                    $ => {
+                        schema = $
+                        return p.value(null)
+                    }
+                )
+            ),
             _error => {
                 foundErrors = true
-                //console.error("SCHEMA ERROR", error)
-            },
-            $ => {
-                schema = $
-                return p.value(null)
             }
         ),
     ).try(

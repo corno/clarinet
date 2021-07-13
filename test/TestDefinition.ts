@@ -16,7 +16,6 @@ export type EventDefinition =
     | ["end", TestLocation | null]
     | ["instance data start"]
     | ["validationerror", string]
-    | ["stacked error", string]
 // [AnyEvent, string?, number?, number?]
 
 export type TestDefinition = {

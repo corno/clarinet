@@ -7,3 +7,7 @@ export type StructureErrorType =
     | ["unexpected data after end", {
         data: string
     }]
+    | ["unexpected '!'"]
+    | ["unknown punctuation", {
+        found: string
+    }]

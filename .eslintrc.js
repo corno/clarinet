@@ -45,6 +45,7 @@ module.exports = {
         "@typescript-eslint/no-unsafe-call": "off",
         "@typescript-eslint/no-unsafe-return": "off",
         "@typescript-eslint/no-empty-interface": "error",
+        "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "error",
         "@typescript-eslint/no-misused-new": "error",
         "@typescript-eslint/no-namespace": "error",
@@ -158,10 +159,6 @@ module.exports = {
         ],
         "prefer-arrow-callback": "error",
         "prefer-const": "error",
-        "quote-props": [
-            "error",
-            "consistent-as-needed"
-        ],
         "radix": "error",
         "spaced-comment": [
             "off",

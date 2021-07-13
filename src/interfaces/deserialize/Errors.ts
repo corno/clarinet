@@ -1,4 +1,6 @@
-import { StructureErrorType, TokenError, TreeParserError } from "../../implementations"
+import { StructureErrorType, TokenError } from "../../implementations"
+
+import * as astncore from "../../core"
 
 export type SchemaError =
     | ["schema schema cannot be embedded"]
@@ -8,7 +10,6 @@ export type SchemaError =
     | ["missing schema schema definition"]
     | ["tokenizer", TokenError]
     | ["structure", StructureErrorType]
-    | ["tree", TreeParserError]
     | ["schema processing", SchemaDeserializationError]
 
 
@@ -22,16 +23,12 @@ export type ContextSchemaError =
     | ["validating schema file against internal schema"]
     | ["external schema resolving", ExternalSchemaResolvingError]
 
-
-import * as astncore from "astn-core"
-
 export type SchemaDeserializationError =
     | ["validation", {
         "message": string
     }]
     | ["expect", astncore.ExpectError]
-    | ["stacked", astncore.StackedDataErrorType]
-
+    | ["stacked", astncore.TreeParserErrorType]
 
 export type DeserializeError =
 | ["no valid schema"]
@@ -39,10 +36,9 @@ export type DeserializeError =
 | ["found both internal and context schema. ignoring internal schema"]
 | ["invalid embedded schema"]
 | ["invalid schema reference"]
-| ["deserialize", astncore.DeserializeError]
-| ["stacked", astncore.StackedDataErrorType]
+| ["deserialize", astncore.UnmarshallError]
+| ["tree", astncore.TreeParserErrorType]
 | ["tokenizer", TokenError]
 | ["structure", StructureErrorType]
-| ["tree", TreeParserError]
 | ["embedded schema error", SchemaDeserializationError]
 | ["schema reference resolving", ExternalSchemaResolvingError]

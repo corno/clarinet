@@ -1,4 +1,4 @@
-import * as astncore from "astn-core"
+import * as astncore from "../../core"
 import { SchemaDeserializationError } from "../../interfaces/deserialize"
 
 function assertUnreachable<RT>(_x: never): RT {

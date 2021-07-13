@@ -64,7 +64,6 @@ the ASTN parser is very much like [yajl] but written in TypeScript:
 
 ``` TypeScript
 //a simple pretty printer
-import * as p from "pareto"
 import * as fs from "fs"
 import * as astn from "astn"
 
@@ -180,7 +179,6 @@ astn.parseString(
 ```
 ## low level
 ``` TypeScript
-import * as p from "pareto"
 import * as p20 from "pareto-20"
 import * as fs from "fs"
 import * as astn from "astn"

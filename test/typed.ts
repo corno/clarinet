@@ -5,32 +5,18 @@
 import * as p from "pareto"
 import { describe } from "mocha"
 import * as chai from "chai"
-import * as core from "astn-core"
+import * as core from "../src/core"
 import * as astn from "../src"
 import { tryToConsumeString } from "./consumeString"
-import { RequiredValueHandler } from "astn-core"
 import { createErrorStreamHandler, printRange, TokenizerAnnotationData } from "../src"
+import { createDummyTreeHandler } from "../src/core"
 
 //const selectedJSONTests: string[] = ["two keys"]
 //const selectedExtensionTests: string[] = []
 
-// type Offset = {
-//     position: number
-//     offset: number
-// }
-
 type ErrorLine = [string, string]
 
-// function getOnMissingAndOnInvalid(
-//     valueType: ValueType,
-// ): OnMissingAndOnInvalid {
-//     return {
-//         onMissing: valueType[2]?.onMissing,
-//         onInvalidType: valueType[2]?.onInvalidType,
-//     }
-// }
-
-type ParserRequiredValueHandler = RequiredValueHandler<TokenizerAnnotationData, null, p.IValue<null>>
+type ParserRequiredValueHandler = core.RequiredValueHandler<TokenizerAnnotationData, null>
 
 
 describe('typed', () => {
@@ -39,7 +25,7 @@ describe('typed', () => {
             testName: string,
             data: string,
             callback: (
-                expect: core.IExpectContext<astn.TokenizerAnnotationData, null, p.IValue<null>>,
+                expect: core.IExpectContext<astn.TokenizerAnnotationData, null>,
                 addError: (errorLine: ErrorLine) => void
             ) => ParserRequiredValueHandler,
             expectedErrors: ErrorLine[]
@@ -54,58 +40,36 @@ describe('typed', () => {
                     foundErrors.push(["expect warning", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
                 }
                 const streamTokenizer = astn.createParserStack({
-                    onEmbeddedSchema: () => {
-                        return {
-                            onData: () => {
-                                return p.value(false)
-                            },
-                            onEnd: () => {
-                                return p.value(null)
-                            },
-                        }
-                    },
+                    onEmbeddedSchema: () => createDummyTreeHandler(),
                     onSchemaReference: () => {
                         throw new Error("IMPLEMENT ME")
                     },
                     onBody: () => {
 
-                        const expect = core.createExpectContext<astn.TokenizerAnnotationData, null, p.IValue<null>>(
+                        const expect = core.createExpectContext<astn.TokenizerAnnotationData, null>(
                             $ => {
                                 foundErrors.push(["expect error", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
                             },
                             onWarning,
-                            () => core.createDummyValueHandler(() => p.value(null)),
-                            () => core.createDummyValueHandler(() => p.value(null)),
-                            () => p.value(null),
+                            () => core.createDummyValueHandler(),
+                            () => core.createDummyValueHandler(),
                             core.Severity.warning,
                             core.OnDuplicateEntry.ignore,
-                            core.createSerializedString,
+                            $ => core.serializeSimpleString($.data),
                         )
-                        return core.createStackedParser(
-                            core.createSemanticState({
-                                treeHandler: {
-                                    root: callback(
-                                        expect,
-                                        errorLine => {
-                                            foundErrors.push(errorLine)
-                                        }
-                                    ),
-                                },
-                                raiseError: (err, annotation) => {
-                                    foundErrors.push(["stacked error", `${err[0]} ${printRange(annotation.range)}`])
-                                },
-                                createReturnValue: () => {
-                                    return p.value(null)
-                                },
-                                createUnexpectedValueHandler: () => core.createDummyValueHandler(() => p.value(null)),
-                                onEnd: () => {
-                                    //do nothing with end
-                                    return p.value(null)
-                                },
-                            })
-                        )
+                        return {
+                            root: callback(
+                                expect,
+                                errorLine => {
+                                    foundErrors.push(errorLine)
+                                }
+                            ),
+                        }
                     },
                     errorStreams: createErrorStreamHandler(true, str => foundErrors.push(["parser error", str])),
+                    onEnd: () => {
+                        return p.value(null)
+                    },
                 })
                 return tryToConsumeString(
                     data,
@@ -159,7 +123,6 @@ describe('typed', () => {
                                     expect,
                                     ["number", {
                                         callback: () => {
-                                            return p.value(null)
                                         },
                                     }]
                                 )
@@ -189,7 +152,6 @@ describe('typed', () => {
                                         expect,
                                         ["number", {
                                             callback: () => {
-                                                return p.value(null)
                                             },
                                             onInvalidType: () => {
                                                 //addError(["stacked error", err.rangeLessMessage, $.start.line, $.start.column, $.end.line, $.end.column])
@@ -224,7 +186,6 @@ describe('typed', () => {
                                         expect,
                                         ["number", {
                                             callback: () => {
-                                                return p.value(null)
                                             },
                                             onInvalidType: () => {
                                                 //addError(["stacked error", err.rangeLessMessage, $.start.line, $.start.column, $.end.line, $.end.column])
@@ -256,7 +217,6 @@ describe('typed', () => {
                                 expect,
                                 ["number", {
                                     callback: () => {
-                                        return p.value(null)
                                     },
                                 }],
                             )
@@ -351,10 +311,7 @@ describe('typed', () => {
             },
             [
                 ["missing", "TBD 0:0-0"],
-                ["stacked error", "missing tagged union value 1:16-17"],
-                ["parser error", "not in an object @ 1:16-17"],
-                ["parser error", "unexpected end of text, still in tagged union @ 1:17-17"],
-                ["parser error", "unexpected end of text, still in object @ 1:17-17"],
+                ["parser error", "missing tagged union value @ 1:16-17"],
             ]
         )
     })

@@ -6,49 +6,18 @@
 import * as p from "pareto"
 import * as p20 from "pareto-20"
 import * as astn from "../src"
-import * as core from "astn-core"
 
 import { describe } from "mocha"
 import * as chai from "chai"
 import { ownJSONTests } from "./data/ownJSONTestset"
 import { extensionTests } from "./data/ASTNTestSet"
-import { EventDefinition, TestRange, TestLocation, TestDefinition } from "./TestDefinition"
-import { getEndLocationFromRange, TokenizerAnnotationData, createErrorStreamHandler } from "../src"
-import { createSerializedQuotedString, RequiredValueHandler, SimpleStringData, ValueHandler } from "astn-core"
-
-function createStreamSplitter<DataType, EndDataType>(
-    subStreamConsumers: p.IStreamConsumer<DataType, EndDataType, null>[]
-): p.IStreamConsumer<DataType, EndDataType, null> {
-    return {
-        onData: (data: DataType): p.IValue<boolean> => {
-            const promises: p.IValue<boolean>[] = []
-            subStreamConsumers.forEach(s => {
-                const returnValue = s.onData(data)
-                promises.push(returnValue)
-            })
-            if (promises.length === 0) {
-                return p.value(false)
-            }
-            return p20.createArray(promises).mergeSafeValues(x => x).mapResult(abortResquests => {
-                return p.value(abortResquests.includes(true)) //if 1 promise requested an abort
-            })
-        },
-        onEnd: (aborted: boolean, endData: EndDataType) => {
-            return p20.createArray(
-                subStreamConsumers
-            ).mergeSafeValues(v => v.onEnd(aborted, endData)
-            ).mapResult(() => {
-                return p.value(null)
-            })
-        },
-    }
-}
+import { EventDefinition, TestRange, TestDefinition, TestLocation } from "./TestDefinition"
+import { TokenizerAnnotationData, createErrorStreamHandler, getEndLocationFromRange } from "../src"
+import { createLoggingHandler, TreeHandler } from "../src/core"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
-
-const DEBUG = false
 
 const selectedOwnJSONTests = Object.keys(ownJSONTests)
 const selectedExtensionTests = Object.keys(extensionTests)
@@ -56,20 +25,8 @@ const selectedExtensionTests = Object.keys(extensionTests)
 // const selectedJSONTests: string[] = []
 // const selectedExtensionTests: string[] = ["comment"]
 
-// type OnError = (message: string, range: astn.Range) => void
-
-type ParserRequiredValueHandler = RequiredValueHandler<TokenizerAnnotationData, null, p.IValue<null>>
-type ParserValueHandler = ValueHandler<TokenizerAnnotationData, null, p.IValue<null>>
-
-interface HeaderSubscriber {
-    onEmbeddedSchema(schemaSchemaName: string): void
-    onSchemaReference(schemaReference: SimpleStringData, annotation: TokenizerAnnotationData): void
-    onInstanceDataStart(annotation: astn.TokenizerAnnotationData): void
-}
-
 function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON: boolean) {
     return function () {
-        if (DEBUG) console.log("CHUNKS:", chunks)
 
         const actualEvents: EventDefinition[] = []
 
@@ -86,8 +43,8 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
                 return null
             }
         }
-        function getLocation(mustCheck: boolean | undefined, location: astn.Location): TestLocation | null {
-            if (mustCheck) {
+        function getLocation(mustTest: boolean | undefined, location: astn.Location): TestLocation | null {
+            if (mustTest) {
                 return [
                     location.line,
                     location.column,
@@ -97,191 +54,68 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
             }
         }
 
-        /*
-        RECREATE THE ORIGINAL STRING
-        */
+        function createLogger(): TreeHandler<TokenizerAnnotationData, null> {
+            return createLoggingHandler(
+                (event, annotation) => {
+                    switch (event[0]) {
+                        case "close array": {
+                            actualEvents.push(["token", "closearray", annotation.tokenString, getRange(test.testForLocation, annotation.range)])
+                            break
+                        }
+                        case "close object": {
+                            actualEvents.push(["token", "closeobject", annotation.tokenString, getRange(test.testForLocation, annotation.range)])
+                            break
+                        }
+                        case "open array": {
+                            actualEvents.push(["token", "openarray", annotation.tokenString, getRange(test.testForLocation, annotation.range)])
+                            break
+                        }
+                        case "open object": {
+                            actualEvents.push(["token", "openobject", annotation.tokenString, getRange(test.testForLocation, annotation.range)])
+                            break
+                        }
+                        case "simple string": {
+                            const data = event[1]
+                            actualEvents.push(["token", "simple string", data.value, getRange(test.testForLocation, annotation.range)])
+                            break
+                        }
+                        case "multiline string": {
+                            const data = event[1]
+                            actualEvents.push(["token", "multiline string", data.lines.join("\\n"), getRange(test.testForLocation, annotation.range)])
+                            break
+                        }
+                        case "tagged union": {
+                            actualEvents.push(["token", "opentaggedunion", getRange(test.testForLocation, annotation.range)])
+                            break
+                        }
+                        default:
+                            assertUnreachable(event[0])
+                    }
+                },
+            )
 
-
-        function createTestRequiredValueHandler(): ParserRequiredValueHandler {
-            return {
-                exists: createTestValueHandler(),
-                missing: () => {
-                    actualEvents.push(["stacked error", "missing value"])
-                },
-            }
-        }
-        function createTestValueHandler(): ParserValueHandler {
-            return {
-                array: () => {
-                    return {
-                        element: () => {
-                            return createTestValueHandler()
-                        },
-                        arrayEnd: () => {
-                            //
-                            return p.value(null)
-                        },
-                    }
-                },
-                object: () => {
-                    return {
-                        property: () => {
-                            return createTestRequiredValueHandler()
-                        },
-                        objectEnd: () => {
-                            //
-                            return p.value(null)
-                        },
-                    }
-
-                },
-                simpleString: () => {
-                    return p.value(null)
-                },
-                multilineString: () => {
-                    return p.value(null)
-                },
-                taggedUnion: () => {
-                    return {
-                        missingOption: () => {
-                            //
-                        },
-                        option: () => {
-                            return createTestRequiredValueHandler()
-                        },
-                        end: () => {
-                            return p.value(null)
-                        },
-                    }
-                },
-            }
-        }
-        const stackedSubscriber = core.createStackedParser(
-            core.createSemanticState({
-                treeHandler: {
-                    root: createTestRequiredValueHandler(),
-                },
-                raiseError: error => {
-                    actualEvents.push(["stacked error", core.printStackedDataError(error)])
-                },
-                createReturnValue: () => {
-                    return p.value(null)
-                },
-                createUnexpectedValueHandler: () => core.createDummyValueHandler(() => p.value(null)),
-                onEnd: () => {
-                    return p.value(null)
-                },
-            })
-        )
-        const eventSubscriber: core.ITreeBuilder<TokenizerAnnotationData> = {
-            onData: data => {
-                switch (data.type[0]) {
-                    case "close array": {
-                        if (DEBUG) console.log("found close array")
-                        actualEvents.push(["token", "closearray", data.annotation.tokenString, getRange(test.testForLocation, data.annotation.range)])
-                        break
-                    }
-                    case "close object": {
-                        if (DEBUG) console.log("found close object")
-                        actualEvents.push(["token", "closeobject", data.annotation.tokenString, getRange(test.testForLocation, data.annotation.range)])
-                        break
-                    }
-                    case "open array": {
-                        if (DEBUG) console.log("found open array")
-                        actualEvents.push(["token", "openarray", data.annotation.tokenString, getRange(test.testForLocation, data.annotation.range)])
-                        break
-                    }
-                    case "open object": {
-                        if (DEBUG) console.log("found open object")
-                        actualEvents.push(["token", "openobject", data.annotation.tokenString, getRange(test.testForLocation, data.annotation.range)])
-                        break
-                    }
-                    case "multiline string": {
-                        const $ = data.type[1]
-                        if (DEBUG) console.log("found wrapped string")
-                        actualEvents.push(["token", "multiline string", $.lines.join("\\n"), getRange(test.testForLocation, data.annotation.range)])
-                        break
-                    }
-                    case "simple string": {
-                        const $ = data.type[1]
-                        actualEvents.push(["token", "simple string", $.value, getRange(test.testForLocation, data.annotation.range)])
-                        break
-                    }
-                    case "tagged union": {
-                        //const $ = data.type[1]
-
-                        if (DEBUG) console.log("found open tagged union")
-                        actualEvents.push(["token", "opentaggedunion", getRange(test.testForLocation, data.annotation.range)])
-                        break
-                    }
-                    default:
-                        assertUnreachable(data.type[0])
-                }
-                return p.value(false)
-            },
-            onEnd: (_aborted, endData) => {
-                if (DEBUG) console.log("found end")
-                actualEvents.push(["end", getLocation(test.testForLocation, getEndLocationFromRange(endData.range))])
-                return p.value(null)
-            },
-        }
-        const out: string[] = []
-        const schemaDataSubscribers: core.ITreeBuilder<TokenizerAnnotationData>[] = [
-            eventSubscriber,
-        ]
-        const instanceDataSubscribers: core.ITreeBuilder<TokenizerAnnotationData>[] = [
-            eventSubscriber,
-            stackedSubscriber,
-        ]
-        const headerSubscribers: HeaderSubscriber[] = [
-            {
-                onEmbeddedSchema: () => {
-                    out.push("!")
-                    return []
-                },
-                onSchemaReference: schemaReference => {
-                    out.push(`! ${createSerializedQuotedString(schemaReference.value)}`)
-                },
-                onInstanceDataStart: () => {
-                    return []
-                },
-            },
-        ]
-
-        if (test.testHeaders) {
-            headerSubscribers.push({
-                onEmbeddedSchema: _range => {
-                    actualEvents.push(["token", "schema data start"])
-                },
-                onSchemaReference: (schemaReference, annotation) => {
-                    actualEvents.push(["token", "schema data start"])
-                    actualEvents.push(["token", "simple string", schemaReference.value, getRange(test.testForLocation, annotation.range)])
-                },
-                onInstanceDataStart: () => {
-                    actualEvents.push(["instance data start"])
-                },
-            })
         }
         const parserStack = astn.createParserStack({
-            onEmbeddedSchema: schemaSchemaName => {
-                headerSubscribers.forEach(s => {
-                    s.onEmbeddedSchema(schemaSchemaName)
-                })
-                return createStreamSplitter(schemaDataSubscribers)
+            onEmbeddedSchema: _schemaSchemaName => {
+                actualEvents.push(["token", "schema data start"])
+                return createLogger()
             },
-            onSchemaReference: (schemaName, annotation) => {
-                headerSubscribers.forEach(s => {
-                    s.onSchemaReference(schemaName, annotation)
-                })
-                return p.value(null)
+            onSchemaReference: schemaReference => {
+                actualEvents.push(["token", "schema data start"])
+                actualEvents.push(["token", "simple string", schemaReference.data.value, getRange(test.testForLocation, schemaReference.annotation.range)])
+                return p.value(false)
             },
-            onBody: annotation => {
-                headerSubscribers.forEach(s => {
-                    s.onInstanceDataStart(annotation)
-                })
-                return createStreamSplitter(instanceDataSubscribers)
+            onBody: _annotation => {
+                if (test.testHeaders) {
+                    actualEvents.push(["instance data start"])
+                }
+                return createLogger()
             },
             errorStreams: createErrorStreamHandler(false, str => actualEvents.push(["parsingerror", str])),
+            onEnd: _annotation => {
+                actualEvents.push(["end", getLocation(test.testForLocation, getEndLocationFromRange(_annotation.range))])
+                return p.value(null)
+            },
         })
 
         return p20.createArray(chunks).streamify().consume(
@@ -291,6 +125,8 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
             //
 
             if (test.events !== undefined) {
+                //console.log(JSON.stringify(actualEvents))
+                // console.log(JSON.stringify(test.events))
                 chai.assert.deepEqual(actualEvents, test.events)
             }
             //const expectedFormattedText = test.formattedText ? test.formattedText : test.text

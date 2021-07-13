@@ -1,6 +1,6 @@
 import * as p from "pareto"
 import * as path from "path"
-import * as astncore from "astn-core"
+import * as astncore from "../../core"
 import { ContextSchema, ContextSchemaError, SchemaSchemaBuilder, TokenizerAnnotationData } from "../../interfaces"
 import { RetrievalError } from "../../interfaces/deserialize/ResolveReferencedSchema"
 import { loadExternalSchema } from "./loadExternalSchema"
@@ -20,9 +20,9 @@ export function loadContextSchema(
     data: ContextSchemaData,
     getSchemaSchemaBuilder: (
         name: string,
-    ) => SchemaSchemaBuilder<TokenizerAnnotationData, p.IValue<null>> | null,
+    ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null,
     onError: (error: ContextSchemaError, severity: astncore.DiagnosticSeverity) => void,
-): p.IValue<ContextSchema<TokenizerAnnotationData, p.IValue<null>>> {
+): p.IValue<ContextSchema<TokenizerAnnotationData, null>> {
     const basename = path.basename(data.filePath)
     const dir = path.dirname(data.filePath)
     if (basename === schemaFileName) {
@@ -34,7 +34,7 @@ export function loadContextSchema(
     return data.getContextSchema(
         dir,
         schemaFileName,
-    ).mapError<ContextSchema<TokenizerAnnotationData, p.IValue<null>>>(error => {
+    ).mapError<ContextSchema<TokenizerAnnotationData, null>>(error => {
         switch (error[0]) {
             case "not found": {
                 //this is okay, the context schema is optional
@@ -50,7 +50,7 @@ export function loadContextSchema(
             default:
                 return assertUnreachable(error[0])
         }
-    }).mapResult<ContextSchema<TokenizerAnnotationData, p.IValue<null>>>(
+    }).mapResult<ContextSchema<TokenizerAnnotationData, null>>(
         stream => {
             return loadExternalSchema(
                 stream,
@@ -58,7 +58,7 @@ export function loadContextSchema(
                 error => {
                     onError(["external schema resolving", error], astncore.DiagnosticSeverity.error)
                 },
-            ).reworkAndCatch<ContextSchema<TokenizerAnnotationData, p.IValue<null>>>(
+            ).reworkAndCatch<ContextSchema<TokenizerAnnotationData, null>>(
                 _error => {
                     return p.value(["has errors"])
                 },

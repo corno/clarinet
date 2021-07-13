@@ -2,20 +2,16 @@
     "max-classes-per-file": off,
 */
 
-import * as p20 from "pareto-20"
 import * as p from "pareto"
-import * as astncore from "astn-core"
-
+import * as astncore from "../../core"
 
 import { ContextSchema } from "../../interfaces/deserialize/Dataset"
 import { DeserializeError } from "../../interfaces/deserialize/Errors"
 import { ResolveReferencedSchema } from "../../interfaces/deserialize/ResolveReferencedSchema"
 import { ResolvedSchema, SchemaSchemaBuilder } from "../../interfaces/deserialize"
-import { DiagnosticSeverity } from "astn-core"
 import { loadPossibleExternalSchema } from "./loadExternalSchema"
-import { TokenizerAnnotationData } from "../../interfaces"
-import { createParserStack } from "../parser"
-import { Range } from "../../generic"
+import { TokenConsumer, TokenizerAnnotationData } from "../../interfaces"
+import { createStructureParser } from "../structureParser"
 
 
 /**
@@ -30,36 +26,36 @@ import { Range } from "../../generic"
  * Can be used to create additional errors and warnings about the serialized document. For example missing properties or invalid formatting
  */
 export function createDeserializer(
-    contextSchema: ContextSchema<TokenizerAnnotationData, p.IValue<null>>,
+    contextSchema: ContextSchema<TokenizerAnnotationData, null>,
     resolveReferencedSchema: ResolveReferencedSchema,
-    onError: (diagnostic: DeserializeError, range: Range, severity: astncore.DiagnosticSeverity) => void,
+    onError: (diagnostic: DeserializeError, annotation: TokenizerAnnotationData, severity: astncore.DiagnosticSeverity) => void,
 
     getSchemaSchemaBuilder: (
         name: string,
-    ) => SchemaSchemaBuilder<TokenizerAnnotationData, p.IValue<null>> | null,
+    ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null,
     handlerBuilder: (
-        schemaSpec: ResolvedSchema<TokenizerAnnotationData>,
-    ) => astncore.RootHandler<TokenizerAnnotationData, p.IValue<null>>,
-): p20.IStreamConsumer<string, null, null> {
+        schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
+    ) => astncore.TypedTreeHandler<TokenizerAnnotationData, null>,
+    onEnd: () => p.IValue<null>,
+): TokenConsumer<TokenizerAnnotationData>  {
 
-    let internalSchemaSpecificationStart: null | Range = null
+    let internalSchemaSpecificationStart: null | TokenizerAnnotationData = null
     let foundSchemaErrors = false
 
-    let internalSchema: ResolvedSchema<TokenizerAnnotationData> | null = null
+    let internalSchema: ResolvedSchema<TokenizerAnnotationData, null> | null = null
 
-
-    const parserStack = createParserStack({
-        onEmbeddedSchema: (schemaSchemaReference, firstTokenAnnotation) => {
-            internalSchemaSpecificationStart = firstTokenAnnotation.range
+    return createStructureParser({
+        onEmbeddedSchema: (schemaSchemaReference, firstTokenizerAnnotationData) => {
+            internalSchemaSpecificationStart = firstTokenizerAnnotationData
 
             const schemaSchemaBuilder = getSchemaSchemaBuilder(schemaSchemaReference)
 
             if (schemaSchemaBuilder === null) {
                 throw new Error(`IMPLEMENT ME: unknown schema schema: ${schemaSchemaReference}`)
             }
-            const builder = schemaSchemaBuilder(
+            return schemaSchemaBuilder(
                 (error, annotation) => {
-                    onError(["embedded schema error", error], annotation.range, astncore.DiagnosticSeverity.error)
+                    onError(["embedded schema error", error], annotation, astncore.DiagnosticSeverity.error)
                     foundSchemaErrors = true
                 },
                 schemaAndSideEffects => {
@@ -67,87 +63,59 @@ export function createDeserializer(
                         schemaAndSideEffects: schemaAndSideEffects,
                         specification: ["embedded"],
                     }
-                    return p.value(null)
                 }
             )
-            return {
-                onData: data => builder.onData(data),
-                onEnd: (aborted, data) => {
-                    return builder.onEnd(aborted, data)
-                },
-            }
         },
-        onSchemaReference: (schemaReference, annotation) => {
-            internalSchemaSpecificationStart = annotation.range
+        onSchemaReference: schemaReference => {
+            internalSchemaSpecificationStart = schemaReference.annotation
 
             return loadPossibleExternalSchema(
-                resolveReferencedSchema(schemaReference.value),
+                resolveReferencedSchema(schemaReference.data.value),
                 getSchemaSchemaBuilder,
                 error => {
                     foundSchemaErrors = true
                     onError(
                         ["schema reference resolving", error],
-                        annotation.range,
+                        schemaReference.annotation,
                         astncore.DiagnosticSeverity.error,
                     )
                 },
-            ).mapResult(schemaAndSideEffects => {
+            ).mapResult<boolean>(schemaAndSideEffects => {
                 internalSchema = {
                     schemaAndSideEffects: schemaAndSideEffects,
-                    specification: ["reference", { name: schemaReference.value }],
+                    specification: ["reference", { name: schemaReference.data.value }],
                 }
-                return p.value(null)
+                return p.value(false)
             }).catch(() => {
-                return p.value(null)
+                return p.value(false)
             })
         },
-        onBody: firstBodyTokenAnnotation => {
-            const dummyStackParser = astncore.createStackedParser<TokenizerAnnotationData>(
-                astncore.createSemanticState({
-                    treeHandler: astncore.createDummyTreeHandler(() => p.value(null)),
-                    raiseError: (error, annotation) => {
-                        onError(["stacked", error], annotation.range, astncore.DiagnosticSeverity.error)
-                    },
-                    createReturnValue: () => {
-                        return p.value(null)
-                    },
-                    createUnexpectedValueHandler: () => astncore.createDummyValueHandler(() => p.value(null)),
-                    onEnd: () => {
-                        return p.value(null)
-                    },
-                })
-            )
+        onBody: firstBodyTokenizerAnnotationData => {
+            function createRealTreeHandler(
+                schema: astncore.Schema,
+                schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
+            ): astncore.TreeHandler<TokenizerAnnotationData, null> {
+                const handler = handlerBuilder(schemaSpec)
+                return astncore.createDatasetUnmarshaller(
+                    schema,
+                    handler,
+                    (error, annotation, severity) => onError(["deserialize", error], annotation, severity),
+                )
+            }
             if (contextSchema[0] === "available") {
                 if (internalSchemaSpecificationStart !== null) {
                     onError(
                         ["found both internal and context schema. ignoring internal schema"],
                         internalSchemaSpecificationStart,
-                        DiagnosticSeverity.warning
+                        astncore.DiagnosticSeverity.warning
                     )
                 }
-                const handler = handlerBuilder({
-                    schemaAndSideEffects: contextSchema[1],
-                    specification: ["none"],
-                })
-                return astncore.createStackedParser(
-                    astncore.createSemanticState({
-                        treeHandler: astncore.createDatasetDeserializer(
-                            contextSchema[1].schema,
-                            handler,
-                            (error, annotation, severity) => onError(["deserialize", error], annotation.range, severity),
-                            () => p.value(null),
-                        ),
-                        raiseError: (error, annotation) => {
-                            onError(["stacked", error], annotation.range, astncore.DiagnosticSeverity.error)
-                        },
-                        createReturnValue: () => {
-                            return p.value(null)
-                        },
-                        createUnexpectedValueHandler: () => astncore.createDummyValueHandler(() => p.value(null)),
-                        onEnd: () => {
-                            return handler.onEnd({})
-                        },
-                    })
+                return createRealTreeHandler(
+                    contextSchema[1].schema,
+                    {
+                        schemaAndSideEffects: contextSchema[1],
+                        specification: ["none"],
+                    }
                 )
             } else if (internalSchemaSpecificationStart !== null) {
                 if (internalSchema === null) {
@@ -156,62 +124,42 @@ export function createDeserializer(
                     }
                     onError(
                         ["no valid schema"],
-                        firstBodyTokenAnnotation.range,
-                        DiagnosticSeverity.error,
+                        firstBodyTokenizerAnnotationData,
+                        astncore.DiagnosticSeverity.error,
                     )
-                    return dummyStackParser
+                    return astncore.createDummyTreeHandler()
                 } else {
-                    const handler = handlerBuilder(internalSchema)
-                    return astncore.createStackedParser(
-                        astncore.createSemanticState({
-                            treeHandler: astncore.createDatasetDeserializer(
-                                internalSchema.schemaAndSideEffects.schema,
-                                handler,
-                                (error, annotation, severity) => onError(["deserialize", error], annotation.range, severity),
-                                () => p.value(null),
-                            ),
-                            raiseError: (error, annotation) => {
-                                onError(["stacked", error], annotation.range, astncore.DiagnosticSeverity.error)
-                            },
-                            createReturnValue: () => {
-                                return p.value(null)
-                            },
-                            createUnexpectedValueHandler: () => astncore.createDummyValueHandler(() => p.value(null)),
-                            onEnd: () => {
-                                return handler.onEnd({})
-                            },
-                        })
+                    return createRealTreeHandler(
+                        internalSchema.schemaAndSideEffects.schema,
+                        internalSchema,
                     )
                 }
             } else {
                 if (contextSchema[0] === "has errors") {
                     onError(
                         ["no valid schema"],
-                        firstBodyTokenAnnotation.range,
-                        DiagnosticSeverity.error,
+                        firstBodyTokenizerAnnotationData,
+                        astncore.DiagnosticSeverity.error,
                     )
                 } else {
                     onError(
                         ["no schema"],
-                        firstBodyTokenAnnotation.range,
-                        DiagnosticSeverity.error,
+                        firstBodyTokenizerAnnotationData,
+                        astncore.DiagnosticSeverity.error,
                     )
                 }
-                return dummyStackParser
+                return astncore.createDummyTreeHandler()
             }
-
         },
-        errorStreams: {
-            onTreeParserError: $ => {
-                onError(["tree", $.error], $.annotation.range, astncore.DiagnosticSeverity.error)
-            },
-            onTextParserError: $ => {
-                onError(["structure", $.error], $.annotation.range, astncore.DiagnosticSeverity.error)
-            },
-            onTokenizerError: $ => {
-                onError(["tokenizer", $.error], $.range, astncore.DiagnosticSeverity.error)
-            },
+        onTreeError: $ => {
+
+            onError(["tree", $.error], $.annotation, astncore.DiagnosticSeverity.error)
+        },
+        onStructureError: $ => {
+            onError(["structure", $.error], $.annotation, astncore.DiagnosticSeverity.error)
+        },
+        onEnd: () => {
+            return onEnd()
         },
     })
-    return parserStack
 }

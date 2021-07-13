@@ -1,8 +1,7 @@
-import * as p from "pareto"
 import { InternalSchemaSpecification } from "./Dataset";
 import { SchemaAndSideEffects } from "./SchemaAndSideEffects";
 
-export type ResolvedSchema<TokenizerAnnotationData> = {
+export type ResolvedSchema<TokenAnnotation, NonTokenAnnotation> = {
     specification: InternalSchemaSpecification
-    schemaAndSideEffects: SchemaAndSideEffects<TokenizerAnnotationData, p.IValue<null>>
+    schemaAndSideEffects: SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation>
 }

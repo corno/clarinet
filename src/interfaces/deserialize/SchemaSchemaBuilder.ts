@@ -1,9 +1,8 @@
-import * as p from "pareto"
 import { SchemaAndSideEffects } from "./SchemaAndSideEffects"
-import * as astncore from "astn-core"
+import * as astncore from "../../core"
 import { SchemaDeserializationError } from "./Errors"
 
-export type SchemaSchemaBuilder<Annotation, ReturnType> = (
-    onSchemaError: (error: SchemaDeserializationError, annotation: Annotation) => void,
-    onSchema: (schema: SchemaAndSideEffects<Annotation, ReturnType>) => p.IValue<null>,
-) => astncore.ITreeBuilder<Annotation>
+export type SchemaSchemaBuilder<TokenAnnotation, NonTokenAnnotation> = (
+    onSchemaError: (error: SchemaDeserializationError, annotation: TokenAnnotation) => void,
+    onSchema: (schema: SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation>) => void,
+) => astncore.TreeHandler<TokenAnnotation, NonTokenAnnotation>

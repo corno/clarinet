@@ -2,7 +2,6 @@ export * from "./pretokenizer"
 export * from "./streamPretokenizer"
 export * from "./structureParser"
 export * from "./tokenizer"
-export * from "./treeParser"
 export * from "./formatting"
 export * from "./parser"
 export {
