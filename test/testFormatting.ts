@@ -2,13 +2,7 @@
 import * as fs from "fs"
 import * as chai from "chai"
 import * as astn from "../src"
-import * as core from "../src/core"
 import { consumeString } from "./consumeString"
-import { createASTNSerializer, createStreamPreTokenizer, createTokenizer, printRange, printStructureError, TokenConsumer, TokenizerAnnotationData } from "../src"
-import { StructureErrorHandler } from "../src/implementations/structureParser/createStructureParser"
-import { printTokenError } from "../src/implementations/pretokenizer/printTokenError"
-import { printTreeParserError } from "../src/core/implementations/treeParser/printTreeParserErrorError"
-import { createJSONSerializer } from "../src/implementations/formatting/createJSONSerializer"
 
 const dir = "./test/data/formatting/"
 
@@ -25,8 +19,8 @@ function format(
         indentationString: string,
         newline: string,
         write: (str: string) => void,
-        errorHandler: StructureErrorHandler<astn.TokenizerAnnotationData>,
-    ) => TokenConsumer<astn.TokenizerAnnotationData>,
+        errorHandler: astn.StructureErrorHandler<astn.TokenizerAnnotationData>,
+    ) => astn.TokenConsumer<astn.TokenizerAnnotationData>,
     outBasename: string,
     outExtension: string
 ): Promise<null | void> {
@@ -43,22 +37,22 @@ function format(
         },
         {
             onStructureError: $ => {
-                throw new Error(`unexpected error ${printStructureError($.error)} @ ${printRange($.annotation.range)}`)
+                throw new Error(`unexpected error ${astn.printStructureError($.error)} @ ${astn.printRange($.annotation.range)}`)
             },
             onTreeError: $ => {
-                throw new Error(`unexpected error ${printTreeParserError($.error)} @ ${printRange($.annotation.range)}`)
+                throw new Error(`unexpected error ${astn.printTreeParserError($.error)} @ ${astn.printRange($.annotation.range)}`)
             },
         },
     )
 
     return consumeString(
         dataIn,
-        createStreamPreTokenizer(
-            createTokenizer(
+        astn.createStreamPreTokenizer(
+            astn.createTokenizer(
                 astnFormatter
             ),
             $ => {
-                throw new Error(`unexpected error ${printTokenError($.error)} @ ${printRange($.range)}`)
+                throw new Error(`unexpected error ${astn.printTokenError($.error)} @ ${astn.printRange($.range)}`)
             },
         ),
     ).convertToNativePromise().then(() => {
@@ -73,14 +67,14 @@ function format(
 describe('formatting', () => {
     it("normalized ASTN", () => {
         return format(
-            createASTNSerializer,
+            astn.createASTNSerializer,
             "normalized",
             "astn",
         )
     })
     it("JSON", () => {
         return format(
-            createJSONSerializer,
+            astn.createJSONSerializer,
             "out",
             "json"
         )

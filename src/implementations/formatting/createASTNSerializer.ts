@@ -1,8 +1,7 @@
 import * as p from "pareto"
 import * as core from "../../core"
 import { TokenConsumer } from "../../interfaces"
-import { createStructureParser } from "../structureParser"
-import { StructureErrorHandler } from "../structureParser/createStructureParser"
+import { createStructureParser, StructureErrorHandler } from "../structureParser"
 
 
 export function createASTNSerializer<TokenAnnotation>(

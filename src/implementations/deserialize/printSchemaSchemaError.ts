@@ -1,7 +1,8 @@
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
 import { SchemaError } from "../../interfaces/deserialize/Errors"
-import { printPreTokenizerError, printStructureError } from ".."
 import { printTreeParserError } from "../../core/implementations/treeParser/printTreeParserErrorError"
+import { printTokenError } from "../pretokenizer"
+import { printStructureError } from "../structureParser"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -15,7 +16,7 @@ export function printSchemaSchemaError($$: SchemaError): string {
         }
         case "tokenizer": {
             const $$$ = $$[1]
-            return printPreTokenizerError($$$)
+            return printTokenError($$$)
         }
         case "structure": {
             const $$$ = $$[1]

@@ -25,7 +25,7 @@ export function printEmbeddedSchemaDeserializationError(error: SchemaDeserializa
         case "stacked": {
             const $$$ = error[1]
 
-            return astncore.printStackedDataError($$$)
+            return astncore.printTreeParserError($$$)
         }
         default:
             return assertUnreachable(error[0])

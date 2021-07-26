@@ -1,3 +1,4 @@
+import { TreeParserErrorType } from "../../core";
 
 export type StructureErrorType =
     | ["expected the schema start (!) or root value"]
@@ -11,3 +12,14 @@ export type StructureErrorType =
     | ["unknown punctuation", {
         found: string
     }]
+
+export interface StructureErrorHandler<Annotation> {
+    onTreeError: ($: {
+        error: TreeParserErrorType
+        annotation: Annotation
+    }) => void
+    onStructureError: ($: {
+        error: StructureErrorType
+        annotation: Annotation
+    }) => void
+}

@@ -5,23 +5,12 @@
 import * as p from "pareto"
 import * as core from "../../core"
 import * as Char from "../../generic/characters"
-import { StructureErrorType as StructureErrorType } from "./functionTypes"
+import { StructureErrorHandler, StructureErrorType as StructureErrorType } from "./functionTypes"
 import { MultilineStringData, SimpleStringData, StructuralTokenData, TokenConsumer, TokenType } from "../../interfaces/ITokenConsumer"
-import { createDummyValueHandler, createTreeParser, TreeParserErrorType } from "../../core"
+import { createDummyValueHandler, createTreeParser } from "../../core"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
-}
-
-export interface StructureErrorHandler<Annotation> {
-    onTreeError: ($: {
-        error: TreeParserErrorType
-        annotation: Annotation
-    }) => void
-    onStructureError: ($: {
-        error: StructureErrorType
-        annotation: Annotation
-    }) => void
 }
 
 /**

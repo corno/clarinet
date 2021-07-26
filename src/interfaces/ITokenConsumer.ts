@@ -39,7 +39,7 @@ export enum TokenType {
     MultilineString,
 }
 
-export type Token<Annotation> = {
+export type Token2<Annotation> = {
     annotation: Annotation
     type:
     | [TokenType.Structural, StructuralTokenData]
@@ -49,6 +49,6 @@ export type Token<Annotation> = {
 
 
 export interface TokenConsumer<Annotation> {
-    onData(token: Token<Annotation>): p.IValue<boolean>
+    onData(token: Token2<Annotation>): p.IValue<boolean>
     onEnd(aborted: boolean, annotation: Annotation): p.IValue<null>
 }
