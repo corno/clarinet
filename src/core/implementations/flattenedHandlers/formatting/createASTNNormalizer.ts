@@ -19,8 +19,9 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
 ): i.FlattenedHandler<TokenAnnotation, NonTokenAnnotation> {
 
     function createIndentation(context: i.StackContext) {
+        const depth = context.dictionaryDepth + context.verboseGroupDepth + context.listDepth
         let indentation = newline
-        for (let x = 0; x !== context.dictionaryDepth + context.verboseGroupDepth + + context.listDepth; x += 1) {
+        for (let x = 0; x !== depth; x += 1) {
             indentation += indentationString
         }
         return indentation
@@ -39,7 +40,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
         property: $ => {
             writer.token(
                 {
-                    stringBefore: `${createIndentation($.stackContext)}${indentationString}`,
+                    stringBefore: `${createIndentation($.stackContext)}`,
                     token: ((): string => {
                         switch ($.objectToken.data.type[0]) {
                             case "verbose group": {
@@ -83,7 +84,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 {
                     string: $.arrayToken.data.type[0] === "shorthand group"
                         ? ` `
-                        : `${createIndentation($.stackContext)}${indentationString}`,
+                        : `${createIndentation($.stackContext)}`,
                 },
                 $.annotation,
             )

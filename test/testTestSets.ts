@@ -12,8 +12,10 @@ import * as chai from "chai"
 import { ownJSONTests } from "./data/ownJSONTestset"
 import { extensionTests } from "./data/ASTNTestSet"
 import { EventDefinition, TestRange, TestDefinition, TestLocation } from "./TestDefinition"
-import { TokenizerAnnotationData, createErrorStreamHandler, getEndLocationFromRange } from "../src"
+import { TokenizerAnnotationData, getEndLocationFromRange, printStructureError, createTokenizer, createStreamPreTokenizer } from "../src"
 import { createLoggingHandler, TreeHandler } from "../src/core"
+import { printTreeParserError } from "../src/core/implementations/treeParser/printTreeParserErrorError"
+import { printTokenError } from "../src/implementations/pretokenizer/printTokenError"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -95,7 +97,7 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
             )
 
         }
-        const parserStack = astn.createParserStack({
+        const structureParser = astn.createStructureParser<TokenizerAnnotationData>({
             onEmbeddedSchema: _schemaSchemaName => {
                 actualEvents.push(["token", "schema data start"])
                 return createLogger()
@@ -111,7 +113,14 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
                 }
                 return createLogger()
             },
-            errorStreams: createErrorStreamHandler(false, str => actualEvents.push(["parsingerror", str])),
+            errors: {
+                onStructureError: $ => {
+                    actualEvents.push(["parsingerror", printStructureError($.error)])
+                },
+                onTreeError: $ => {
+                    actualEvents.push(["parsingerror", printTreeParserError($.error)])
+                },
+            },
             onEnd: _annotation => {
                 actualEvents.push(["end", getLocation(test.testForLocation, getEndLocationFromRange(_annotation.range))])
                 return p.value(null)
@@ -120,7 +129,12 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
 
         return p20.createArray(chunks).streamify().consume(
             null,
-            parserStack,
+            createStreamPreTokenizer(
+                createTokenizer(structureParser),
+                $ => {
+                    actualEvents.push(["parsingerror", printTokenError($.error)])
+                },
+            ),
         ).convertToNativePromise().then(() => {
             //
 

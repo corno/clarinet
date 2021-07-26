@@ -19,7 +19,6 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
         }
         return indentation
     }
-    let foundProperties = false
     return {
         objectBegin: $ => {
             writer.token(
@@ -32,11 +31,9 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
             )
         },
         property: $ => {
-            const wasFirst = !foundProperties
-            foundProperties = true
             writer.token(
                 {
-                    stringBefore: `${wasFirst ? "" : ","}${newline}${createIndentation($.stackContext)}${indentationString}`,
+                    stringBefore: `${$.isFirst ? "" : ","}${newline}${createIndentation($.stackContext)}`,
                     token: createSerializedQuotedString($.propertyToken.data.value),
                     stringAfter: `: `,
                 },

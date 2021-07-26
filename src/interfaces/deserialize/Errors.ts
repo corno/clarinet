@@ -1,6 +1,7 @@
 import { StructureErrorType, TokenError } from "../../implementations"
 
 import * as astncore from "../../core"
+import { TreeParserErrorType } from "../../core"
 
 export type SchemaError =
     | ["schema schema cannot be embedded"]
@@ -10,6 +11,7 @@ export type SchemaError =
     | ["missing schema schema definition"]
     | ["tokenizer", TokenError]
     | ["structure", StructureErrorType]
+    | ["tree", TreeParserErrorType]
     | ["schema processing", SchemaDeserializationError]
 
 

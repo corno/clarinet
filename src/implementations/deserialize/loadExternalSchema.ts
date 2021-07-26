@@ -71,14 +71,17 @@ export function createSchemaDeserializer<TokenAnnotation>(
                 }
             }
         },
-        onTreeError: _$ => {
-            //FIXME onSchemaError(["tree", $.error], $.annotation)
-        },
-        onStructureError: $ => {
-            onSchemaError(["structure", $.error], $.annotation)
-        },
         onEnd: () => {
             return p.value(null)
+        },
+        errors: {
+            onTreeError: $ => {
+                onSchemaError(["tree", $.error], $.annotation)
+            },
+            onStructureError: $ => {
+                onSchemaError(["structure", $.error], $.annotation)
+            },
+
         },
     })
 }

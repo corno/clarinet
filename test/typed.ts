@@ -8,8 +8,10 @@ import * as chai from "chai"
 import * as core from "../src/core"
 import * as astn from "../src"
 import { tryToConsumeString } from "./consumeString"
-import { createErrorStreamHandler, printRange, TokenizerAnnotationData } from "../src"
+import { createStreamPreTokenizer, createTokenizer, printRange, printStructureError, TokenizerAnnotationData } from "../src"
 import { createDummyTreeHandler } from "../src/core"
+import { printTreeParserError } from "../src/core/implementations/treeParser/printTreeParserErrorError"
+import { printTokenError } from "../src/implementations/pretokenizer/printTokenError"
 
 //const selectedJSONTests: string[] = ["two keys"]
 //const selectedExtensionTests: string[] = []
@@ -39,7 +41,7 @@ describe('typed', () => {
                 }) => {
                     foundErrors.push(["expect warning", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
                 }
-                const streamTokenizer = astn.createParserStack({
+                const structureParser = astn.createStructureParser<TokenizerAnnotationData>({
                     onEmbeddedSchema: () => createDummyTreeHandler(),
                     onSchemaReference: () => {
                         throw new Error("IMPLEMENT ME")
@@ -66,14 +68,26 @@ describe('typed', () => {
                             ),
                         }
                     },
-                    errorStreams: createErrorStreamHandler(true, str => foundErrors.push(["parser error", str])),
+                    errors: {
+                        onStructureError: $ => {
+                            foundErrors.push(["parser error", `${printStructureError($.error)} @ ${printRange($.annotation.range)}`])
+                        },
+                        onTreeError: $ => {
+                            foundErrors.push(["parser error", `${printTreeParserError($.error)} @ ${printRange($.annotation.range)}`])
+                        },
+                    },
                     onEnd: () => {
                         return p.value(null)
                     },
                 })
                 return tryToConsumeString(
                     data,
-                    streamTokenizer,
+                    createStreamPreTokenizer(
+                        createTokenizer(structureParser),
+                        $ => {
+                            foundErrors.push(["parser error", `${printTokenError($.error)} @ ${printRange($.range)}`])
+                        },
+                    ),
                 ).convertToNativePromise().then(() => {
                     chai.assert.deepEqual(foundErrors, expectedErrors)
                 })

@@ -4,8 +4,8 @@ import { describe } from "mocha"
 import assert from "assert"
 import * as path from "path"
 import * as p20 from "pareto-20"
-import { createErrorStreamHandler, createParserStack } from "../src"
 import { createDummyTreeHandler } from "../src/core"
+import { createStreamPreTokenizer, createStructureParser, createTokenizer } from "../src"
 
 function tokenizeStrings(
     strings: string[],
@@ -13,17 +13,26 @@ function tokenizeStrings(
 ) {
     p20.createArray(strings).streamify().handle(
         null,
-        createParserStack({
-            onEmbeddedSchema: () => createDummyTreeHandler(),
-            onSchemaReference: () => {
-                return p.value(false)
-            },
-            onBody: () => createDummyTreeHandler(),
-            errorStreams: createErrorStreamHandler(false, () => onError()),
-            onEnd: () => {
-                return p.value(null)
-            },
-        })
+        createStreamPreTokenizer(
+            createTokenizer(
+                createStructureParser({
+                    onEmbeddedSchema: () => createDummyTreeHandler(),
+                    onSchemaReference: () => {
+                        return p.value(false)
+                    },
+                    onBody: () => createDummyTreeHandler(),
+                    errors: {
+                        onTreeError: onError,
+                        onStructureError: onError,
+                    },
+                    onEnd: () => {
+                        return p.value(null)
+                    },
+
+                })
+            ),
+            onError,
+        )
     )
 }
 

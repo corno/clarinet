@@ -3,7 +3,6 @@ export * from "./streamPretokenizer"
 export * from "./structureParser"
 export * from "./tokenizer"
 export * from "./formatting"
-export * from "./parser"
 export {
     createCodeCompletionFinder
 } from "./ide-integration/createCodeCompletionFinder"

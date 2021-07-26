@@ -13,6 +13,17 @@ function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
 
+export interface StructureErrorHandler<Annotation> {
+    onTreeError: ($: {
+        error: TreeParserErrorType
+        annotation: Annotation
+    }) => void
+    onStructureError: ($: {
+        error: StructureErrorType
+        annotation: Annotation
+    }) => void
+}
+
 /**
  * @param onEmbeddedSchema a text can contain schema data. If this is the case, this callback will be called.
  * it enables the consuming code to prepare for the instance data. It cannot produce a result itself, hence the type parameters are null and null
@@ -30,14 +41,7 @@ export function createStructureParser<Annotation>($: {
         annotation: Annotation,
     ) => core.TreeHandler<Annotation, null>
     onEnd: (endAnnotation: Annotation) => p.IValue<null>
-    onTreeError: ($: {
-        error: TreeParserErrorType
-        annotation: Annotation
-    }) => void
-    onStructureError: ($: {
-        error: StructureErrorType
-        annotation: Annotation
-    }) => void
+    errors: StructureErrorHandler<Annotation>
 }): TokenConsumer<Annotation> {
 
     enum StructureState {
@@ -74,7 +78,7 @@ export function createStructureParser<Annotation>($: {
         */
         onEnd: (_aborted, annotation) => {
             function raiseError(error: StructureErrorType) {
-                $.onStructureError({
+                $.errors.onStructureError({
                     error: error,
                     annotation: annotation,
                 })
@@ -116,7 +120,7 @@ export function createStructureParser<Annotation>($: {
         },
         onData: data => {
             function raiseError(error: StructureErrorType) {
-                $.onStructureError({
+                $.errors.onStructureError({
                     error: error,
                     annotation: data.annotation,
                 })
@@ -249,7 +253,7 @@ export function createStructureParser<Annotation>($: {
                     $.onBody(
                         data.annotation,
                     ),
-                    $.onTreeError,
+                    $.errors.onTreeError,
                     createDummyValueHandler,
                     () => {
                         rootContext.state = [StructureState.EXPECTING_END, {
@@ -296,7 +300,7 @@ export function createStructureParser<Annotation>($: {
                                     "mrshl/metadata@0.1",
                                     data.annotation,
                                 ),
-                                $.onTreeError,
+                                $.errors.onTreeError,
                                 createDummyValueHandler,
                                 () => {
                                     rootContext.state = [StructureState.EXPECTING_BODY, {

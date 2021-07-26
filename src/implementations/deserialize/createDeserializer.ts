@@ -37,7 +37,7 @@ export function createDeserializer(
         schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
     ) => astncore.TypedTreeHandler<TokenizerAnnotationData, null>,
     onEnd: () => p.IValue<null>,
-): TokenConsumer<TokenizerAnnotationData>  {
+): TokenConsumer<TokenizerAnnotationData> {
 
     let internalSchemaSpecificationStart: null | TokenizerAnnotationData = null
     let foundSchemaErrors = false
@@ -151,12 +151,13 @@ export function createDeserializer(
                 return astncore.createDummyTreeHandler()
             }
         },
-        onTreeError: $ => {
-
-            onError(["tree", $.error], $.annotation, astncore.DiagnosticSeverity.error)
-        },
-        onStructureError: $ => {
-            onError(["structure", $.error], $.annotation, astncore.DiagnosticSeverity.error)
+        errors: {
+            onTreeError: $ => {
+                onError(["tree", $.error], $.annotation, astncore.DiagnosticSeverity.error)
+            },
+            onStructureError: $ => {
+                onError(["structure", $.error], $.annotation, astncore.DiagnosticSeverity.error)
+            },
         },
         onEnd: () => {
             return onEnd()
