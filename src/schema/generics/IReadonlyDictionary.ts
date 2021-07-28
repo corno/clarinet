@@ -2,8 +2,6 @@ export type RawObject<T> = { [key: string]: T }
 
 export interface IReadonlyLookup<T> {
     getUnsafe(key: string): T
-    get(key: string): T | null
-    getKeys(): string[]
     with<RT>(
         key: string,
         ifExists: (v: T) => RT,
@@ -11,6 +9,6 @@ export interface IReadonlyLookup<T> {
     ): RT
 }
 
-export interface IReadonlyDictionary<T> {
+export interface IReadonlyDictionary<T> extends IReadonlyLookup<T> {
     forEach(callback: (entry: T, key: string) => void): void
 }

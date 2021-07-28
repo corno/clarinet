@@ -6,10 +6,9 @@ import * as def from "./definitions"
 import {
     AnnotatedString,
     createReference,
-    ResolveRegistry,
+    createResolveRegistry,
 } from "./Reference"
-import * as g from "./Dictionary"
-import { IExpectContext, TreeHandler, ValueHandler } from "../core"
+import { createDictionary, IExpectContext, TreeHandler, ValueHandler } from "../core"
 
 /**
  * this function is only calls back if the value is not null
@@ -22,8 +21,8 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
     onValidationError: (message: string, annotation: TokenAnnotation) => void,
     callback: (metaData: def.Schema | null) => void,
 ): TreeHandler<TokenAnnotation, NonTokenAnnotation> {
-    const resolveRegistry = new ResolveRegistry<TokenAnnotation>()
-    const types = g.createDictionary<def.TypeDefinition>({})
+    const resolveRegistry = createResolveRegistry<TokenAnnotation>()
+    const types = createDictionary<def.TypeDefinition>()
     let rootTypeName: AnnotatedString<TokenAnnotation> | null = null
     function wrap(handler: ValueHandler<TokenAnnotation, NonTokenAnnotation>) {
         return {
@@ -48,7 +47,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                         context.expectTaggedUnion({
                             options: {
                                 "group": () => {
-                                    const properties = g.createDictionary<def.ValueDefinition>({})
+                                    const properties = createDictionary<def.ValueDefinition>()
                                     return wrap(context.expectType({
                                         properties: {
                                             "properties": {
@@ -84,7 +83,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                         },
                                         onTypeEnd: () => {
                                             targetValueType = ["group", {
-                                                "properties": properties,
+                                                "properties": properties.toDictionary(),
                                             }]
                                         },
                                     }))
@@ -212,15 +211,15 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                                     targetComponentTypeName,
                                                     "",
                                                     $.annotation,
-                                                    types,
-                                                    resolveRegistry,
+                                                    types.toDictionary(),
+                                                    resolveRegistry.getRegistrater(),
                                                 ),
                                             }]
                                         },
                                     }))
                                 },
                                 "tagged union": () => {
-                                    const options = g.createDictionary<def.OptionDefinition>({})
+                                    const options = createDictionary<def.OptionDefinition>()
                                     let defaultOptionName: null | AnnotatedString<TokenAnnotation> = null
                                     return wrap(context.expectType({
                                         properties: {
@@ -272,14 +271,14 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                         },
                                         onTypeEnd: $ => {
                                             targetValueType = ["tagged union", {
-                                                "options": options,
+                                                "options": options.toDictionary(),
                                                 "default option": createReference(
                                                     "option",
                                                     defaultOptionName,
                                                     "yes",
                                                     $.annotation,
-                                                    options,
-                                                    resolveRegistry,
+                                                    options.toDictionary(),
+                                                    resolveRegistry.getRegistrater(),
                                                 ),
                                             }]
                                         },
@@ -398,14 +397,14 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
             onTypeEnd: $ => {
                 let schema: def.Schema | null = null
                 schema = {
-                    "types": types,
+                    "types": types.toDictionary(),
                     "root type": createReference(
                         "type",
                         rootTypeName,
                         "root",
                         $.annotation,
-                        types,
-                        resolveRegistry,
+                        types.toDictionary(),
+                        resolveRegistry.getRegistrater(),
                     ),
                 }
                 const success = resolveRegistry.resolve(
