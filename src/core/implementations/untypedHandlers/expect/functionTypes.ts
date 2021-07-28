@@ -5,7 +5,7 @@ export type ExpectErrorHandler<TokenAnnotation> = ($: {
     annotation: TokenAnnotation
 }) => void
 
-export enum Severity {
+export enum ExpectSeverity {
     warning,
     error,
     nothing

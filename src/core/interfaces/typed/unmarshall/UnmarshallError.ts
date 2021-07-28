@@ -14,6 +14,12 @@ export type UnmarshallError =
         elements: string[]
     }]
     | ["missing option"]
+    | ["entry key does not have quotes", {
+        //
+    }]
+    | ["property key does not have apostrophes", {
+        //
+    }]
     | ["object is not a dictionary"]
     | ["object is not a verbose group"]
     | ["property has default value, remove"]

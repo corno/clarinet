@@ -7,7 +7,7 @@ import {
     SimpleStringToken,
     TaggedUnionToken,
 } from "../../untyped/ITreeParser"
-import * as def from "../schema"
+import * as def from "../../../../schema"
 
 export interface TypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
     root: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>

@@ -1,0 +1,30 @@
+! "astn/schema@0.1" (
+    'types': {
+        "x": (
+            'value': (
+                'type': | 'group' (
+                    'properties': {
+                        "y": (
+                            'value': (
+                                'type': | 'tagged union' (
+                                    'default option': "a"
+                                    'options': { 
+                                        "a": (
+                                            'value': (
+                                                'type': | 'group' (
+                                                    
+                                                )
+                                            )
+                                        )
+                                        "b": ()
+                                    }
+                                )
+                            )
+                        )
+                    }
+                )
+            )
+        )
+    }
+    'root type': "x"
+)

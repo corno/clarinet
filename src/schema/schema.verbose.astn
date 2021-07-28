@@ -1,0 +1,189 @@
+! "mrshl/schemaschema@0.1"
+(
+    'component types': {
+        "simple string": (
+            'node': (
+                'properties': {
+                    "default value": (
+                        'type': | 'value' (
+                            'default value': ""
+                            'type': | 'text' ( )
+                        )
+                    )
+                    "quoted": (
+                        'type': | 'value' (
+                            'default value': "true"
+                            'type': | 'text' ( )
+                        )
+                    )
+                }
+            )
+        )
+        "value": (
+            'node': (
+                'properties': {
+                    "type": (
+                        'type': | 'state group' (
+                            'default state': "simple string"
+                            'states': {
+                                "simple string": (
+                                    'node': (
+                                        'properties': {
+                                            "default value": (
+                                                'type': | 'value' (
+                                                    'default value': ""
+                                                    'type': | 'text' ( )
+                                                )
+                                            )
+                                            "quoted": (
+                                                'type': | 'value' (
+                                                    'default value': "true"
+                                                    'type': | 'text' ( )
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                                "multiline string": (
+                                    'node': (
+                                        'properties': { }
+                                    )
+                                )
+                                "tagged union": (
+                                    'node': (
+                                        'properties': {
+                                            "options": (
+                                                'type': | 'collection' (
+                                                    'node': (
+                                                        'properties': {
+                                                            "name": (
+                                                                'type': | 'value' (
+                                                                    'default value': ""
+                                                                    'type': | 'text' ( )
+                                                                )
+                                                            )
+                                                            "value": (
+                                                                'type': | 'component' (
+                                                                    'type': "value"
+                                                                )
+                                                            )
+                                                        }
+                                                    )
+                                                    'type': | 'dictionary' (
+                                                        'key property': "name"
+                                                    )
+                                                )
+                                            )
+                                            "default option": (
+                                                'type': | 'value' (
+                                                    'default value': ""
+                                                    'type': | 'text' ( )
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                                "type reference": (
+                                    'node': (
+                                        'properties': {
+                                            "type": (
+                                                'type': | 'value' (
+                                                    'default value': ""
+                                                    'type': | 'text' ( )
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                                "group": (
+                                    'node': (
+                                        'properties': {
+                                            "properties": (
+                                                'type': | 'collection' (
+                                                    'node': (
+                                                        'properties': {
+                                                            "name": (
+                                                                'type': | 'value' (
+                                                                    'default value': ""
+                                                                    'type': | 'text' ( )
+                                                                )
+                                                            )
+                                                            "value": (
+                                                                'type': | 'component' (
+                                                                    'type': "value"
+                                                                )
+                                                            )
+                                                        }
+                                                    )
+                                                    'type': | 'dictionary' (
+                                                        'key property': "name"
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                                "dictionary": (
+                                    'node': (
+                                        'properties': {
+                                            "value": (
+                                                'type': | 'component' (
+                                                    'type': "value"
+                                                )
+                                            )
+                                            "key": (
+                                                'type': | 'component' (
+                                                    'type': "simple string"
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                                "list": (
+                                    'node': (
+                                        'properties': {
+                                            "value": (
+                                                'type': | 'component' (
+                                                    'type': "value"
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+            )
+        )
+        "root": (
+            'node': (
+                'properties': {
+                    "types": (
+                        'type': | 'collection' (
+                            'node': (
+                                'properties': {
+                                    "value": (
+                                        'type': | 'component' (
+                                            'type': "value"
+                                        )
+                                    )
+                                }
+                            )
+                            'type': | 'dictionary' (
+                                'key property': "name"
+                            )
+                        )
+                    )
+                    "root type": (
+                        'type': | 'value' (
+                            'default value': ""
+                            'type': | 'text' ( )
+                        )
+                    )
+                }
+            )
+        )
+    }
+    'root type': "root"
+)

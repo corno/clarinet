@@ -1,0 +1,47 @@
+! "mrshl/schemaschema@0.1"
+< {
+    "simple string": < {
+        "default value": < 'value' "" 'text' >
+        "quoted": < 'value' "true" 'text' >
+    } >
+    "value": < {
+        "type": < 'state group' "simple string" {
+            "simple string": < {
+                "default value": < 'value' "" 'text' >
+                "quoted": < 'value' "true" 'text' >
+            } >
+            "multiline string": < {  
+            } >
+            "tagged union": < {
+                "options": < 'collection' {
+                    "name": < 'value' "" 'text' >
+                    "value": < 'component' "value" >
+                } 'dictionary' "name" >
+                "default option": < 'value' "" 'text' >
+            } >
+            "type reference": < {
+                "type": < 'value' "" 'text' >
+            } >
+            "group": < {
+                "properties": < 'collection' {
+                    "name": < 'value' "" 'text' >
+                    "value": < 'component' "value" >
+                } 'dictionary' "name" >
+            } >
+            "dictionary": < {
+                "value": < 'component' "value" >
+                "key": < 'component' "simple string" >
+            } >
+            "list": < {
+                "value": < 'component' "value" >
+            } >
+        } >
+    } >
+    "root": < {
+        "types": < 'collection' {
+            "name": < 'value' "" 'text' >
+            "value": < 'component' "value" >
+        } 'dictionary' "name" >
+        "root type": < 'value' "" 'text' >
+    } >
+} "root" >

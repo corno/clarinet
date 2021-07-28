@@ -47,13 +47,16 @@
     "validatePublishReadiness": "git diff --exit-code && ncu -u --packageFile package.json && npm install && npm run buildLintAndTest",
     "pubMin": "npm run validatePublishReadiness && npm version minor && git push && npm publish",
     "pubPatch": "npm run validatePublishReadiness && npm version patch && git push && npm publish",
-    "test": "tsc && node ./node_modules/mocha/bin/mocha dist/test/testTestSets.js && node ./node_modules/mocha/bin/mocha dist/test/JSONTestSuite.js && node ./node_modules/mocha/bin/mocha dist/test/testFormatting.js && node ./node_modules/mocha/bin/mocha dist/test/typed.js",
-    "testOwnSuite": "tsc && node ./node_modules/mocha/bin/mocha dist/test/testTestSets.js",
-    "testFormatting": "tsc && node ./node_modules/mocha/bin/mocha dist/test/testFormatting.js",
-    "testJSONTestSuite": "tsc && node ./node_modules/mocha/bin/mocha dist/test/JSONTestSuite.js",
+    "test": "tsc &&  npm run testJSONTestSuite && npm run testOwnSuite &&  npm run testFormatting &&  npm run testTyped2 &&  npm run testTyped",
+    "testOwnSuite": "node ./node_modules/mocha/bin/mocha dist/test/testTestSets.js",
+    "testFormatting": "node ./node_modules/mocha/bin/mocha dist/test/testFormatting.js",
+    "testTyped": "node ./node_modules/mocha/bin/mocha dist/test/testTyped.js",
+    "testTyped2": "node ./node_modules/mocha/bin/mocha dist/test/typed.js",
+    "testJSONTestSuite": "node ./node_modules/mocha/bin/mocha dist/test/JSONTestSuite.js",
     "update2latest": "ncu -u --packageFile package.json && nsi && tsc",
     "update2latestAndPublishMinor": "npm run validatePublishReadiness && npm run update2latest && npm run test && git commit -am \"u2l\" && npm run pubMin",
-    "update2latestAndPublishPath": "npm run validatePublishReadiness && npm run update2latest && npm run test && git commit -am \"u2l\" && npm run pubPatch"
+    "update2latestAndPublishPath": "npm run validatePublishReadiness && npm run update2latest && npm run test && git commit -am \"u2l\" && npm run pubPatch",
+    "generateASTNSchema": "astn-expand ./src/schema/schema.astn > ./src/schema/astnschema@0.1"
   },
   "engines": {
     "node": ">=8.0.0",

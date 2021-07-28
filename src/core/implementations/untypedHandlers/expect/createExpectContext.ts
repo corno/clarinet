@@ -3,7 +3,7 @@
 */
 import * as i from "../../../interfaces/untyped"
 import {
-    ExpectError, ExpectErrorHandler, OnDuplicateEntry, Severity,
+    ExpectError, ExpectErrorHandler, OnDuplicateEntry, ExpectSeverity,
 } from "./functionTypes"
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -101,7 +101,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
     //createDummyObjectHandler: (range: bc.Range, data: bc.ArrayOpenData, contextData: bc.ContextData) => bc.ObjectHandler,
     createDummyPropertyHandler: CreateDummyOnProperty<TokenAnnotation, NonTokenAnnotation>,
     createDummyValueHandler: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
-    duplicateEntrySeverity: Severity,
+    duplicateEntrySeverity: ExpectSeverity,
     onDuplicateEntry: OnDuplicateEntry,
 ): ICreateContext<TokenAnnotation, NonTokenAnnotation> {
 
@@ -143,12 +143,12 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                         const process = (): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
                             if (foundEntries.includes(propertyData.token.data.value)) {
                                 switch (duplicateEntrySeverity) {
-                                    case Severity.error:
+                                    case ExpectSeverity.error:
                                         raiseError(["duplicate entry", { key: propertyData.token.data.value }], propertyData.token.annotation)
                                         break
-                                    case Severity.nothing:
+                                    case ExpectSeverity.nothing:
                                         break
-                                    case Severity.warning:
+                                    case ExpectSeverity.warning:
                                         raiseWarning(["duplicate entry", { key: propertyData.token.data.value }], propertyData.token.annotation)
                                         break
                                     default:
@@ -219,12 +219,12 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                         const process = (): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
                             if (foundProperies.includes($$.token.data.value)) {
                                 switch (duplicateEntrySeverity) {
-                                    case Severity.error:
+                                    case ExpectSeverity.error:
                                         raiseError(["duplicate property", { name: $$.token.data.value }], $$.token.annotation)
                                         break
-                                    case Severity.nothing:
+                                    case ExpectSeverity.nothing:
                                         break
-                                    case Severity.warning:
+                                    case ExpectSeverity.warning:
                                         raiseWarning(["duplicate property", { name: $$.token.data.value }], $$.token.annotation)
                                         break
                                     default:
@@ -541,7 +541,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     warningHandler: ExpectErrorHandler<TokenAnnotation>,
     createDummyPropertyHandler: CreateDummyOnProperty<TokenAnnotation, NonTokenAnnotation>,
     createDummyValueHandler: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
-    duplicateEntrySeverity: Severity,
+    duplicateEntrySeverity: ExpectSeverity,
     onDuplicateEntry: OnDuplicateEntry,
     serializeStringToken: (token: i.SimpleStringToken<TokenAnnotation>) => string,
 ): i.IExpectContext<TokenAnnotation, NonTokenAnnotation> {

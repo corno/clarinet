@@ -1,0 +1,27 @@
+! (
+    'types': {
+        "root": (
+            'value': (
+                'type': | 'group' (
+                    'properties': {
+                        "c": (
+                            'value': (
+                                'type': | 'simple string' (
+                                    'quoted': false
+                                    'default value': ""
+                                )
+                            )
+                        )
+                    }
+
+                )
+            )
+        )
+    }
+    'root type': "root"
+)
+(
+    'a': "B"
+    'b': "X"
+    "c": C
+)

@@ -1,0 +1,12 @@
+[
+	[
+		"schema not found @ 1:3-5",
+		null,
+		"error"
+	],
+	[
+		"no valid schema found @ 1:6-7",
+		null,
+		"error"
+	]
+]

@@ -16,6 +16,12 @@ export function printUnmarshallError(error: UnmarshallError): string {
         case "object is not a dictionary": {
             return "object is not a dictionary: { }"
         }
+        case "property key does not have apostrophes": {
+            return "property key does not have apostrophes"
+        }
+        case "entry key does not have quotes": {
+            return "entry key does not have quotes"
+        }
         case "double key": {
             return "double key"
         }

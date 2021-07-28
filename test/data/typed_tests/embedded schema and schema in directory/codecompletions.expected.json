@@ -1,0 +1,46 @@
+{
+	"23:1-2": {
+		"inToken": null,
+		"afterToken": [
+			"\n    'a26': \"\"\n    'b': \"\"\n    'c': \n"
+		]
+	},
+	"24:5-8": {
+		"inToken": [
+			"a26",
+			"b",
+			"c"
+		],
+		"afterToken": null
+	},
+	"25:5-8": {
+		"inToken": null,
+		"afterToken": [
+			" \"\""
+		]
+	},
+	"25:10-13": {
+		"inToken": [
+			"\"\""
+		],
+		"afterToken": null
+	},
+	"26:5-8": {
+		"inToken": null,
+		"afterToken": [
+			" "
+		]
+	},
+	"26:10-11": {
+		"inToken": [
+			""
+		],
+		"afterToken": null
+	},
+	"27:1-2": {
+		"inToken": [
+			"\n    'a26': \"\"\n    'b': \"\"\n    'c': \n"
+		],
+		"afterToken": null
+	}
+}

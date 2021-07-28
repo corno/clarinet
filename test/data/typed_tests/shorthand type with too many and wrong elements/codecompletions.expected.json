@@ -1,0 +1,26 @@
+{
+	"1:1-2": {
+		"inToken": null,
+		"afterToken": [
+			" \"\" \"\" "
+		]
+	},
+	"1:6-8": {
+		"inToken": [
+			"\"\""
+		],
+		"afterToken": null
+	},
+	"1:9-11": {
+		"inToken": [
+			""
+		],
+		"afterToken": null
+	},
+	"1:18-19": {
+		"inToken": [
+			" \"\" \"\" "
+		],
+		"afterToken": null
+	}
+}

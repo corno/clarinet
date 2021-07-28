@@ -55,7 +55,7 @@ describe('typed', () => {
                             onWarning,
                             () => core.createDummyValueHandler(),
                             () => core.createDummyValueHandler(),
-                            core.Severity.warning,
+                            core.ExpectSeverity.warning,
                             core.OnDuplicateEntry.ignore,
                             $ => core.serializeSimpleString($.data),
                         )

@@ -1,0 +1,12 @@
+[
+	[
+		"errors in external schema",
+		null,
+		"error"
+	],
+	[
+		"no valid schema found @ 1:1-2",
+		null,
+		"error"
+	]
+]

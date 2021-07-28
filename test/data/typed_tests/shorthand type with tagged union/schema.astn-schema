@@ -1,0 +1,73 @@
+! "astn/schema@0.1" (
+    'types': {
+        "a component": (
+            'value': (
+                'type': | 'group' (
+                    'properties': {
+                        'i': (
+                        )
+                    }
+                )
+
+            )
+        )
+        'root': (
+            'value': (
+                'type': | 'group' (
+                    'properties': {
+                        'a25': (
+                        )
+                        'b': (
+                            'value': (
+                                'type': | 'simple string' (
+                                    'default value': "this is default"
+                                )
+                            )
+                        )
+                        'c': (
+                            'value': (
+                                'type': | 'simple string' (
+                                    'quoted': false
+                                )
+                            )
+                        )
+                        'd': (
+                            'value': (
+                                'type': | 'tagged union' (
+                                    'options': {
+                                        "e": (
+                                            'value': (
+                                                'type': | 'group' (
+                                                    'properties': {
+                                                        "f": (
+                                                            'value': (
+                                                                'type': | 'simple string' (
+                                                                    'quoted': false
+                                                                )
+                                                            )
+                                                        )
+                                                        "g": (
+                                                        )
+                                                    }
+                                                )
+                                            )
+                                        )
+                                    }
+                                    'default option': "e"
+                                )
+                            )
+                        )
+                        "h": (
+                            'value': (
+                                'type': | 'type reference' (
+                                    'type': "a component"
+                                )
+                            )
+                        )
+                    }
+                )
+            )
+        )
+    }
+    'root type': 'root'
+)

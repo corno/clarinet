@@ -2,6 +2,7 @@
     "@typescript-eslint/no-shadow": "off"
  */
 import * as i from "../../interfaces"
+import { IReadonlyDictionary } from "../../interfaces"
 import {
     createDummyArrayHandler,
     createDummyObjectHandler,
@@ -158,6 +159,27 @@ export function defaultInitializeValue<TokenAnnotation, NonTokenAnnotation>(
     }
 }
 
+function find<T, RT>(
+    dictionary: IReadonlyDictionary<T>,
+    key: string,
+    ifFound: (entry: T) => RT,
+    ifNotFound: (keys: string[]) => RT,
+): RT {
+    const keys: string[] = []
+    let entry: T | null = null
+    dictionary.forEach((e, k) => {
+        keys.push(k)
+        if (k === key) {
+            entry = e
+        }
+    })
+    if (entry === null) {
+        return ifNotFound(keys)
+    } else {
+        return ifFound(entry)
+    }
+}
+
 type MixidIn<TokenAnnotation, NonTokenAnnotation> = {
     pushGroup: (
         definition: i.GroupDefinition,
@@ -211,7 +233,9 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                     })
                     return {
                         property: $p => {
-
+                            if ($p.token.data.wrapping[0] !== "quote") {
+                                onError(["entry key does not have quotes", {}], $p.token.annotation, i.DiagnosticSeverity.warning)
+                            }
                             if (foundKeys.includes($p.token.data.value)) {
                                 onError(["double key"], $p.token.annotation, i.DiagnosticSeverity.error)
                             }
@@ -379,7 +403,8 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                 unknownCallback: () => T,
                 knownCallback: (option: i.OptionDefinition, handler: i.TypedValueHandler<TokenAnnotation, NonTokenAnnotation>) => T,
             ): T {
-                return definition.options.with(
+                return find(
+                    definition.options,
                     optionToken.data.value,
                     optionDefinition => {
                         if (optionDefinition !== definition["default option"].get()) {
@@ -772,7 +797,11 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         return {
                             property: $p => {
                                 const key = $p.token.data.value
-                                return $d.properties.with(
+                                if ($p.token.data.wrapping[0] !== "apostrophe") {
+                                    onError(["property key does not have apostrophes", {}], $p.token.annotation, i.DiagnosticSeverity.warning)
+                                }
+                                return find(
+                                    $d.properties,
                                     key,
                                     propertyDefinition => {
                                         const pp = {

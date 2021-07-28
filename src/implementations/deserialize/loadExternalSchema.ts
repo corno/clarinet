@@ -43,7 +43,7 @@ export function createSchemaDeserializer<TokenAnnotation>(
             schemaDefinitionFound = true
             schemaSchemaBuilder = getSchemaSchemaBuilder(schemaSchemaReference.data.value)
             if (schemaSchemaBuilder === null) {
-                console.error(`unknown schema schema '${schemaSchemaReference.data.value}'`)
+                //console.error(`unknown schema schema '${schemaSchemaReference.data.value}'`)
                 onSchemaError(["unknown schema schema", { name: schemaSchemaReference.data.value }], schemaSchemaReference.annotation)
             }
             return p.value(false)

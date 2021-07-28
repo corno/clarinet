@@ -283,10 +283,9 @@ export function createStructureParser<Annotation>($: {
                 case StructureState.EXPECTING_SCHEMA: {
                     return handleToken(
                         _punctuation => {
-                            console.error("FIXME schema schema reference")
                             const schemaParser = createTreeParser(
                                 $.onEmbeddedSchema(
-                                    "mrshl/metadata@0.1",
+                                    "astn/schema@0.1",
                                     data.annotation,
                                 ),
                                 $.errors.onTreeError,

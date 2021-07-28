@@ -1,0 +1,22 @@
+[
+	[
+		"expected an unquoted string @ 1:3-4",
+		null,
+		"error"
+	],
+	[
+		"value should not have quotes @ 1:9-11",
+		null,
+		"warning"
+	],
+	[
+		"superfluous element @ 1:12-14",
+		null,
+		"error"
+	],
+	[
+		"superfluous element @ 1:15-16",
+		null,
+		"error"
+	]
+]

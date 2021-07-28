@@ -198,7 +198,7 @@ export type ExpectShorthandGroupParameters<TokenAnnotation, NonTokenAnnotation> 
     }) => void
 }
 
-export type ExpectXTypeParameters<TokenAnnotation, NonTokenAnnotation> = {
+export type ExpectTypeParameters<TokenAnnotation, NonTokenAnnotation> = {
     properties?: ExpectedProperties<TokenAnnotation, NonTokenAnnotation>
     elements?: ExpectedElements<TokenAnnotation, NonTokenAnnotation>
     onTypeBegin?: ($: {
@@ -238,6 +238,6 @@ export interface IExpectContext<TokenAnnotation, NonTokenAnnotation> {
     expectVerboseGroup($: ExpectVerboseGroupParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectList($: ExpectListParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectShorthandGroup($: ExpectShorthandGroupParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
-    expectType($: ExpectXTypeParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
+    expectType($: ExpectTypeParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectTaggedUnion($: ExpectTaggedUnionParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
 }

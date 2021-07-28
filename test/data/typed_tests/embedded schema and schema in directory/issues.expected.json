@@ -1,0 +1,17 @@
+[
+	[
+		"found both internal and context schema. ignoring internal schema @ 1:3-4",
+		null,
+		"warning"
+	],
+	[
+		"unknown property, choose from: 'a26', 'b', 'c' @ 24:5-8",
+		null,
+		"error"
+	],
+	[
+		"property key does not have apostrophes @ 26:5-8",
+		null,
+		"warning"
+	]
+]

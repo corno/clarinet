@@ -18,3 +18,5 @@ export {
 export * from "./deserialize/printDeserializeDiagnostic"
 export * from "./deserialize/printContextSchemaError"
 export * from "./deserialize/printSchemaSchemaError"
+export * from "./simpleDataStore"
+//export * from "./serialize"

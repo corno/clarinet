@@ -1,0 +1,21 @@
+! "astn/schema@0.1" (
+	'types': {
+		"x": (
+			'value': (
+				'type': | 'group' (
+					'properties': {
+						"y": (
+							'value': (
+								'type': | 'simple string' (
+									'quoted': false,
+									'default value': ""
+								)
+							)
+						)
+					}
+				)
+			)
+		)
+	}
+	'root type': "x"
+)

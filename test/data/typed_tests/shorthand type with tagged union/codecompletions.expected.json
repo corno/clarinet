@@ -1,0 +1,54 @@
+{
+	"1:1-2": {
+		"inToken": null,
+		"afterToken": [
+			" \"\" \"this is default\"  'e'  \"\" \"\""
+		]
+	},
+	"1:3-6": {
+		"inToken": [
+			"\"\""
+		],
+		"afterToken": null
+	},
+	"1:7-24": {
+		"inToken": [
+			"\"this is default\""
+		],
+		"afterToken": null
+	},
+	"1:25-26": {
+		"inToken": [
+			""
+		],
+		"afterToken": null
+	},
+	"1:27-30": {
+		"inToken": null,
+		"afterToken": null
+	},
+	"1:31-32": {
+		"inToken": [
+			""
+		],
+		"afterToken": null
+	},
+	"1:33-36": {
+		"inToken": [
+			"\"\""
+		],
+		"afterToken": null
+	},
+	"1:37-40": {
+		"inToken": [
+			"\"\""
+		],
+		"afterToken": null
+	},
+	"1:41-42": {
+		"inToken": [
+			" \"\" \"this is default\"  'e'  \"\" \"\""
+		],
+		"afterToken": null
+	}
+}

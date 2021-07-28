@@ -1,0 +1,12 @@
+[
+	[
+		"unknown option, choose from: 'a', 'b' @ 2:12-15",
+		null,
+		"error"
+	],
+	[
+		"property has default value, remove @ 2:5-8",
+		null,
+		"warning"
+	]
+]

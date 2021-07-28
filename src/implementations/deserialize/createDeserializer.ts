@@ -13,31 +13,19 @@ import { loadPossibleExternalSchema } from "./loadExternalSchema"
 import { TokenConsumer, TokenizerAnnotationData } from "../../interfaces"
 import { createStructureParser } from "../structureParser"
 
-
-/**
- * this function returns a promise to a deserialized dataset and the promise is resolved when the validation has been completed
- * @param serializedDataset
- * @param schemaReferenceResolver if the document contains a reference to a schema, this callback resolves the schema
- * @param onEmbeddedSchema if the document contains a schema (either reference or embedded), this callback is used to create the dataset
- * @param onNoEmbeddedSchema if the document does not contain a schema, this callback is used to create the dataset
- * @param onError
- * @param onWarning
- * @param sideEffectsHandlers these handlers will be called during the deserialization.
- * Can be used to create additional errors and warnings about the serialized document. For example missing properties or invalid formatting
- */
-export function createDeserializer(
-    contextSchema: ContextSchema<TokenizerAnnotationData, null>,
-    resolveReferencedSchema: ResolveReferencedSchema,
-    onError: (diagnostic: DeserializeError, annotation: TokenizerAnnotationData, severity: astncore.DiagnosticSeverity) => void,
+export function createDeserializer($: {
+    contextSchema: ContextSchema<TokenizerAnnotationData, null>
+    resolveReferencedSchema: ResolveReferencedSchema
+    onError: (diagnostic: DeserializeError, annotation: TokenizerAnnotationData, severity: astncore.DiagnosticSeverity) => void
 
     getSchemaSchemaBuilder: (
         name: string,
-    ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null,
+    ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null
     handlerBuilder: (
         schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
-    ) => astncore.TypedTreeHandler<TokenizerAnnotationData, null>,
-    onEnd: () => p.IValue<null>,
-): TokenConsumer<TokenizerAnnotationData> {
+    ) => astncore.TypedTreeHandler<TokenizerAnnotationData, null>
+    onEnd: () => p.IValue<null>
+}): TokenConsumer<TokenizerAnnotationData> {
 
     let internalSchemaSpecificationStart: null | TokenizerAnnotationData = null
     let foundSchemaErrors = false
@@ -48,14 +36,14 @@ export function createDeserializer(
         onEmbeddedSchema: (schemaSchemaReference, firstTokenizerAnnotationData) => {
             internalSchemaSpecificationStart = firstTokenizerAnnotationData
 
-            const schemaSchemaBuilder = getSchemaSchemaBuilder(schemaSchemaReference)
+            const schemaSchemaBuilder = $.getSchemaSchemaBuilder(schemaSchemaReference)
 
             if (schemaSchemaBuilder === null) {
                 throw new Error(`IMPLEMENT ME: unknown schema schema: ${schemaSchemaReference}`)
             }
             return schemaSchemaBuilder(
                 (error, annotation) => {
-                    onError(["embedded schema error", error], annotation, astncore.DiagnosticSeverity.error)
+                    $.onError(["embedded schema error", error], annotation, astncore.DiagnosticSeverity.error)
                     foundSchemaErrors = true
                 },
                 schemaAndSideEffects => {
@@ -70,11 +58,11 @@ export function createDeserializer(
             internalSchemaSpecificationStart = schemaReference.annotation
 
             return loadPossibleExternalSchema(
-                resolveReferencedSchema(schemaReference.data.value),
-                getSchemaSchemaBuilder,
+                $.resolveReferencedSchema(schemaReference.data.value),
+                $.getSchemaSchemaBuilder,
                 error => {
                     foundSchemaErrors = true
-                    onError(
+                    $.onError(
                         ["schema reference resolving", error],
                         schemaReference.annotation,
                         astncore.DiagnosticSeverity.error,
@@ -95,25 +83,25 @@ export function createDeserializer(
                 schema: astncore.Schema,
                 schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
             ): astncore.TreeHandler<TokenizerAnnotationData, null> {
-                const handler = handlerBuilder(schemaSpec)
+                const handler = $.handlerBuilder(schemaSpec)
                 return astncore.createDatasetUnmarshaller(
                     schema,
                     handler,
-                    (error, annotation, severity) => onError(["deserialize", error], annotation, severity),
+                    (error, annotation, severity) => $.onError(["deserialize", error], annotation, severity),
                 )
             }
-            if (contextSchema[0] === "available") {
+            if ($.contextSchema[0] === "available") {
                 if (internalSchemaSpecificationStart !== null) {
-                    onError(
+                    $.onError(
                         ["found both internal and context schema. ignoring internal schema"],
                         internalSchemaSpecificationStart,
                         astncore.DiagnosticSeverity.warning
                     )
                 }
                 return createRealTreeHandler(
-                    contextSchema[1].schema,
+                    $.contextSchema[1].schema,
                     {
-                        schemaAndSideEffects: contextSchema[1],
+                        schemaAndSideEffects: $.contextSchema[1],
                         specification: ["none"],
                     }
                 )
@@ -122,7 +110,7 @@ export function createDeserializer(
                     if (!foundSchemaErrors) {
                         console.error("NO SCHEMA AND NO ERROR")
                     }
-                    onError(
+                    $.onError(
                         ["no valid schema"],
                         firstBodyTokenizerAnnotationData,
                         astncore.DiagnosticSeverity.error,
@@ -135,14 +123,14 @@ export function createDeserializer(
                     )
                 }
             } else {
-                if (contextSchema[0] === "has errors") {
-                    onError(
+                if ($.contextSchema[0] === "has errors") {
+                    $.onError(
                         ["no valid schema"],
                         firstBodyTokenizerAnnotationData,
                         astncore.DiagnosticSeverity.error,
                     )
                 } else {
-                    onError(
+                    $.onError(
                         ["no schema"],
                         firstBodyTokenizerAnnotationData,
                         astncore.DiagnosticSeverity.error,
@@ -152,15 +140,15 @@ export function createDeserializer(
             }
         },
         errors: {
-            onTreeError: $ => {
-                onError(["tree", $.error], $.annotation, astncore.DiagnosticSeverity.error)
+            onTreeError: $$ => {
+                $.onError(["tree", $$.error], $$.annotation, astncore.DiagnosticSeverity.error)
             },
-            onStructureError: $ => {
-                onError(["structure", $.error], $.annotation, astncore.DiagnosticSeverity.error)
+            onStructureError: $$ => {
+                $.onError(["structure", $$.error], $$.annotation, astncore.DiagnosticSeverity.error)
             },
         },
         onEnd: () => {
-            return onEnd()
+            return $.onEnd()
         },
     })
 }
