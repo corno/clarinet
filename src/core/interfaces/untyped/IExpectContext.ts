@@ -11,6 +11,7 @@ export type ExpectErrorValueType =
     | "null"
     | "number"
     | "object"
+    | "nonwrapped string"
     | "quoted string"
     | "shorthand group"
     | "string"
@@ -67,17 +68,6 @@ export type Options<TokenAnnotation, NonTokenAnnotation> = {
     ) => h.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
 }
 
-export type ExpectBooleanParameters<TokenAnnotation> = {
-    callback: ($: {
-        value: boolean
-        token: sp.SimpleStringToken<TokenAnnotation>
-    }) => void
-    onInvalidType?: OnInvalidType<TokenAnnotation>
-    onNull?: ($: {
-        token: sp.SimpleStringToken<TokenAnnotation>
-    }) => void
-}
-
 export type ExpectDictionaryParameters<TokenAnnotation, NonTokenAnnotation> = {
     onBegin?: ($: {
         token: sp.OpenObjectToken<TokenAnnotation>
@@ -94,28 +84,6 @@ export type ExpectDictionaryParameters<TokenAnnotation, NonTokenAnnotation> = {
     }) => void
 }
 
-export type ExpectValueParameters<TokenAnnotation, NonTokenAnnotation> = {
-    handler: h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
-    onMissing?: () => void
-}
-
-export type ExpectStringParameters<TokenAnnotation> = {
-    callback: ($: {
-        token: sp.SimpleStringToken<TokenAnnotation>
-    }) => void
-    onInvalidType?: OnInvalidType<TokenAnnotation>
-    onNull?: ($: {
-        token: sp.SimpleStringToken<TokenAnnotation>
-    }) => void
-}
-
-export type ExpectNullParameters<TokenAnnotation> = {
-    callback: ($: {
-        token: sp.SimpleStringToken<TokenAnnotation>
-    }) => void
-    onInvalidType?: OnInvalidType<TokenAnnotation>
-}
-
 export type ExpectListParameters<TokenAnnotation, NonTokenAnnotation> = {
     onBegin?: ($: {
         token: sp.OpenArrayToken<TokenAnnotation>
@@ -123,17 +91,6 @@ export type ExpectListParameters<TokenAnnotation, NonTokenAnnotation> = {
     onElement: () => h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     onEnd?: ($: {
         annotation: TokenAnnotation
-    }) => void
-    onInvalidType?: OnInvalidType<TokenAnnotation>
-    onNull?: ($: {
-        token: sp.SimpleStringToken<TokenAnnotation>
-    }) => void
-}
-
-export type ExpectNumberParameters<TokenAnnotation> = {
-    callback: ($: {
-        value: number
-        token: sp.SimpleStringToken<TokenAnnotation>
     }) => void
     onInvalidType?: OnInvalidType<TokenAnnotation>
     onNull?: ($: {
@@ -172,9 +129,29 @@ export type ExpectVerboseGroupParameters<TokenAnnotation, NonTokenAnnotation> = 
     }) => void
 }
 
+export type ExpectStringParameters<TokenAnnotation> = {
+    callback: ($: {
+        token: sp.SimpleStringToken<TokenAnnotation>
+    }) => void
+    onInvalidType?: OnInvalidType<TokenAnnotation>
+    onNull?: ($: {
+        token: sp.SimpleStringToken<TokenAnnotation>
+    }) => void
+}
+
 export type ExpectQuotedStringParameters<TokenAnnotation> = {
     callback: ($: {
-        value: string
+        token: sp.SimpleStringToken<TokenAnnotation>
+    }) => void
+    onInvalidType?: OnInvalidType<TokenAnnotation>
+    onNull?: ($: {
+        token: sp.SimpleStringToken<TokenAnnotation>
+    }) => void
+    warningOnly?: boolean
+}
+
+export type ExpectNonwrappedStringParameters<TokenAnnotation> = {
+    callback: ($: {
         token: sp.SimpleStringToken<TokenAnnotation>
     }) => void
     onInvalidType?: OnInvalidType<TokenAnnotation>
@@ -198,7 +175,7 @@ export type ExpectShorthandGroupParameters<TokenAnnotation, NonTokenAnnotation> 
     }) => void
 }
 
-export type ExpectTypeParameters<TokenAnnotation, NonTokenAnnotation> = {
+export type ExpectGroupParameters<TokenAnnotation, NonTokenAnnotation> = {
     properties?: ExpectedProperties<TokenAnnotation, NonTokenAnnotation>
     elements?: ExpectedElements<TokenAnnotation, NonTokenAnnotation>
     onTypeBegin?: ($: {
@@ -228,16 +205,13 @@ export type ExpectNothingParameters<TokenAnnotation> = {
 }
 
 export interface IExpectContext<TokenAnnotation, NonTokenAnnotation> {
-    expectNothing($: ExpectNothingParameters<TokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectSimpleString($: ExpectStringParameters<TokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
-    expectBoolean($: ExpectBooleanParameters<TokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
-    expectNull($: ExpectNullParameters<TokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
-    expectNumber($: ExpectNumberParameters<TokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectQuotedString($: ExpectQuotedStringParameters<TokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
+    expectNonWrappedString($: ExpectNonwrappedStringParameters<TokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectDictionary($: ExpectDictionaryParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectVerboseGroup($: ExpectVerboseGroupParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectList($: ExpectListParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectShorthandGroup($: ExpectShorthandGroupParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
-    expectType($: ExpectTypeParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
+    expectGroup($: ExpectGroupParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     expectTaggedUnion($: ExpectTaggedUnionParameters<TokenAnnotation, NonTokenAnnotation>): h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
 }

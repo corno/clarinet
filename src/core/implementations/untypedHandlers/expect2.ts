@@ -6,10 +6,6 @@ function assertUnreachable<RT>(_x: never): RT {
 
 export type ValueType<TokenAnnotation, NonTokenAnnotation> =
     | [
-        "boolean",
-        i.ExpectBooleanParameters<TokenAnnotation>
-    ]
-    | [
         "dicionary",
         i.ExpectDictionaryParameters<TokenAnnotation, NonTokenAnnotation>
     ]
@@ -18,19 +14,11 @@ export type ValueType<TokenAnnotation, NonTokenAnnotation> =
         i.ExpectListParameters<TokenAnnotation, NonTokenAnnotation>
     ]
     | [
-        "null",
-        i.ExpectNullParameters<TokenAnnotation>
-    ]
-    | [
-        "number",
-        i.ExpectNumberParameters<TokenAnnotation>
-    ]
-    | [
         "quoted string",
         i.ExpectQuotedStringParameters<TokenAnnotation>
     ]
     | [
-        "string",
+        "simple string",
         i.ExpectStringParameters<TokenAnnotation>
     ]
     | [
@@ -63,10 +51,6 @@ export function createValueHandler<TokenAnnotation, NonTokenAnnotation>(
     valueType: ValueType<TokenAnnotation, NonTokenAnnotation>,
 ): i.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
     switch (valueType[0]) {
-        case "boolean": {
-            const $1 = valueType[1]
-            return context.expectBoolean($1)
-        }
         case "dicionary": {
             const $1 = valueType[1]
             return context.expectDictionary($1)
@@ -75,20 +59,11 @@ export function createValueHandler<TokenAnnotation, NonTokenAnnotation>(
             const $1 = valueType[1]
             return context.expectList($1)
         }
-        case "null": {
-            const $1 = valueType[1]
-
-            return context.expectNull($1)
-        }
-        case "number": {
-            const $1 = valueType[1]
-            return context.expectNumber($1)
-        }
         case "quoted string": {
             const $1 = valueType[1]
             return context.expectQuotedString($1)
         }
-        case "string": {
+        case "simple string": {
             const $1 = valueType[1]
             return context.expectSimpleString($1)
         }

@@ -27,19 +27,19 @@ export function createDeserializer($: {
     onEnd: () => p.IValue<null>
 }): TokenConsumer<TokenizerAnnotationData> {
 
-    let internalSchemaSpecificationStart: null | TokenizerAnnotationData = null
+    let headerAnnotation: null | TokenizerAnnotationData = null
     let foundSchemaErrors = false
 
     let internalSchema: ResolvedSchema<TokenizerAnnotationData, null> | null = null
 
     return createStructureParser({
-        onEmbeddedSchema: (schemaSchemaReference, firstTokenizerAnnotationData) => {
-            internalSchemaSpecificationStart = firstTokenizerAnnotationData
+        onEmbeddedSchema: $$ => {
+            headerAnnotation = $$.headerAnnotation
 
-            const schemaSchemaBuilder = $.getSchemaSchemaBuilder(schemaSchemaReference)
+            const schemaSchemaBuilder = $.getSchemaSchemaBuilder($$.schemaSchemaReferenceToken.data.value)
 
             if (schemaSchemaBuilder === null) {
-                throw new Error(`IMPLEMENT ME: unknown schema schema: ${schemaSchemaReference}`)
+                throw new Error(`IMPLEMENT ME: unknown schema schema: ${$$.schemaSchemaReferenceToken.data.value}`)
             }
             return schemaSchemaBuilder(
                 (error, annotation) => {
@@ -54,24 +54,24 @@ export function createDeserializer($: {
                 }
             )
         },
-        onSchemaReference: schemaReference => {
-            internalSchemaSpecificationStart = schemaReference.annotation
+        onSchemaReference: $$ => {
+            headerAnnotation = $$.token.annotation
 
             return loadPossibleExternalSchema(
-                $.resolveReferencedSchema(schemaReference.data.value),
+                $.resolveReferencedSchema($$.token.data.value),
                 $.getSchemaSchemaBuilder,
                 error => {
                     foundSchemaErrors = true
                     $.onError(
                         ["schema reference resolving", error],
-                        schemaReference.annotation,
+                        $$.token.annotation,
                         astncore.DiagnosticSeverity.error,
                     )
                 },
             ).mapResult<boolean>(schemaAndSideEffects => {
                 internalSchema = {
                     schemaAndSideEffects: schemaAndSideEffects,
-                    specification: ["reference", { name: schemaReference.data.value }],
+                    specification: ["reference", { name: $$.token.data.value }],
                 }
                 return p.value(false)
             }).catch(() => {
@@ -91,10 +91,10 @@ export function createDeserializer($: {
                 )
             }
             if ($.contextSchema[0] === "available") {
-                if (internalSchemaSpecificationStart !== null) {
+                if (headerAnnotation !== null) {
                     $.onError(
                         ["found both internal and context schema. ignoring internal schema"],
-                        internalSchemaSpecificationStart,
+                        headerAnnotation,
                         astncore.DiagnosticSeverity.warning
                     )
                 }
@@ -105,7 +105,7 @@ export function createDeserializer($: {
                         specification: ["none"],
                     }
                 )
-            } else if (internalSchemaSpecificationStart !== null) {
+            } else if (headerAnnotation !== null) {
                 if (internalSchema === null) {
                     if (!foundSchemaErrors) {
                         console.error("NO SCHEMA AND NO ERROR")

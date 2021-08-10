@@ -6,68 +6,65 @@ function assertUnreachable<RT>(_x: never): RT {
 
 export function serializeSchema(
     schema: Schema,
-    onEvent: (event: TreeParserEvent) => void,
+    sendEvent: (event: TreeParserEvent) => void,
 ): void {
-    function addEvent(e: TreeParserEvent) {
-        //console.error(JSON.stringify(e))
-        onEvent(e)
-    }
-
     function serializeDictionary<T>(
         dict: IReadonlyDictionary<T>,
         entryCallback: (t: T) => void,
     ) {
-        addEvent(["open object", {
+        sendEvent(["open object", {
             type: ["dictionary"],
         }])
         dict.forEach((entry, key) => {
-            addEvent(["simple string", {
+            sendEvent(["simple string", {
                 value: key,
                 wrapping: ["quote", {}],
             }])
             entryCallback(entry)
         })
-        addEvent(["close object", {
+        sendEvent(["close object", {
         }])
     }
-    function serializeVerboseType(properties: { [key: string]: () => void }) {
-        addEvent(["open object", {
+    function serializeVerboseType(
+        properties: { [key: string]: () => void }
+    ) {
+        sendEvent(["open object", {
             type: ["verbose group"],
         }])
         Object.keys(properties).sort().forEach(key => {
-            addEvent(["simple string", {
+            sendEvent(["simple string", {
                 value: key,
                 wrapping: ["apostrophe", {}],
             }])
             properties[key]()
         })
-        addEvent(["close object", {
+        sendEvent(["close object", {
         }])
     }
     function serializeTaggedUnion(option: string, callback: () => void) {
-        addEvent(["tagged union", {
+        sendEvent(["tagged union", {
         }])
-        addEvent(["simple string", {
+        sendEvent(["simple string", {
             value: option,
             wrapping: ["apostrophe", {}],
         }])
         callback()
     }
     function serializeQuotedString(value: string) {
-        addEvent(["simple string", {
+        sendEvent(["simple string", {
             value: value,
             wrapping: ["quote", {}],
         }])
     }
     function serializeReference<T>(reference: IReference<T>) {
-        addEvent(["simple string", {
+        sendEvent(["simple string", {
             value: reference.name,
             wrapping: ["quote", {}],
         }])
     }
 
     function serializeNonWrappedString(value: string) {
-        addEvent(["simple string", {
+        sendEvent(["simple string", {
             value: value,
             wrapping: ["none", {}],
         }])
@@ -176,9 +173,9 @@ export function serializeSchema(
         "component types": () => {
             serializeDictionary(
                 schema.types,
-                type => {
+                entry => {
                     serializeVerboseType({
-                        node: () => serializeValueDefinition(type.value),
+                        node: () => serializeValueDefinition(entry.value),
                     })
                 }
             )

@@ -35,16 +35,16 @@ export function createSchemaDeserializer<TokenAnnotation>(
     }
 
     return createStructureParser({
-        onEmbeddedSchema: (_schemaSchemaName, annotation) => {
-            onSchemaError(["schema schema cannot be embedded"], annotation)
+        onEmbeddedSchema: $$ => {
+            onSchemaError(["schema schema cannot be embedded"], $$.embeddedSchemaAnnotation)
             return astncore.createDummyTreeHandler()
         },
-        onSchemaReference: schemaSchemaReference => {
+        onSchemaReference: $$ => {
             schemaDefinitionFound = true
-            schemaSchemaBuilder = getSchemaSchemaBuilder(schemaSchemaReference.data.value)
+            schemaSchemaBuilder = getSchemaSchemaBuilder($$.token.data.value)
             if (schemaSchemaBuilder === null) {
                 //console.error(`unknown schema schema '${schemaSchemaReference.data.value}'`)
-                onSchemaError(["unknown schema schema", { name: schemaSchemaReference.data.value }], schemaSchemaReference.annotation)
+                onSchemaError(["unknown schema schema", { name: $$.token.data.value }], $$.token.annotation)
             }
             return p.value(false)
         },

@@ -25,7 +25,7 @@ export type SerializeOut = Out<TreeParserEvent, {
     close: TreeParserEvent
 }>
 
-export interface Dataset {
+export interface SerializableDataset {
     root: Value
 }
 
@@ -167,7 +167,7 @@ function onValueIsNonDefault(
 }
 
 export function serializeDataset(
-    dataset: Dataset,
+    dataset: SerializableDataset,
     definition: TypeDefinition,
     out: SerializeOut,
     style: SerializationStyle,

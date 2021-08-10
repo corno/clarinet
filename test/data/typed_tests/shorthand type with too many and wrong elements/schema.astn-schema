@@ -11,7 +11,7 @@
                         'c': (
                             'value': (
                                 'type': | 'simple string' (
-                                    'quoted': false
+                                    'quoted': | 'no' ()
                                 )
                             )
                         )

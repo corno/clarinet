@@ -124,16 +124,16 @@ function buildValue<TokenAnnotation, NonTokenAnnotation>(
     }
 }
 
-export function build<Annotation, ReturnType>(
+export function createBuilder<TokenAnnotation, NonTokenAnnotation>(
     ds: Datastore,
-    onEnd: () => ReturnType,
-): TypedTreeHandler<Annotation, ReturnType> {
+    onEnd: () => void,
+): TypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         root: buildValue(
             ds.root,
         ),
-        onEnd: _$ => {
-            return onEnd()
+        onEnd: () => {
+            onEnd()
         },
     }
 }
@@ -218,7 +218,7 @@ function createValueSerializeInterface(value: Value): serialize.Value {
 
 export function createSerializeInterface(
     ds: Datastore
-): serialize.Dataset {
+): serialize.SerializableDataset {
     return {
         root: createValueSerializeInterface(ds.root),
     }

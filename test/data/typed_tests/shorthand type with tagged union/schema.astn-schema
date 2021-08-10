@@ -27,7 +27,7 @@
                         'c': (
                             'value': (
                                 'type': | 'simple string' (
-                                    'quoted': false
+                                    'quoted': | 'no' ()
                                 )
                             )
                         )
@@ -42,7 +42,7 @@
                                                         "f": (
                                                             'value': (
                                                                 'type': | 'simple string' (
-                                                                    'quoted': false
+                                                                    'quoted': | 'no' ()
                                                                 )
                                                             )
                                                         )

@@ -21,11 +21,15 @@ function assertUnreachable<RT>(_x: never): RT {
  * @param onHeaderOverheadToken when a whitespace, newline or comment is encountered while parsing the header, this callback is called
  */
 export function createStructureParser<Annotation>($: {
-    onEmbeddedSchema: (
-        schemaSchemaName: string,
-        firstTokenAnnotation: Annotation,
-    ) => core.TreeHandler<Annotation, null>
-    onSchemaReference: (token: core.SimpleStringToken<Annotation>) => p.IValue<boolean>
+    onEmbeddedSchema: ($: {
+        headerAnnotation: Annotation
+        embeddedSchemaAnnotation: Annotation
+        schemaSchemaReferenceToken: core.SimpleStringToken<Annotation>
+    }) => core.TreeHandler<Annotation, null>
+    onSchemaReference: ($: {
+        headerAnnotation: Annotation
+        token: core.SimpleStringToken<Annotation>
+    }) => p.IValue<boolean>
     onBody: (
         annotation: Annotation,
     ) => core.TreeHandler<Annotation, null>
@@ -34,9 +38,11 @@ export function createStructureParser<Annotation>($: {
 }): TokenConsumer<Annotation> {
 
     enum StructureState {
-        EXPECTING_SCHEMA_START_OR_ROOT_VALUE,
-        EXPECTING_SCHEMA,
-        PROCESSING_SCHEMA,
+        EXPECTING_HEADER_OR_BODY,
+        EXPECTING_SCHEMA_REFERENCE_OR_EMBEDDED_SCHEMA,
+        EXPECTING_SCHEMA_SCHEMA_REFERENCE,
+        EXPECTING_EMBEDDED_SCHEMA,
+        PROCESSING_EMBEDDED_SCHEMA,
         EXPECTING_BODY,
         PROCESSING_BODY,
         EXPECTING_END, // no more input expected}
@@ -44,9 +50,18 @@ export function createStructureParser<Annotation>($: {
     }
     type RootContext = {
         state:
-        | [StructureState.EXPECTING_SCHEMA_START_OR_ROOT_VALUE]
-        | [StructureState.EXPECTING_SCHEMA]
-        | [StructureState.PROCESSING_SCHEMA, {
+        | [StructureState.EXPECTING_HEADER_OR_BODY]
+        | [StructureState.EXPECTING_SCHEMA_REFERENCE_OR_EMBEDDED_SCHEMA, {
+            headerAnnotation: Annotation
+        }]
+        | [StructureState.EXPECTING_SCHEMA_SCHEMA_REFERENCE, {
+            headerAnnotation: Annotation
+            embeddedSchemaAnnotation: Annotation
+        }]
+        | [StructureState.EXPECTING_EMBEDDED_SCHEMA, {
+            treeHandler: core.TreeHandler<Annotation, null>
+        }]
+        | [StructureState.PROCESSING_EMBEDDED_SCHEMA, {
             schemaParser: core.ITreeParser<Annotation>
         }]
         | [StructureState.EXPECTING_BODY, {
@@ -59,7 +74,7 @@ export function createStructureParser<Annotation>($: {
     }
 
 
-    const rootContext: RootContext = { state: [StructureState.EXPECTING_SCHEMA_START_OR_ROOT_VALUE] }
+    const rootContext: RootContext = { state: [StructureState.EXPECTING_HEADER_OR_BODY] }
 
     return {
         /*
@@ -73,16 +88,24 @@ export function createStructureParser<Annotation>($: {
                 })
             }
             switch (rootContext.state[0]) {
-                case StructureState.EXPECTING_SCHEMA_START_OR_ROOT_VALUE: {
+                case StructureState.EXPECTING_HEADER_OR_BODY: {
                     //const $ = rootContext.state[1]
                     raiseError(["expected the schema start (!) or root value"])
                     break
                 }
-                case StructureState.EXPECTING_SCHEMA: {
+                case StructureState.EXPECTING_SCHEMA_REFERENCE_OR_EMBEDDED_SCHEMA: {
+                    raiseError(["expected a schema reference or an embedded schema"])
+                    break
+                }
+                case StructureState.EXPECTING_SCHEMA_SCHEMA_REFERENCE: {
+                    raiseError(["expected a schema schema reference"])
+                    break
+                }
+                case StructureState.EXPECTING_EMBEDDED_SCHEMA: {
                     raiseError(["expected the schema"])
                     break
                 }
-                case StructureState.PROCESSING_SCHEMA: {
+                case StructureState.PROCESSING_EMBEDDED_SCHEMA: {
                     const $$ = rootContext.state[1]
                     //errors should be reported by schema parser
                     $$.schemaParser.forceEnd(annotation)
@@ -258,12 +281,14 @@ export function createStructureParser<Annotation>($: {
 
             }
             switch (rootContext.state[0]) {
-                case StructureState.EXPECTING_SCHEMA_START_OR_ROOT_VALUE: {
+                case StructureState.EXPECTING_HEADER_OR_BODY: {
                     return handleToken(
                         punctuation => {
                             switch (punctuation.char) {
                                 case Char.Punctuation.exclamationMark:
-                                    rootContext.state = [StructureState.EXPECTING_SCHEMA]
+                                    rootContext.state = [StructureState.EXPECTING_SCHEMA_REFERENCE_OR_EMBEDDED_SCHEMA, {
+                                        headerAnnotation: data.annotation,
+                                    }]
                                     break
                                 default:
                                     startBody()
@@ -280,44 +305,77 @@ export function createStructureParser<Annotation>($: {
                         }
                     )
                 }
-                case StructureState.EXPECTING_SCHEMA: {
+                case StructureState.EXPECTING_SCHEMA_REFERENCE_OR_EMBEDDED_SCHEMA: {
+                    const headerAnnotation = rootContext.state[1].headerAnnotation
                     return handleToken(
-                        _punctuation => {
-                            const schemaParser = createTreeParser(
-                                $.onEmbeddedSchema(
-                                    "astn/schema@0.1",
-                                    data.annotation,
-                                ),
-                                $.errors.onTreeError,
-                                createDummyValueHandler,
-                                () => {
-                                    rootContext.state = [StructureState.EXPECTING_BODY, {
-                                    }]
-                                }
-                            )
-                            rootContext.state = [StructureState.PROCESSING_SCHEMA, {
-                                schemaParser: schemaParser,
+                        structuralToken => {
+                            if (structuralToken.char !== Char.Punctuation.exclamationMark) {
+                                raiseError(["expected a schema reference or an embedded schema"])
+                                return p.value(false)
+                            }
+                            rootContext.state = [StructureState.EXPECTING_SCHEMA_SCHEMA_REFERENCE, {
+                                headerAnnotation: headerAnnotation,
+                                embeddedSchemaAnnotation: data.annotation,
                             }]
-                            callStackedParser(
-                                schemaParser,
-                            )
                             return p.value(false)
                         },
                         stringData => {
                             rootContext.state = [StructureState.EXPECTING_BODY, {
                             }]
                             return $.onSchemaReference({
-                                data: stringData,
-                                annotation: data.annotation,
+                                headerAnnotation: headerAnnotation,
+                                token: {
+                                    data: stringData,
+                                    annotation: data.annotation,
+                                },
                             })
                         },
-                        _stringData => {
-                            raiseError([`expected a schema reference or a schema body`])
+                        () => {
+                            raiseError(["expected an embedded schema"])
                             return p.value(false)
                         },
                     )
                 }
-                case StructureState.PROCESSING_SCHEMA: {
+                case StructureState.EXPECTING_SCHEMA_SCHEMA_REFERENCE: {
+                    const headerAnnotation = rootContext.state[1].headerAnnotation
+                    const embeddedSchemaAnnotation = rootContext.state[1].embeddedSchemaAnnotation
+                    if (data.type[0] !== TokenType.SimpleString) {
+                        raiseError(["expected a schema schema reference"])
+                        return p.value(false)
+                    }
+
+                    rootContext.state = [StructureState.EXPECTING_EMBEDDED_SCHEMA, {
+                        treeHandler: $.onEmbeddedSchema({
+                            headerAnnotation: headerAnnotation,
+                            embeddedSchemaAnnotation: embeddedSchemaAnnotation,
+                            schemaSchemaReferenceToken: {
+                                data: data.type[1],
+                                annotation: data.annotation,
+                            },
+                        }),
+                    }]
+                    return p.value(false)
+                }
+                case StructureState.EXPECTING_EMBEDDED_SCHEMA: {
+
+                    const schemaParser = createTreeParser(
+                        rootContext.state[1].treeHandler,
+                        $.errors.onTreeError,
+                        createDummyValueHandler,
+                        () => {
+                            rootContext.state = [StructureState.EXPECTING_BODY, {
+                            }]
+                        }
+                    )
+                    rootContext.state = [StructureState.PROCESSING_EMBEDDED_SCHEMA, {
+                        schemaParser: schemaParser,
+                    }]
+                    callStackedParser(
+                        schemaParser,
+                    )
+                    return p.value(false)
+                }
+                case StructureState.PROCESSING_EMBEDDED_SCHEMA: {
                     const $ = rootContext.state[1]
                     callStackedParser(
                         $.schemaParser,

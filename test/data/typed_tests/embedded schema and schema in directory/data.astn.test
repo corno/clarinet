@@ -1,4 +1,4 @@
-! (
+! ! "astn/schema@0.1" (
     'types': {
         "root": (
             'value': (
@@ -7,7 +7,7 @@
                         "c": (
                             'value': (
                                 'type': | 'simple string' (
-                                    'quoted': false
+                                    'quoted': | 'no' ()
                                     'default value': ""
                                 )
                             )

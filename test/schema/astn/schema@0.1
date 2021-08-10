@@ -11,9 +11,20 @@
                         )
                     )
                     "quoted": (
-                        'type': | 'value' (
-                            'default value': "true"
-                            'type': | 'text' ( )
+                        'type': | 'state group' (
+                            'default state': "yes"
+                            'states': {
+                                "yes": (
+                                    'node': (
+                                        'properties': {}
+                                    )
+                                )
+                                "no": (
+                                    'node': (
+                                        'properties': {}
+                                    )
+                                )
+                            }
                         )
                     )
                 }
@@ -36,9 +47,20 @@
                                                 )
                                             )
                                             "quoted": (
-                                                'type': | 'value' (
-                                                    'default value': "true"
-                                                    'type': | 'text' ( )
+                                                'type': | 'state group' (
+                                                    'default state': "yes"
+                                                    'states': {
+                                                        "yes": (
+                                                            'node': (
+                                                                'properties': {}
+                                                            )
+                                                        )
+                                                        "no": (
+                                                            'node': (
+                                                                'properties': {}
+                                                            )
+                                                        )
+                                                    }
                                                 )
                                             )
                                         }

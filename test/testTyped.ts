@@ -9,6 +9,7 @@ import * as p from "pareto"
 import { describe } from "mocha"
 import * as astn from "../src"
 import * as p20 from "pareto-20"
+//import { createBuilder, createSerializeInterface, Datastore } from "../src"
 
 function readFileFromFileSystem(
     dir: string,
@@ -121,7 +122,6 @@ export function directoryTests(): void {
                     () => astn.createDummyValueHandler(),
                     astn.ExpectSeverity.warning,
                     astn.OnDuplicateEntry.ignore,
-                    $ => astn.serializeSimpleString($.data),
                 ),
                 (message, annotation) => {
                     foundErrors = true
@@ -177,7 +177,6 @@ export function directoryTests(): void {
                                 astn.createDeserializer({
                                     contextSchema: contextSchema,
                                     resolveReferencedSchema: schemaID => {
-                                        console.log("!!!", path.join(__dirname + "../../../test/schema", schemaID))
                                         return readFileFromFileSystem(__dirname + "../../../test/schema", schemaID)
                                     },
                                     onError: (error, annotation, severity) => {
@@ -216,24 +215,24 @@ export function directoryTests(): void {
                     })
                 })
                 it("compact", () => {
-                    //console.log("FIX COMPACT")
                     // let out = ""
                     // return parse(
                     //     () => {
                     //     },
-                    //     schema => {
-
-                    //         const simpleDS: Datastore = { root: { type: null } }
-                    //         return build(
+                    //     resolvedSchema => {
+                    //         const simpleDS: Datastore = {
+                    //             root: { type: null },
+                    //         }
+                    //         return createBuilder(
                     //             simpleDS,
                     //             () => {
-                    //                 return serialize(
+                    //                 return astn.serialize(
                     //                     createSerializeInterface(simpleDS),
-                    //                     schema.schemaAndSideEffects.schema,
-                    //                     schema.specification,
-                    //                     style,
+                    //                     resolvedSchema.schemaAndSideEffects.schema,
+                    //                     resolvedSchema.specification,
+                    //                     ["compact"],
                     //                     str => {
-                    //                         write(str)
+                    //                         out += str
                     //                     }
                     //                 )
                     //             }
@@ -241,21 +240,6 @@ export function directoryTests(): void {
                     //     },
                     // ).convertToNativePromise(
                     // ).then(() => {
-                    //     deepEqualJSON(testDirPath, "issues", actualIssues)
-                    // })
-                    // return normalize(
-                    //     serializedDatasetPath,
-                    //     (_schemaHost, schemaID, _timeout) => {
-                    //         return readFileFromFileSystem(__dirname + "/../../test/schemas", schemaID)
-                    //     },
-                    //     ["compact"],
-                    //     () => {
-                    //         //ignore diagnostics
-                    //     },
-                    //     str => {
-                    //         out += str
-                    //     }
-                    // ).mapResult(() => {
                     //     deepEqual(
                     //         testDirPath,
                     //         "output",
@@ -264,8 +248,7 @@ export function directoryTests(): void {
                     //         out,
                     //         out,
                     //     )
-                    //     return p.value(null)
-                    // }).convertToNativePromise()
+                    // })
                 })
                 it("verbose", () => {
                     //console.log("FIX VERBOSE")

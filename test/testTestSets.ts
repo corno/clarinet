@@ -102,9 +102,9 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
                 actualEvents.push(["token", "schema data start"])
                 return createLogger()
             },
-            onSchemaReference: schemaReference => {
+            onSchemaReference: $$ => {
                 actualEvents.push(["token", "schema data start"])
-                actualEvents.push(["token", "simple string", schemaReference.data.value, getRange(test.testForLocation, schemaReference.annotation.range)])
+                actualEvents.push(["token", "simple string", $$.token.data.value, getRange(test.testForLocation, $$.token.annotation.range)])
                 return p.value(false)
             },
             onBody: _annotation => {

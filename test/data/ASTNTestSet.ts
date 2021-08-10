@@ -288,7 +288,7 @@ export const extensionTests: TestDefinitions = {
         ],
     },
     "embedded schema": {
-        text: `!(
+        text: `! ! "astn/schema@0.1" (
     'component types': {
         'root': (
             'node': (
@@ -392,7 +392,7 @@ export const extensionTests: TestDefinitions = {
         ],
     },
     "invalid internal schema": {
-        text: `!(
+        text: `! ! "astn/schema@0.1" (
     'component types': {
         'x': (
             'node': (

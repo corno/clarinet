@@ -1,4 +1,4 @@
-! (
+! ! "dummy schema schema" (
     'the schema': "foo"
 ) (
     'correct': (

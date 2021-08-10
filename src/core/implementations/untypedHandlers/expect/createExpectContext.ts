@@ -543,7 +543,6 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     createDummyValueHandler: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
     duplicateEntrySeverity: ExpectSeverity,
     onDuplicateEntry: OnDuplicateEntry,
-    serializeStringToken: (token: i.SimpleStringToken<TokenAnnotation>) => string,
 ): i.IExpectContext<TokenAnnotation, NonTokenAnnotation> {
 
     function raiseError(issue: ExpectError, annotation: TokenAnnotation): void {
@@ -585,20 +584,6 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     }
 
     return {
-
-        expectNothing: $ => {
-            const expectValue: i.ExpectErrorValue = {
-                "type": "nothing",
-                "null allowed": false,
-            }
-            return {
-                array: createContext.createUnexpectedArrayHandler(expectValue, $.onInvalidType),
-                object: createContext.createUnexpectedObjectHandler(expectValue, $.onInvalidType),
-                simpleString: createContext.createUnexpectedSimpleStringHandler(expectValue, $.onInvalidType),
-                multilineString: createContext.createUnexpectedMultilineStringHandler(expectValue, $.onInvalidType),
-                taggedUnion: createContext.createUnexpectedTaggedUnionHandler(expectValue, $.onInvalidType),
-            }
-        },
         expectSimpleString: $ => {
 
             const expectValue: i.ExpectErrorValue = {
@@ -606,102 +591,6 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                 "null allowed": $.onNull !== undefined,
             }
             return expectSimpleStringImp(expectValue, $.callback, $.onInvalidType)
-        },
-        expectBoolean: $ => {
-            const expectValue: i.ExpectErrorValue = {
-                "type": "boolean",
-                "null allowed": false,
-            }
-            return expectSimpleStringImp(
-                expectValue,
-                $$ => {
-                    const onError = () => {
-                        if ($.onInvalidType) {
-                            $.onInvalidType({
-                                annotation: $$.token.annotation,
-                            })
-                        } else {
-                            raiseError(["invalid string", { expected: expectValue, found: serializeStringToken($$.token) }], $$.token.annotation)
-                        }
-                    }
-                    if ($$.token.data.wrapping[0] !== "none") {
-                        return onError()
-                    }
-                    if ($$.token.data.value === "true") {
-                        return $.callback({
-                            value: true,
-                            token: $$.token,
-                        })
-                    }
-                    if ($$.token.data.value === "false") {
-                        return $.callback({
-                            value: false,
-                            token: $$.token,
-                        })
-                    }
-                    return onError()
-                },
-                $.onInvalidType,
-            )
-        },
-        expectNull: $ => {
-
-            const expectValue: i.ExpectErrorValue = {
-                "type": "null",
-                "null allowed": false,
-            }
-            return expectSimpleStringImp(
-                expectValue,
-                $$ => {
-                    const isNull = $$.token.data.wrapping[0] === "none"
-                        && $$.token.data.value === "null"
-                    if (!isNull) {
-                        if ($.onInvalidType) {
-                            $.onInvalidType({
-                                annotation: $$.token.annotation,
-                            })
-                        } else {
-                            raiseError(["invalid string", { expected: expectValue, found: serializeStringToken($$.token) }], $$.token.annotation)
-                        }
-                    }
-                    return $.callback($$)
-                },
-                $.onInvalidType,
-            )
-        },
-        expectNumber: $ => {
-
-            const expectValue: i.ExpectErrorValue = {
-                "type": "number",
-                "null allowed": $.onNull !== undefined,
-            }
-            return expectSimpleStringImp(
-                expectValue,
-                $$ => {
-                    const onError = () => {
-                        if ($.onInvalidType) {
-                            $.onInvalidType({
-                                annotation: $$.token.annotation,
-                            })
-                        } else {
-                            raiseError(["not a valid number", { value: serializeStringToken($$.token) }], $$.token.annotation)
-                        }
-                    }
-                    if ($$.token.data.wrapping[0] !== "none") {
-                        return onError()
-                    }
-                    //eslint-disable-next-line
-                    const nr = new Number($$.token.data.value).valueOf()
-                    if (isNaN(nr)) {
-                        return onError()
-                    }
-                    return $.callback({
-                        value: nr,
-                        token: $$.token,
-                    })
-                },
-                $.onInvalidType
-            )
         },
         expectQuotedString: $ => {
             const expectValue: i.ExpectErrorValue = {
@@ -715,7 +604,6 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                         if ($.warningOnly) {
                             raiseWarning(["string is not quoted", {}], $$.token.annotation)
                             return $.callback({
-                                value: $$.token.data.value,
                                 token: $$.token,
                             })
                         } else {
@@ -729,7 +617,38 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                         }
                     } else {
                         return $.callback({
-                            value: $$.token.data.value,
+                            token: $$.token,
+                        })
+                    }
+                },
+                $.onInvalidType
+            )
+        },
+        expectNonWrappedString: $ => {
+            const expectValue: i.ExpectErrorValue = {
+                "type": "nonwrapped string",
+                "null allowed": $.onNull !== undefined,
+            }
+            return expectSimpleStringImp(
+                expectValue,
+                $$ => {
+                    if ($$.token.data.wrapping[0] !== "none") {
+                        if ($.warningOnly) {
+                            raiseWarning(["string should not have quotes or apostrophes", {}], $$.token.annotation)
+                            return $.callback({
+                                token: $$.token,
+                            })
+                        } else {
+                            if ($.onInvalidType) {
+                                $.onInvalidType({
+                                    annotation: $$.token.annotation,
+                                })
+                            } else {
+                                raiseError(["string should not have quotes or apostrophes", {}], $$.token.annotation)
+                            }
+                        }
+                    } else {
+                        return $.callback({
                             token: $$.token,
                         })
                     }
@@ -799,7 +718,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
             }
         },
 
-        expectType: $ => {
+        expectGroup: $ => {
 
             const expectValue: i.ExpectErrorValue = {
                 "type": "type or shorthand group",

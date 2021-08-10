@@ -42,6 +42,9 @@ export function printExpectErrorValueType(vt: i.ExpectErrorValueType): string {
         case "quoted string": {
             return `a string with quotes`
         }
+        case "nonwrapped string": {
+            return `a string without quotes or aposthropes`
+        }
         case "tagged union": {
             return `a tagged union ( | "statename" data )`
         }
@@ -142,6 +145,10 @@ export function printExpectError(issue: ExpectError): string {
         case "string is not quoted": {
             // const $ = issue[1]
             return `not a quoted string`
+        }
+        case "string should not have quotes or apostrophes": {
+            // const $ = issue[1]
+            return `a string with quotes or apostrophes`
         }
         case "superfluous element": {
             //const $ = issue[1]

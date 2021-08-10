@@ -60,6 +60,8 @@ export type ExpectError =
     }]
     | ["string is not quoted", {
     }]
+    | ["string should not have quotes or apostrophes", {
+    }]
     | ["superfluous element", {
     }]
     | ["elements missing", {

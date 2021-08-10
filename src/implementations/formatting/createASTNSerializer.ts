@@ -32,9 +32,9 @@ export function createASTNSerializer<TokenAnnotation>(
                 writer
             ))
         },
-        onSchemaReference: schemaReference => {
+        onSchemaReference: $$ => {
             foundHeader = true
-            write(`! ${schemaReference.data.value}\n`)
+            write(`! ${$$.token.data.value}\n`)
             return p.value(false)
         },
         onBody: () => {

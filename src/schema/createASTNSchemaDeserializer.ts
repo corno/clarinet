@@ -40,7 +40,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
             "default value": "",
             "quoted": true,
         }]
-        return context.expectType({
+        return context.expectGroup({
             properties: {
                 "type": {
                     onExists: () => wrap(
@@ -48,7 +48,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                             options: {
                                 "group": () => {
                                     const properties = createDictionary<def.ValueDefinition>()
-                                    return wrap(context.expectType({
+                                    return wrap(context.expectGroup({
                                         properties: {
                                             "properties": {
                                                 onExists: () => wrap(context.expectDictionary({
@@ -59,7 +59,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                                                 "quoted": true,
                                                             }],
                                                         }
-                                                        return wrap(context.expectType({
+                                                        return wrap(context.expectGroup({
                                                             properties: {
                                                                 "value": {
                                                                     onExists: () => wrap(
@@ -99,7 +99,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                         "default value": "",
                                         "quoted": true,
                                     }
-                                    return wrap(context.expectType({
+                                    return wrap(context.expectGroup({
                                         properties: {
                                             "value": {
                                                 onExists: () => wrap(
@@ -115,13 +115,18 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                                     let quoted = true
                                                     let defaultValue = ""
                                                     return wrap(
-                                                        context.expectType({
+                                                        context.expectGroup({
                                                             properties: {
                                                                 "quoted": {
-                                                                    onExists: () => wrap(context.expectBoolean({
-                                                                        callback: $ => {
-                                                                            quoted = $.value
-
+                                                                    onExists: () => wrap(context.expectTaggedUnion({
+                                                                        options: {
+                                                                            "yes": () => {
+                                                                                return wrap(context.expectGroup({}))
+                                                                            },
+                                                                            "no": () => {
+                                                                                quoted = false
+                                                                                return wrap(context.expectGroup({}))
+                                                                            },
                                                                         },
                                                                     })),
                                                                     onNotExists: () => {
@@ -131,7 +136,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                                                     onExists: () => wrap(context.expectQuotedString({
                                                                         warningOnly: true,
                                                                         callback: $ => {
-                                                                            defaultValue = $.value
+                                                                            defaultValue = $.token.data.value
 
                                                                         },
                                                                     })),
@@ -167,7 +172,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                             "quoted": true,
                                         }],
                                     }
-                                    return wrap(context.expectType({
+                                    return wrap(context.expectGroup({
                                         properties: {
                                             "value": {
                                                 onExists: () => wrap(
@@ -188,14 +193,14 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                 },
                                 "type reference": () => {
                                     let targetComponentTypeName: AnnotatedString<TokenAnnotation> | null = null
-                                    return wrap(context.expectType({
+                                    return wrap(context.expectGroup({
                                         properties: {
                                             "type": {
                                                 onExists: () => wrap(context.expectQuotedString({
                                                     warningOnly: true,
                                                     callback: $ => {
                                                         targetComponentTypeName = {
-                                                            value: $.value,
+                                                            value: $.token.data.value,
                                                             annotation: $.token.annotation,
                                                         }
                                                     },
@@ -221,7 +226,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                 "tagged union": () => {
                                     const options = createDictionary<def.OptionDefinition>()
                                     let defaultOptionName: null | AnnotatedString<TokenAnnotation> = null
-                                    return wrap(context.expectType({
+                                    return wrap(context.expectGroup({
                                         properties: {
                                             "options": {
                                                 onExists: () => wrap(context.expectDictionary({
@@ -232,7 +237,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                                                 "quoted": true,
                                                             }],
                                                         }
-                                                        return wrap(context.expectType({
+                                                        return wrap(context.expectGroup({
                                                             properties: {
                                                                 "value": {
                                                                     onExists: () => wrap(
@@ -260,7 +265,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                                     warningOnly: true,
                                                     callback: $ => {
                                                         defaultOptionName = {
-                                                            value: $.value,
+                                                            value: $.token.data.value,
                                                             annotation: $.token.annotation,
                                                         }
                                                     },
@@ -288,13 +293,18 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                     let quoted = true
                                     let defaultValue = ""
                                     return {
-                                        exists: context.expectType({
+                                        exists: context.expectGroup({
                                             properties: {
                                                 "quoted": {
-                                                    onExists: () => wrap(context.expectBoolean({
-                                                        callback: $ => {
-                                                            quoted = $.value
-
+                                                    onExists: () => wrap(context.expectTaggedUnion({
+                                                        options: {
+                                                            "yes": () => {
+                                                                return wrap(context.expectGroup({}))
+                                                            },
+                                                            "no": () => {
+                                                                quoted = false
+                                                                return wrap(context.expectGroup({}))
+                                                            },
                                                         },
                                                     })),
                                                     onNotExists: () => {
@@ -304,7 +314,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                                     onExists: () => wrap(context.expectQuotedString({
                                                         warningOnly: true,
                                                         callback: $ => {
-                                                            defaultValue = $.value
+                                                            defaultValue = $.token.data.value
 
                                                         },
                                                     })),
@@ -342,7 +352,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
         })
     }
     return {
-        root: wrap(context.expectType({
+        root: wrap(context.expectGroup({
             properties: {
                 "types": {
                     onExists: () => {
@@ -354,7 +364,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                         "quoted": true,
                                     }],
                                 }
-                                return wrap(context.expectType({
+                                return wrap(context.expectGroup({
                                     properties: {
                                         "value": {
                                             onExists: () => wrap(
@@ -385,7 +395,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                             callback: $ => {
                                 rootTypeName = {
                                     annotation: $.token.annotation,
-                                    value: $.value,
+                                    value: $.token.data.value,
                                 }
                             },
                         }))

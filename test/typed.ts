@@ -57,7 +57,6 @@ describe('typed', () => {
                             () => core.createDummyValueHandler(),
                             core.ExpectSeverity.warning,
                             core.OnDuplicateEntry.ignore,
-                            $ => core.serializeSimpleString($.data),
                         )
                         return {
                             root: callback(
@@ -105,7 +104,7 @@ describe('typed', () => {
                         },
                         onProperty: () => {
                             return {
-                                exists: expect.expectType({}),
+                                exists: expect.expectGroup({}),
                                 missing: () => {
                                     //
                                 },
@@ -135,7 +134,7 @@ describe('typed', () => {
                             onExists: () => {
                                 return core.createRequiredValueHandler(
                                     expect,
-                                    ["number", {
+                                    ["simple string", {
                                         callback: () => {
                                         },
                                     }]
@@ -151,7 +150,7 @@ describe('typed', () => {
             ]
         )
         doTest(
-            'unexpected boolean',
+            'expected boolean, but it\'s just an unquoted string',
 
             `( "a": true )`,
             (expect, addError) => core.createRequiredValueHandler(
@@ -164,7 +163,7 @@ describe('typed', () => {
                                 onExists: () => {
                                     return core.createRequiredValueHandler(
                                         expect,
-                                        ["number", {
+                                        ["quoted string", {
                                             callback: () => {
                                             },
                                             onInvalidType: () => {
@@ -198,7 +197,7 @@ describe('typed', () => {
                                 onExists: () => {
                                     return core.createRequiredValueHandler(
                                         expect,
-                                        ["number", {
+                                        ["simple string", {
                                             callback: () => {
                                             },
                                             onInvalidType: () => {
@@ -229,7 +228,7 @@ describe('typed', () => {
                         onElement: () => {
                             return core.createValueHandler(
                                 expect,
-                                ["number", {
+                                ["simple string", {
                                     callback: () => {
                                     },
                                 }],
@@ -251,7 +250,7 @@ describe('typed', () => {
                     missing: () => {
                         //
                     },
-                    exists: expect.expectType({
+                    exists: expect.expectGroup({
                         properties: {
                             a: {
                                 onExists: () => {
@@ -260,7 +259,7 @@ describe('typed', () => {
                                             options: {
                                                 foo: () => {
                                                     return {
-                                                        exists: expect.expectType({
+                                                        exists: expect.expectGroup({
                                                             properties: {
                                                                 //
                                                             },
@@ -293,7 +292,7 @@ describe('typed', () => {
                     missing: () => {
                         //
                     },
-                    exists: expect.expectType({
+                    exists: expect.expectGroup({
                         properties: {
                             a: {
                                 onExists: () => {
@@ -302,7 +301,7 @@ describe('typed', () => {
                                             options: {
                                                 foo: () => {
                                                     return {
-                                                        exists: expect.expectType({}),
+                                                        exists: expect.expectGroup({}),
                                                         missing: () => {
                                                             addError(["missing", "TBD 0:0-0"])
                                                         },
