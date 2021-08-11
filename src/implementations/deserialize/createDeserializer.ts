@@ -75,7 +75,7 @@ export function createDeserializer($: {
                 return p.value(false)
             })
         },
-        onBody: firstBodyTokenizerAnnotationData => {
+        onBody: firstBodyTokenAnnotation => {
             function createRealTreeHandler(
                 schema: astncore.Schema,
                 schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
@@ -109,7 +109,7 @@ export function createDeserializer($: {
                     }
                     $.onError(
                         ["no valid schema"],
-                        firstBodyTokenizerAnnotationData,
+                        firstBodyTokenAnnotation,
                         astncore.DiagnosticSeverity.error,
                     )
                     return astncore.createDummyTreeHandler()
@@ -123,13 +123,13 @@ export function createDeserializer($: {
                 if ($.contextSchema[0] === "has errors") {
                     $.onError(
                         ["no valid schema"],
-                        firstBodyTokenizerAnnotationData,
+                        firstBodyTokenAnnotation,
                         astncore.DiagnosticSeverity.error,
                     )
                 } else {
                     $.onError(
                         ["no schema"],
-                        firstBodyTokenizerAnnotationData,
+                        firstBodyTokenAnnotation,
                         astncore.DiagnosticSeverity.error,
                     )
                 }
