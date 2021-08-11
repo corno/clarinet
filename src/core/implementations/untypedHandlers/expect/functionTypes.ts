@@ -1,7 +1,9 @@
+import { DiagnosticSeverity } from "../../../interfaces";
 import * as i from "../../../interfaces/untyped";
 
-export type ExpectErrorHandler<TokenAnnotation> = ($: {
+export type ExpectIssueHandler<TokenAnnotation> = ($: {
     issue: ExpectError
+    severity: DiagnosticSeverity
     annotation: TokenAnnotation
 }) => void
 

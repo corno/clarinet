@@ -9,7 +9,7 @@ import * as core from "../src/core"
 import * as astn from "../src"
 import { tryToConsumeString } from "./consumeString"
 import { createStreamPreTokenizer, createTokenizer, printRange, printStructureError, TokenizerAnnotationData } from "../src"
-import { createDummyTreeHandler } from "../src/core"
+import { createDummyTreeHandler, DiagnosticSeverity } from "../src/core"
 import { printTreeParserError } from "../src/core/implementations/treeParser/printTreeParserErrorError"
 import { printTokenError } from "../src/implementations/pretokenizer/printTokenError"
 
@@ -35,24 +35,20 @@ describe('typed', () => {
 
             it(testName, () => {
                 const foundErrors: ErrorLine[] = []
-                const onWarning = ($: {
-                    issue: core.ExpectError
-                    annotation: astn.TokenizerAnnotationData
-                }) => {
-                    foundErrors.push(["expect warning", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
-                }
                 const structureParser = astn.createStructureParser<TokenizerAnnotationData>({
                     onEmbeddedSchema: () => createDummyTreeHandler(),
                     onSchemaReference: () => {
                         throw new Error("IMPLEMENT ME")
                     },
                     onBody: () => {
-
                         const expect = core.createExpectContext<astn.TokenizerAnnotationData, null>(
                             $ => {
-                                foundErrors.push(["expect error", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
+                                if ($.severity === DiagnosticSeverity.error) {
+                                    foundErrors.push(["expect error", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
+                                } else {
+                                    foundErrors.push(["expect warning", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
+                                }
                             },
-                            onWarning,
                             () => core.createDummyValueHandler(),
                             () => core.createDummyValueHandler(),
                             core.ExpectSeverity.warning,

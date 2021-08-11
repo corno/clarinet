@@ -1,8 +1,9 @@
 /* eslint
 */
+import { DiagnosticSeverity } from "../../../interfaces"
 import * as i from "../../../interfaces/untyped"
 import {
-    ExpectError, ExpectErrorHandler, OnDuplicateEntry, ExpectSeverity,
+    ExpectError, ExpectIssueHandler, OnDuplicateEntry, ExpectSeverity,
 } from "./functionTypes"
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -94,8 +95,7 @@ interface ICreateContext<TokenAnnotation, NonTokenAnnotation> {
 }
 
 function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
-    errorHandler: ExpectErrorHandler<TokenAnnotation>,
-    warningHandler: ExpectErrorHandler<TokenAnnotation>,
+    issueHandler: ExpectIssueHandler<TokenAnnotation>,
     //createDummyArrayHandler: (range: bc.Range, data: bc.ArrayOpenData, contextData: bc.ContextData) => bc.ArrayHandler,
     //createDummyObjectHandler: (range: bc.Range, data: bc.ArrayOpenData, contextData: bc.ContextData) => bc.ObjectHandler,
     createDummyPropertyHandler: CreateDummyOnProperty<TokenAnnotation, NonTokenAnnotation>,
@@ -105,14 +105,16 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
 ): ICreateContext<TokenAnnotation, NonTokenAnnotation> {
 
     function raiseWarning(issue: ExpectError, annotation: TokenAnnotation): void {
-        warningHandler({
+        issueHandler({
             issue: issue,
+            severity: DiagnosticSeverity.warning,
             annotation: annotation,
         })
     }
     function raiseError(issue: ExpectError, annotation: TokenAnnotation): void {
-        errorHandler({
+        issueHandler({
             issue: issue,
+            severity: DiagnosticSeverity.error,
             annotation: annotation,
         })
     }
@@ -536,8 +538,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
 }
 
 export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
-    errorHandler: ExpectErrorHandler<TokenAnnotation>,
-    warningHandler: ExpectErrorHandler<TokenAnnotation>,
+    issueHandler: ExpectIssueHandler<TokenAnnotation>,
     createDummyPropertyHandler: CreateDummyOnProperty<TokenAnnotation, NonTokenAnnotation>,
     createDummyValueHandler: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
     duplicateEntrySeverity: ExpectSeverity,
@@ -545,21 +546,22 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
 ): i.IExpectContext<TokenAnnotation, NonTokenAnnotation> {
 
     function raiseError(issue: ExpectError, annotation: TokenAnnotation): void {
-        errorHandler({
+        issueHandler({
             issue: issue,
+            severity: DiagnosticSeverity.error,
             annotation: annotation,
         })
     }
     function raiseWarning(issue: ExpectError, annotation: TokenAnnotation): void {
-        warningHandler({
+        issueHandler({
             issue: issue,
+            severity: DiagnosticSeverity.warning,
             annotation: annotation,
         })
     }
 
     const createContext = createCreateContext(
-        errorHandler,
-        warningHandler,
+        issueHandler,
         createDummyPropertyHandler,
         createDummyValueHandler,
         duplicateEntrySeverity,
