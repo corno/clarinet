@@ -1,5 +1,4 @@
 import * as p from "pareto"
-import * as path from "path"
 import * as astncore from "../../core"
 import { ContextSchema, ContextSchemaError, SchemaSchemaBuilder, TokenizerAnnotationData } from "../../interfaces"
 import { RetrievalError } from "../../interfaces/deserialize/ResolveReferencedSchema"
@@ -10,7 +9,8 @@ function assertUnreachable<RT>(_x: never): RT {
 }
 
 export type ContextSchemaData = {
-    filePath: string
+    basename: string
+    dirname: string
     getContextSchema: (dir: string, schemaFileName: string) => p.IUnsafeValue<p.IStream<string, null>, RetrievalError>
 }
 
@@ -23,16 +23,14 @@ export function loadContextSchema(
     ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null,
     onError: (error: ContextSchemaError, severity: astncore.DiagnosticSeverity) => void,
 ): p.IValue<ContextSchema<TokenizerAnnotationData, null>> {
-    const basename = path.basename(data.filePath)
-    const dir = path.dirname(data.filePath)
-    if (basename === schemaFileName) {
+    if (data.basename === schemaFileName) {
         //don't validate the schema against itself
         onError(["validating schema file against internal schema"], astncore.DiagnosticSeverity.warning)
         return p.value(["ignored"])
     }
 
     return data.getContextSchema(
-        dir,
+        data.dirname,
         schemaFileName,
     ).mapError<ContextSchema<TokenizerAnnotationData, null>>(error => {
         switch (error[0]) {

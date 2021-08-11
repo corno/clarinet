@@ -9,8 +9,11 @@ import * as p from "pareto"
 import { describe } from "mocha"
 import * as astn from "../src"
 import * as p20 from "pareto-20"
-import { createBuilder, createSerializeInterface, Datastore, SerializationStyle, serialize } from "../src"
-import { processFile } from "./normalize"
+import {
+    SerializationStyle,
+    processFile,
+    createTypedSerializer,
+} from "../src"
 
 function readFileFromFileSystem(
     dir: string,
@@ -158,45 +161,18 @@ export function directoryTests(): void {
                     schema: astn.ResolvedSchema<astn.TokenizerAnnotationData, null>
                 ) => astn.TypedTreeHandler<astn.TokenizerAnnotationData, null>,
             ): p.IValue<null> {
-
-                return astn.loadContextSchema(
-                    {
-                        filePath: serializedDatasetPath,
-                        getContextSchema: readFileFromFileSystem,
-                    },
+                return processFile(
+                    serializedDataset,
+                    path.basename(serializedDatasetPath),
+                    path.dirname(serializedDatasetPath),
                     getSchemaSchemaBuilder,
-                    (error, severity) => {
-                        onError(astn.printContextSchemaError(error), severity)
+                    readFileFromFileSystem,
+                    schemaID => {
+                        return readFileFromFileSystem(__dirname + "../../../test/schema", schemaID)
                     },
-                ).mapResult(contextSchema => {
-                    return p20.createArray(
-                        [serializedDataset]
-                    ).streamify().consume(
-                        null,
-                        astn.createStreamPreTokenizer(
-                            astn.createTokenizer(
-                                astn.createDeserializer({
-                                    contextSchema: contextSchema,
-                                    resolveReferencedSchema: schemaID => {
-                                        return readFileFromFileSystem(__dirname + "../../../test/schema", schemaID)
-                                    },
-                                    onError: (error, annotation, severity) => {
-                                        onError(`${astn.printDeserializationDiagnostic(error)} @ ${astn.printRange(annotation.range)}`, severity)
-                                    },
-                                    getSchemaSchemaBuilder: getSchemaSchemaBuilder,
-                                    handlerBuilder: getRootHandler,
-                                    onEnd: () => {
-                                        return p.value(null)
-                                    },
-                                })
-
-                            ),
-                            $ => {
-                                onError(astn.printTokenError($.error), astn.DiagnosticSeverity.error)
-                            }
-                        )
-                    )
-                })
+                    onError,
+                    getRootHandler,
+                )
             }
             describe(dir, () => {
                 it("issues", async () => {
@@ -219,52 +195,29 @@ export function directoryTests(): void {
                     style: SerializationStyle,
                     file: string,
                 ) {
-                    let resolvedSchema: astn.ResolvedSchema<astn.TokenizerAnnotationData, null> | null = null
-                    const simpleDS: Datastore = {
-                        root: { type: null },
-                    }
-                    return processFile(
-                        serializedDataset,
-                        serializedDatasetPath,
-                        getSchemaSchemaBuilder,
-                        readFileFromFileSystem,
-                        schemaID => {
-                            return readFileFromFileSystem(__dirname + "../../../test/schema", schemaID)
-                        },
+                    let out = ""
+                    return parse(
                         () => {
 
                         },
-                        rs => {
-                            resolvedSchema = rs
-                            return createBuilder(
-                                simpleDS,
-                            )
-                        },
-                    ).mapResult(() => {
-
-                        if (resolvedSchema === null) {
-                            return p.value("")
-                        }
-                        let out = ""
-                        serialize(
-                            createSerializeInterface(simpleDS),
-                            resolvedSchema.schemaAndSideEffects.schema,
-                            resolvedSchema.specification,
+                        rs => createTypedSerializer(
+                            rs,
                             style,
                             str => {
                                 out += str
-                            },
-                        )
+                            }
+                        ),
+                    ).mapResult(() => {
                         return p.value(out)
                     }).convertToNativePromise(
-                    ).then(out => {
+                    ).then(serialized => {
                         deepEqual(
                             testDirPath,
                             "output",
                             file,
                             str => str,
-                            out,
-                            out,
+                            serialized,
+                            serialized,
                         )
                     })
 

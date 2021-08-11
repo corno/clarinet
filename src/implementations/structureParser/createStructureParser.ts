@@ -10,13 +10,6 @@ function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
 
-/**
- * @param onEmbeddedSchema a text can contain schema data. If this is the case, this callback will be called.
- * it enables the consuming code to prepare for the instance data. It cannot produce a result itself, hence the type parameters are null and null
- * @param onInstanceDataStart when the instance data starts, this callback is called and a TextParserEventConsumer should be returned. This consumer will also produce the final resulting type
- * @param onTextParserError a handler for when a parsing error occurs
- * @param onHeaderOverheadToken when a whitespace, newline or comment is encountered while parsing the header, this callback is called
- */
 export function createStructureParser<Annotation>($: {
     onEmbeddedSchema: ($: {
         headerAnnotation: Annotation
@@ -42,8 +35,7 @@ export function createStructureParser<Annotation>($: {
         PROCESSING_EMBEDDED_SCHEMA,
         EXPECTING_BODY,
         PROCESSING_BODY,
-        EXPECTING_END, // no more input expected}
-
+        EXPECTING_END,
     }
     type RootContext = {
         state:
@@ -70,13 +62,9 @@ export function createStructureParser<Annotation>($: {
         }]
     }
 
-
     const rootContext: RootContext = { state: [StructureState.EXPECTING_HEADER_OR_BODY] }
 
     return {
-        /*
-        a structure overhead token is a newline/whitspace/comment outside the content parts: (schema data, instance data)
-        */
         onEnd: (_aborted, annotation) => {
             function raiseError(error: StructureErrorType) {
                 $.errors.onStructureError({

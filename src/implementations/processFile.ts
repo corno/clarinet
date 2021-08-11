@@ -3,7 +3,7 @@
 */
 
 import * as p from "pareto"
-import * as astn from "../src"
+import * as astn from ".."
 import * as p20 from "pareto-20"
 //import { createBuilder, createSerializeInterface, Datastore, SerializationStyle } from "../src"
 
@@ -40,7 +40,8 @@ import * as p20 from "pareto-20"
 
 export function processFile(
     serializedDataset: string,
-    serializedDatasetPath: string,
+    serializedDatasetBaseName: string,
+    serializedDatasetDirName: string,
     getSchemaSchemaBuilder: (
         name: string
     ) => astn.SchemaSchemaBuilder<astn.TokenizerAnnotationData, null> | null,
@@ -57,7 +58,8 @@ export function processFile(
 
     return astn.loadContextSchema(
         {
-            filePath: serializedDatasetPath,
+            basename: serializedDatasetBaseName,
+            dirname: serializedDatasetDirName,
             getContextSchema: getContextSchema,
         },
         getSchemaSchemaBuilder,
