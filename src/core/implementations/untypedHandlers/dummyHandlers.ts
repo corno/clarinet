@@ -59,5 +59,6 @@ export function createDummyTreeHandler<TokenAnnotation, NonTokenAnnotation>(
 ): i.TreeHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         root: createDummyRequiredValueHandler(),
+        onEnd: () => {},
     }
 }

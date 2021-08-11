@@ -9,7 +9,8 @@ import * as p from "pareto"
 import { describe } from "mocha"
 import * as astn from "../src"
 import * as p20 from "pareto-20"
-//import { createBuilder, createSerializeInterface, Datastore } from "../src"
+import { createBuilder, createSerializeInterface, Datastore, SerializationStyle, serialize } from "../src"
+import { processFile } from "./normalize"
 
 function readFileFromFileSystem(
     dir: string,
@@ -214,68 +215,65 @@ export function directoryTests(): void {
                         deepEqualJSON(testDirPath, "issues", actualIssues)
                     })
                 })
+                function testNormalize(
+                    style: SerializationStyle,
+                    file: string,
+                ) {
+                    let resolvedSchema: astn.ResolvedSchema<astn.TokenizerAnnotationData, null> | null = null
+                    const simpleDS: Datastore = {
+                        root: { type: null },
+                    }
+                    return processFile(
+                        serializedDataset,
+                        serializedDatasetPath,
+                        getSchemaSchemaBuilder,
+                        readFileFromFileSystem,
+                        schemaID => {
+                            return readFileFromFileSystem(__dirname + "../../../test/schema", schemaID)
+                        },
+                        () => {
+
+                        },
+                        rs => {
+                            resolvedSchema = rs
+                            return createBuilder(
+                                simpleDS,
+                            )
+                        },
+                    ).mapResult(() => {
+
+                        if (resolvedSchema === null) {
+                            return p.value("")
+                        }
+                        let out = ""
+                        serialize(
+                            createSerializeInterface(simpleDS),
+                            resolvedSchema.schemaAndSideEffects.schema,
+                            resolvedSchema.specification,
+                            style,
+                            str => {
+                                out += str
+                            },
+                        )
+                        return p.value(out)
+                    }).convertToNativePromise(
+                    ).then(out => {
+                        deepEqual(
+                            testDirPath,
+                            "output",
+                            file,
+                            str => str,
+                            out,
+                            out,
+                        )
+                    })
+
+                }
                 it("compact", () => {
-                    // let out = ""
-                    // return parse(
-                    //     () => {
-                    //     },
-                    //     resolvedSchema => {
-                    //         const simpleDS: Datastore = {
-                    //             root: { type: null },
-                    //         }
-                    //         return createBuilder(
-                    //             simpleDS,
-                    //             () => {
-                    //                 return astn.serialize(
-                    //                     createSerializeInterface(simpleDS),
-                    //                     resolvedSchema.schemaAndSideEffects.schema,
-                    //                     resolvedSchema.specification,
-                    //                     ["compact"],
-                    //                     str => {
-                    //                         out += str
-                    //                     }
-                    //                 )
-                    //             }
-                    //         )
-                    //     },
-                    // ).convertToNativePromise(
-                    // ).then(() => {
-                    //     deepEqual(
-                    //         testDirPath,
-                    //         "output",
-                    //         "compact.astn",
-                    //         str => str,
-                    //         out,
-                    //         out,
-                    //     )
-                    // })
+                    return testNormalize(["compact"], "compact.astn")
                 })
                 it("verbose", () => {
-                    //console.log("FIX VERBOSE")
-                    // let out = ""
-                    // return normalize(
-                    //     serializedDatasetPath,
-                    //     (_schemaHost, schemaID, _timeout) => {
-                    //         return readFileFromFileSystem(__dirname + "/../../test/schemas", schemaID)
-                    //     },
-                    //     ["expanded", { omitPropertiesWithDefaultValues: true }],
-                    //     () => {
-                    //         //ignore diagnostics
-                    //     },
-                    //     str => {
-                    //         out += str
-                    //     }
-                    // ).mapResult(() => {
-                    //     deepEqual(
-                    //         testDirPath,
-                    //         "output",
-                    //         "verbose.astn",
-                    //         str => str,
-                    //         out,
-                    //         out,
-                    //     )
-                    //     return p.value(null)
-                    // }).convertToNativePromise()
+                    return testNormalize(["expanded", { omitPropertiesWithDefaultValues: true }], "verbose.astn")
                 })
                 it("codecompletions", async () => {
                     const actualCodeCompletions: CodeCompletions = {}

@@ -1,7 +1,4 @@
-/* eslint
-    no-console:"off",
-    max-classes-per-file:"off",
-*/
+
 import * as p from "pareto"
 import * as core from "../../core"
 import * as Char from "../../generic/characters"
@@ -33,7 +30,7 @@ export function createStructureParser<Annotation>($: {
     onBody: (
         annotation: Annotation,
     ) => core.TreeHandler<Annotation, null>
-    onEnd: (endAnnotation: Annotation) => p.IValue<null>
+    onEnd: (endAnnotation: Annotation) => void
     errors: StructureErrorHandler<Annotation>
 }): TokenConsumer<Annotation> {
 
@@ -128,7 +125,7 @@ export function createStructureParser<Annotation>($: {
                 default:
                     return assertUnreachable(rootContext.state[0])
             }
-            return $.onEnd(annotation)
+            $.onEnd(annotation)
         },
         onData: data => {
             function raiseError(error: StructureErrorType) {

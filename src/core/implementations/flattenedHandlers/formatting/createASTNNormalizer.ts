@@ -158,5 +158,8 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 $.annotation,
             )
         },
+        end: () => {
+
+        },
     }
 }

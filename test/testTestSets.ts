@@ -1,7 +1,6 @@
 /* eslint
     no-console:"off",
     complexity: "off",
-    max-classes-per-file: "off",
 */
 import * as p from "pareto"
 import * as p20 from "pareto-20"

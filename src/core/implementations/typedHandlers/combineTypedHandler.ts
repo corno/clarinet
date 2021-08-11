@@ -1,3 +1,5 @@
+import * as p20 from "pareto-20"
+import * as p from "pareto"
 import { TypedValueHandler, TypedTreeHandler } from "../../interfaces"
 
 export function combineTypedHandlers<TokenAnnotation, NonTokenAnnotation>(
@@ -74,7 +76,7 @@ export function combineTypedHandlers<TokenAnnotation, NonTokenAnnotation>(
     return {
         root: combineTypedValueHandler(treeHandlers.map(rh => rh.root)),
         onEnd: $ => {
-            treeHandlers.forEach(rh => rh.onEnd($))
+            return p20.createArray(treeHandlers.map(rh => rh.onEnd($))).mergeSafeValues(() => p.value(null)).mapResult(() => p.value(null))
         },
     }
 }

@@ -352,6 +352,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
         })
     }
     return {
+        onEnd: () => {},
         root: wrap(context.expectGroup({
             properties: {
                 "types": {

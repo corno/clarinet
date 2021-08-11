@@ -62,5 +62,6 @@ export function createLoggingHandler<TokenAnnotation, NonTokenAnnotation>(
     }
     return {
         root: createLoggingRequiredValueHandler(),
+        onEnd: () => {},
     }
 }

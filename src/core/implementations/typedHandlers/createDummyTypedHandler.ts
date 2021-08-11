@@ -1,8 +1,6 @@
-/* eslint
-    "max-classes-per-file": off,
-*/
 
 import * as astncore from "../.."
+import * as p from "pareto"
 
 export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
 ): astncore.TypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
@@ -90,6 +88,7 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
     return {
         root: createValueNOPSideEffects(),
         onEnd: () => {
+            return p.value(null)
         },
     }
 }

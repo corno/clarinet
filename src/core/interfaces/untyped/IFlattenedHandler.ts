@@ -61,4 +61,5 @@ export interface FlattenedHandler<InTokenAnnotation, InNonTokenAnnotation> {
         annotation: InNonTokenAnnotation
         stackContext: StackContext
     }) => void
+    end: (annotation: InTokenAnnotation) => void
 }

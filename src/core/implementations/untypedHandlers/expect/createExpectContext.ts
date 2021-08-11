@@ -1,5 +1,4 @@
 /* eslint
-    max-classes-per-file: "off",
 */
 import * as i from "../../../interfaces/untyped"
 import {

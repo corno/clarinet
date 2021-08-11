@@ -68,6 +68,7 @@ export interface RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
 
 export interface TreeHandler<TokenAnnotation, NonTokenAnnotation> {
     root: RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
+    onEnd: (annotation: TokenAnnotation) => void
 }
 
 export interface ValueHandler<TokenAnnotation, NonTokenAnnotation> {

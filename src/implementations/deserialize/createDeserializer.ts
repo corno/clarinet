@@ -1,6 +1,3 @@
-/* eslint
-    "max-classes-per-file": off,
-*/
 
 import * as p from "pareto"
 import * as astncore from "../../core"
@@ -24,7 +21,7 @@ export function createDeserializer($: {
     handlerBuilder: (
         schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
     ) => astncore.TypedTreeHandler<TokenizerAnnotationData, null>
-    onEnd: () => p.IValue<null>
+    onEnd: () => void
 }): TokenConsumer<TokenizerAnnotationData> {
 
     let headerAnnotation: null | TokenizerAnnotationData = null
@@ -148,7 +145,7 @@ export function createDeserializer($: {
             },
         },
         onEnd: () => {
-            return $.onEnd()
+            $.onEnd()
         },
     })
 }

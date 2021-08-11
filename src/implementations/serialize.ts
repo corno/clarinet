@@ -1,144 +1,123 @@
-import * as p from "pareto"
 //import * as p20 from "pareto-20"
-//import { createASTNNormalizer, serializeSchema } from "../core"
+import {
+    createASTNNormalizer,
+    serializeSchema,
+    createSerializedQuotedString,
+    createTreeParser,
+    handleEvent,
+    flatten,
+    FormatInstructionWriter,
+    printTreeParserError,
+    createDummyValueHandler,
+    TreeParserEvent,
+} from "../core"
 import { InternalSchemaSpecification, SerializationStyle } from "../interfaces"
 import { Schema } from "../schema"
 //import { SerializeOut, serializeDataset, SerializableDataset } from "./serializeDataset"
-import { SerializableDataset } from "./serializeDataset"
+import { SerializableDataset, serializeDataset, SerializeOut } from "./serializeDataset"
 
-// function assertUnreachable<RT>(_x: never): RT {
-//     throw new Error("unreachable")
-// }
+function assertUnreachable<RT>(_x: never): RT {
+    throw new Error("unreachable")
+}
 
 export function serialize(
-    _dataset: SerializableDataset,
-    _schema: Schema,
-    _internalSchemaSpecification: InternalSchemaSpecification,
-    _style: SerializationStyle,
-    _writer: (str: string) => void,
-): p.IValue<null> {
-    return p.value(null)
-    // const newline = "\r\n"
-    // const indentation = "    "
+    dataset: SerializableDataset,
+    schema: Schema,
+    internalSchemaSpecification: InternalSchemaSpecification,
+    style: SerializationStyle,
+    writer: (str: string) => void,
+): void {
+    const newline = "\r\n"
+    const indentation = "    "
 
-    // const normalizer = createASTNNormalizer<null, null>(
-    //     indentation,
-    //     newline,
-    //     writer,
-    // )
 
-    // return ((): p.IValue<null> => {
-    //     switch (internalSchemaSpecification[0]) {
-    //         case "embedded": {
-    //             serializeSchema(
-    //                 schema,
-    //                 event => {
-    //                     normalizer.
-    //                 }
-    //             )
-    //             const treeBuilder = astncore.createStackedParser<null>(
-    //                 astncore.createSemanticState({
-    //                     treeHandler: astncore.createDecoratedTree(
-    //                         normalizer.schemaFormatter,
-    //                         astncore.createTreeConcatenator(
-    //                             writer,
-    //                             () => p.value(null)
-    //                         ),
-    //                     ),
-    //                     raiseError: _error => {
-    //                         //
-    //                     },
-    //                     createReturnValue: () => {
-    //                         return p.value(null)
-    //                     },
-    //                     createUnexpectedValueHandler: () => astncore.createDummyValueHandler(() => p.value(null)),
-    //                     onEnd: () => {
-    //                         writer(normalizer.onAfterSchema())
-    //                         //onEnd
-    //                         //no need to return an value, we're only here for the side effects, so return 'null'
-    //                         return p.value(null)
-    //                     },
-    //                 })
-    //             )
-    //             writer(`! `)
-    //             const events: astncore.TreeBuilderEvent<null>[] = []
-    //             astncore.serializeSchema(
-    //                 schema,
-    //                 event => {
-    //                     events.push(event)
-    //                 },
-    //                 null,
-    //             )
+    const writer2: FormatInstructionWriter<null, null> = {
+        token: instruction => {
+            writer(instruction.stringBefore)
+            writer(instruction.token)
+            writer(instruction.stringAfter)
 
-    //             return p20.createArray(events).streamify().consume(null, treeBuilder)
-    //         }
-    //         case "none": {
-    //             return p.value(null)
-    //         }
-    //         case "reference": {
-    //             const $ = internalSchemaSpecification[1]
-    //             writer(`! ${astncore.createSerializedQuotedString($.name)}${newline}`)
-    //             return p.value(null)
-    //         }
-    //         default:
-    //             return assertUnreachable(internalSchemaSpecification[0])
-    //     }
+        },
+        nonToken: instruction => {
+            writer(instruction.string)
+        },
+    }
+    const normalizer = createASTNNormalizer<null, null>(
+        indentation,
+        newline,
+        writer2,
+    )
 
-    // })().mapResult(() => {
+    switch (internalSchemaSpecification[0]) {
+        case "embedded": {
+            writer(`! ! "astn/schema@0.1" `)
+            const embeddedSchemaParser = createTreeParser(
+                flatten(normalizer),
+                $ => {
+                    throw new Error(`unexpected error in schema: ${printTreeParserError($.error)}`)
+                },
+                () => {
+                    return createDummyValueHandler()
+                },
+                () => {
 
-    //     const events: astncore.TreeBuilderEvent<null>[] = []
+                },
+            )
+            serializeSchema(
+                schema,
+                event => {
+                    handleEvent(event, null, embeddedSchemaParser)
+                },
+            )
+            embeddedSchemaParser.forceEnd(null)
+            break
+        }
+        case "none": {
+            break
+        }
+        case "reference": {
+            const $ = internalSchemaSpecification[1]
+            writer(`! ${createSerializedQuotedString($.name)}${newline}`)
+            break
+        }
+        default:
+            assertUnreachable(internalSchemaSpecification[0])
+    }
 
-    //     function createOut(): SerializeOut {
-    //         return {
-    //             sendBlock: (eventpair, callback) => {
-    //                 events.push({
-    //                     type: eventpair.open,
-    //                     annotation: null,
-    //                 })
-    //                 callback(createOut())
-    //                 events.push({
-    //                     type: eventpair.close,
-    //                     annotation: null,
-    //                 })
-    //             },
-    //             sendEvent: event => {
-    //                 events.push({
-    //                     type: event,
-    //                     annotation: null,
-    //                 })
-    //             },
-    //         }
-    //     }
-    //     serializeDataset(
-    //         dataset,
-    //         schema["root type"].get(),
-    //         createOut(),
-    //         style,
-    //     )
-    //     const treeBuilder = astncore.createStackedParser<null>(
-    //         astncore.createSemanticState({
-    //             treeHandler: astncore.createDecoratedTree(
-    //                 normalizer.schemaFormatter,
-    //                 astncore.createTreeConcatenator(
-    //                     writer,
-    //                     () => p.value(null)
-    //                 ),
-    //             ),
-    //             raiseError: _error => {
-    //                 //
-    //             },
-    //             createReturnValue: () => {
-    //                 return p.value(null)
-    //             },
-    //             createUnexpectedValueHandler: () => astncore.createDummyValueHandler(() => p.value(null)),
-    //             onEnd: () => {
-    //                 writer(normalizer.onAfterSchema())
-    //                 //onEnd
-    //                 //no need to return an value, we're only here for the side effects, so return 'null'
-    //                 return p.value(null)
-    //             },
-    //         })
-    //     )
-    //     return p20.createArray(events).streamify().consume(null, treeBuilder)
-    // })
+    const bodyParser = createTreeParser(
+        flatten(normalizer),
+        $ => {
+            throw new Error(`unexpected error in schema: ${printTreeParserError($.error)}`)
+        },
+        () => {
+            return createDummyValueHandler()
+        },
+        () => {
+
+        },
+    )
+
+    function createOut(): SerializeOut {
+        function he(event: TreeParserEvent) {
+            handleEvent(event, null, bodyParser)
+        }
+        return {
+            sendBlock: (eventpair, callback) => {
+                he(eventpair.open)
+                callback(createOut())
+                he(eventpair.close)
+            },
+            sendEvent: event => {
+                he(event)
+            },
+        }
+    }
+    serializeDataset(
+        dataset,
+        schema["root type"].get(),
+        createOut(),
+        style,
+    )
+    bodyParser.forceEnd(null)
+    writer(newline)
 }

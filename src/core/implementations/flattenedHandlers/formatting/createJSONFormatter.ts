@@ -151,6 +151,9 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.annotation,
             )
         },
+        end: () => {
+
+        },
     }
 }
 

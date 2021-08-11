@@ -1,7 +1,6 @@
 /* eslint
     complexity:"off",
     no-console:"off",
-    max-classes-per-file: "off",
 */
 import * as p from "pareto"
 import { Location, Range } from "../../generic/location"

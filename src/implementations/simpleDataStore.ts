@@ -126,14 +126,12 @@ function buildValue<TokenAnnotation, NonTokenAnnotation>(
 
 export function createBuilder<TokenAnnotation, NonTokenAnnotation>(
     ds: Datastore,
-    onEnd: () => void,
 ): TypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         root: buildValue(
             ds.root,
         ),
         onEnd: () => {
-            onEnd()
         },
     }
 }

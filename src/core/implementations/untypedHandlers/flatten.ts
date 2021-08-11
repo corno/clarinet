@@ -178,5 +178,8 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
     }
     return {
         root: createDecoratedRequiredValue(),
+        onEnd: annotation => {
+            handler.end(annotation)
+        },
     }
 }

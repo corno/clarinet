@@ -1,6 +1,4 @@
-/* eslint
-    "max-classes-per-file": off,
-*/
+
 import { TypedTreeHandler, Token, TypedValueHandler } from "../../../interfaces"
 
 function assertUnreachable<RT>(_x: never): RT {

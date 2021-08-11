@@ -1,5 +1,4 @@
 /* eslint
-    max-classes-per-file: "off",
 */
 import { Range, printRange } from "./location";
 

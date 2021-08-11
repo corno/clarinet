@@ -1,3 +1,4 @@
+import * as p from "pareto"
 import * as astncore from "../../core"
 
 import { getEndLocationFromRange } from "../../generic"
@@ -49,6 +50,7 @@ export function createCodeCompletionFinder(
             if (!positionAlreadyFound) {
                 generate(previousAfter)
             }
+            return p.value(null)
         }
     )
 }

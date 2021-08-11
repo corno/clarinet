@@ -50,5 +50,5 @@ export type Token2<Annotation> = {
 
 export interface TokenConsumer<Annotation> {
     onData(token: Token2<Annotation>): p.IValue<boolean>
-    onEnd(aborted: boolean, annotation: Annotation): p.IValue<null>
+    onEnd(aborted: boolean, annotation: Annotation): void
 }

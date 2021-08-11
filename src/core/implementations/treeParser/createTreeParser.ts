@@ -1,7 +1,6 @@
 /* eslint
     no-underscore-dangle: "off",
     complexity: off,
-    max-classes-per-file: off,
 */
 import * as i from "../../interfaces/untyped"
 import { TreeParserErrorType } from "./functionTypes"
@@ -164,6 +163,7 @@ export function createTreeParser<TokenAnnotation>(
     ): void {
         if (currentContext === null) {
             currentTreeHandler = null
+            treeHandler.onEnd(annotation)
             onEnd(annotation)
         } else {
             switch (currentContext[0]) {

@@ -1,6 +1,4 @@
-/* eslint
-    "max-classes-per-file": off,
-*/
+
 import * as astncore from "../../core"
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
 import { DeserializeError, ExternalSchemaResolvingError } from "../../interfaces/deserialize/Errors"

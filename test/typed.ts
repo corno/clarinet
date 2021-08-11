@@ -59,6 +59,7 @@ describe('typed', () => {
                             core.OnDuplicateEntry.ignore,
                         )
                         return {
+                            onEnd: () => {},
                             root: callback(
                                 expect,
                                 errorLine => {

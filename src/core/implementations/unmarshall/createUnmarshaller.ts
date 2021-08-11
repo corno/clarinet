@@ -26,5 +26,6 @@ export function createUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                 )
             },
         },
+        onEnd: () => handler.onEnd({}),
     }
 }

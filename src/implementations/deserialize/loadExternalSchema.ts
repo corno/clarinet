@@ -1,6 +1,4 @@
-/* eslint
-    "max-classes-per-file": off,
-*/
+
 import * as p from "pareto"
 import { SchemaAndSideEffects } from "../../interfaces/deserialize/SchemaAndSideEffects"
 
