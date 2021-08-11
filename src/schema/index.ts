@@ -1,5 +1,6 @@
 export * from "./definitions"
 export * from "./generics"
 export * from "./createASTNSchemaDeserializer"
+export * from "./createASTNSchemaBuilder"
 export * from "./Reference"
 export * from "./createDictionary"

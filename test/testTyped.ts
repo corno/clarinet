@@ -13,6 +13,8 @@ import {
     SerializationStyle,
     processFile,
     createTypedSerializer,
+    DiagnosticSeverity,
+    createASTNSchemaBuilder,
 } from "../src"
 
 function readFileFromFileSystem(
@@ -102,52 +104,8 @@ function deepEqualJSON(
         JSON.stringify(actual, undefined, "\t"),
     )
 }
-
 export function directoryTests(): void {
 
-    function getSchemaSchemaBuilder(
-        name: string
-    ): astn.SchemaSchemaBuilder<astn.TokenizerAnnotationData, null> | null {
-        if (name !== "astn/schema@0.1") {
-            return null
-        }
-        return (onError2, onSchema) => {
-            let foundErrors = false
-            return astn.createASTNSchemaDeserializer(
-                astn.createExpectContext(
-                    $ => {
-                        onError2(["expect", $.issue], $.annotation)
-                    },
-                    _$ => {
-                        //ignore warnings
-                        //onError2(`${astn.printExpectError($.issue)} @ ${astn.printRange($.annotation.range)}`, astn.DiagnosticSeverity.warning)
-                    },
-                    () => astn.createDummyValueHandler(),
-                    () => astn.createDummyValueHandler(),
-                    astn.ExpectSeverity.warning,
-                    astn.OnDuplicateEntry.ignore,
-                ),
-                (message, annotation) => {
-                    foundErrors = true
-                    onError2(["validation", { message: message }], annotation)
-                },
-                schema => {
-                    if (schema === null) {
-                        if (foundErrors === false) {
-                            throw new Error("no schema, no errors")
-                        }
-                    } else {
-                        onSchema({
-                            schema: schema,
-                            createStreamingValidator: () => {
-                                return astn.createDummyTypedHandler()
-                            },
-                        })
-                    }
-                },
-            )
-        }
-    }
     describe("'tests' directory", () => {
         fs.readdirSync(testsDir).forEach(dir => {
             const testDirPath = path.join(testsDir, dir)
@@ -165,7 +123,12 @@ export function directoryTests(): void {
                     serializedDataset,
                     path.basename(serializedDatasetPath),
                     path.dirname(serializedDatasetPath),
-                    getSchemaSchemaBuilder,
+                    name => {
+                        if (name !== "astn/schema@0.1") {
+                            return null
+                        }
+                        return createASTNSchemaBuilder()
+                    },
                     readFileFromFileSystem,
                     schemaID => {
                         return readFileFromFileSystem(__dirname + "../../../test/schema", schemaID)
