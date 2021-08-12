@@ -4,38 +4,6 @@
 
 import * as p from "pareto"
 import * as astn from ".."
-//import { createBuilder, createSerializeInterface, Datastore, SerializationStyle } from "../src"
-
-
-// export function createNormalizer(
-//     style: SerializationStyle,
-//     onEnd: (str: string) => void,
-// ): (schemaSpec: astn.ResolvedSchema<astn.TokenizerAnnotationData, null>) => astn.TypedTreeHandler<astn.TokenizerAnnotationData, null> {
-//     return resolvedSchema => {
-//         const simpleDS: Datastore = {
-//             root: { type: null },
-//         }
-//         return createBuilder(
-//             simpleDS,
-//             () => {
-//                 let out = ""
-//                 return astn.serialize(
-//                     createSerializeInterface(simpleDS),
-//                     resolvedSchema.schemaAndSideEffects.schema,
-//                     resolvedSchema.specification,
-//                     style,
-//                     str => {
-//                         //console.log("!!!!", str)
-//                         out += str
-//                     },
-//                 ).mapResult(() => {
-//                     console.log("XXX", out)
-//                     return onEnd(out)
-//                 })
-//             }
-//         )
-//     }
-// }
 
 export function createProcessorForASTNStreamWithContext(
     serializedDatasetBaseName: string,
@@ -53,7 +21,7 @@ export function createProcessorForASTNStreamWithContext(
     getTypedTreeHandler: (
         schemaSpec: astn.ResolvedSchema<astn.TokenizerAnnotationData, null>
     ) => astn.TypedTreeHandler<astn.TokenizerAnnotationData, null>,
-    onError: (error: string, severity: astn.DiagnosticSeverity) => void,
+    onError: (error: string, severity: astn.DiagnosticSeverity, range: astn.Range | null) => void,
 ): p.IValue<p.IStreamConsumer<string, null, null>> {
     return astn.loadContextSchema(
         {
@@ -63,7 +31,7 @@ export function createProcessorForASTNStreamWithContext(
         },
         getSchemaSchemaBuilder,
         (error, severity) => {
-            onError(astn.printContextSchemaError(error), severity)
+            onError(astn.printContextSchemaError(error), severity, null)
         },
     ).mapResult(contextSchema => {
         return p.value(astn.createStreamPreTokenizer(
@@ -72,7 +40,7 @@ export function createProcessorForASTNStreamWithContext(
                     contextSchema: contextSchema,
                     resolveReferencedSchema: getReferencedSchema,
                     onError: (error, annotation, severity) => {
-                        onError(`${astn.printDeserializationDiagnostic(error)} @ ${astn.printRange(annotation.range)}`, severity)
+                        onError(`${astn.printDeserializationDiagnostic(error)}`, severity, annotation.range)
                     },
                     getSchemaSchemaBuilder: getSchemaSchemaBuilder,
                     handlerBuilder: getTypedTreeHandler,
@@ -83,7 +51,7 @@ export function createProcessorForASTNStreamWithContext(
 
             ),
             $ => {
-                onError(astn.printTokenError($.error), astn.DiagnosticSeverity.error)
+                onError(astn.printTokenError($.error), astn.DiagnosticSeverity.error, $.range)
             }
         ))
     })

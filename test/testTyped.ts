@@ -15,6 +15,7 @@ import {
     createTypedSerializer,
     DiagnosticSeverity,
     createASTNSchemaBuilder,
+    printRange,
 } from "../src"
 
 function readFileFromFileSystem(
@@ -114,7 +115,7 @@ export function directoryTests(): void {
             const serializedDataset = fs.readFileSync(serializedDatasetPath, { encoding: "utf-8" })
 
             function parse(
-                onError: (error: string, severity: astn.DiagnosticSeverity) => void,
+                onError: (error: string, severity: astn.DiagnosticSeverity, range: astn.Range | null) => void,
                 getRootHandler: (
                     schema: astn.ResolvedSchema<astn.TokenizerAnnotationData, null>
                 ) => astn.TypedTreeHandler<astn.TokenizerAnnotationData, null>,
@@ -148,8 +149,8 @@ export function directoryTests(): void {
                 it("issues", async () => {
                     const actualIssues: Issues = []
                     return parse(
-                        (error, severity) => {
-                            actualIssues.push([error, null, severity === astn.DiagnosticSeverity.warning ? "warning" : "error"])
+                        (error, severity, range) => {
+                            actualIssues.push([error + (range === null ? "": ` @ ${printRange(range)}`), null, severity === astn.DiagnosticSeverity.warning ? "warning" : "error"])
                         },
                         schema => schema.schemaAndSideEffects.createStreamingValidator(
                             (error, annotation, severity) => {
