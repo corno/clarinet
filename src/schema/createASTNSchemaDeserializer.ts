@@ -278,7 +278,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                             targetValueType = ["tagged union", {
                                                 "options": options.toDictionary(),
                                                 "default option": createReference(
-                                                    "option",
+                                                    "default option",
                                                     defaultOptionName,
                                                     "yes",
                                                     $.annotation,
@@ -410,7 +410,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                 schema = {
                     "types": types.toDictionary(),
                     "root type": createReference(
-                        "type",
+                        "root type",
                         rootTypeName,
                         "root",
                         $.annotation,

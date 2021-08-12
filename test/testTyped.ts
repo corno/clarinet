@@ -11,7 +11,7 @@ import * as astn from "../src"
 import * as p20 from "pareto-20"
 import {
     SerializationStyle,
-    processFile,
+    createProcessorForASTNStreamWithContext,
     createTypedSerializer,
     DiagnosticSeverity,
     createASTNSchemaBuilder,
@@ -119,8 +119,7 @@ export function directoryTests(): void {
                     schema: astn.ResolvedSchema<astn.TokenizerAnnotationData, null>
                 ) => astn.TypedTreeHandler<astn.TokenizerAnnotationData, null>,
             ): p.IValue<null> {
-                return processFile(
-                    serializedDataset,
+                return createProcessorForASTNStreamWithContext(
                     path.basename(serializedDatasetPath),
                     path.dirname(serializedDatasetPath),
                     name => {
@@ -133,9 +132,17 @@ export function directoryTests(): void {
                     schemaID => {
                         return readFileFromFileSystem(__dirname + "../../../test/schema", schemaID)
                     },
-                    onError,
                     getRootHandler,
-                )
+                    onError,
+                ).mapResult(sp => {
+
+                    return p20.createArray(
+                        [serializedDataset]
+                    ).streamify().consume(
+                        null,
+                        sp
+                    )
+                })
             }
             describe(dir, () => {
                 it("issues", async () => {

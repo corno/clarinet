@@ -4,7 +4,6 @@
 
 import * as p from "pareto"
 import * as astn from ".."
-import * as p20 from "pareto-20"
 //import { createBuilder, createSerializeInterface, Datastore, SerializationStyle } from "../src"
 
 
@@ -38,8 +37,7 @@ import * as p20 from "pareto-20"
 //     }
 // }
 
-export function processFile(
-    serializedDataset: string,
+export function createProcessorForASTNStreamWithContext(
     serializedDatasetBaseName: string,
     serializedDatasetDirName: string,
     getSchemaSchemaBuilder: (
@@ -52,10 +50,11 @@ export function processFile(
     getReferencedSchema: (
         id: string
     ) => p.IUnsafeValue<p.IStream<string, null>, astn.RetrievalError>,
+    getTypedTreeHandler: (
+        schemaSpec: astn.ResolvedSchema<astn.TokenizerAnnotationData, null>
+    ) => astn.TypedTreeHandler<astn.TokenizerAnnotationData, null>,
     onError: (error: string, severity: astn.DiagnosticSeverity) => void,
-    handlerBuilder: (schemaSpec: astn.ResolvedSchema<astn.TokenizerAnnotationData, null>) => astn.TypedTreeHandler<astn.TokenizerAnnotationData, null>,
-): p.IValue<null> {
-
+): p.IValue<p.IStreamConsumer<string, null, null>> {
     return astn.loadContextSchema(
         {
             basename: serializedDatasetBaseName,
@@ -67,30 +66,25 @@ export function processFile(
             onError(astn.printContextSchemaError(error), severity)
         },
     ).mapResult(contextSchema => {
-        return p20.createArray(
-            [serializedDataset]
-        ).streamify().consume(
-            null,
-            astn.createStreamPreTokenizer(
-                astn.createTokenizer(
-                    astn.createDeserializer({
-                        contextSchema: contextSchema,
-                        resolveReferencedSchema: getReferencedSchema,
-                        onError: (error, annotation, severity) => {
-                            onError(`${astn.printDeserializationDiagnostic(error)} @ ${astn.printRange(annotation.range)}`, severity)
-                        },
-                        getSchemaSchemaBuilder: getSchemaSchemaBuilder,
-                        handlerBuilder: handlerBuilder,
-                        onEnd: () => {
-                            return p.value(null)
-                        },
-                    })
+        return p.value(astn.createStreamPreTokenizer(
+            astn.createTokenizer(
+                astn.createDeserializer({
+                    contextSchema: contextSchema,
+                    resolveReferencedSchema: getReferencedSchema,
+                    onError: (error, annotation, severity) => {
+                        onError(`${astn.printDeserializationDiagnostic(error)} @ ${astn.printRange(annotation.range)}`, severity)
+                    },
+                    getSchemaSchemaBuilder: getSchemaSchemaBuilder,
+                    handlerBuilder: getTypedTreeHandler,
+                    onEnd: () => {
+                        return p.value(null)
+                    },
+                })
 
-                ),
-                $ => {
-                    onError(astn.printTokenError($.error), astn.DiagnosticSeverity.error)
-                }
-            )
-        )
+            ),
+            $ => {
+                onError(astn.printTokenError($.error), astn.DiagnosticSeverity.error)
+            }
+        ))
     })
 }
