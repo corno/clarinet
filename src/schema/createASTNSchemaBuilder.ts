@@ -8,8 +8,8 @@ import {
 } from ".."
 
 
-export function createASTNSchemaBuilder(
-): astn.SchemaSchemaBuilder<astn.TokenizerAnnotationData, null> | null {
+export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(
+): astn.SchemaSchemaBuilder<TokenAnnotation, NonTokenAnnotation> | null {
     return (onError2, onSchema) => {
         let foundErrors = false
         return astn.createASTNSchemaDeserializer(
