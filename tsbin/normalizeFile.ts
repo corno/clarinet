@@ -1,7 +1,6 @@
-// import * as core from "../src/core"
-// import { formatCLI } from "./formatCLI";
+import * as core from "../src"
+import { formatCLI } from "./formatCLI";
 
-// formatCLI(
-//     core.createASTNNormalizer("    ", "\r\n"),
-//     "\r\n",
-// )
+formatCLI(
+    core.createASTNSerializer,
+)
