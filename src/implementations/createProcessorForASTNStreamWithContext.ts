@@ -1,7 +1,3 @@
-/* eslint
-    no-console: "off",
-*/
-
 import * as p from "pareto"
 import * as astn from ".."
 
