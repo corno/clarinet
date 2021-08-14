@@ -1,5 +1,5 @@
 
-export const Comment = {
+export const CommentChar = {
     solidus: 0x2F,           // /
     asterisk: 0x2A,          // *
 }

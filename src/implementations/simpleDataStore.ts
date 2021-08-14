@@ -3,7 +3,8 @@
     "complexity": 0
 */
 
-import { DiagnosticSeverity, TypedTreeHandler, TypedValueHandler } from "../interfaces/typed"
+import { DiagnosticSeverity } from "../generic"
+import { TypedTreeHandler, TypedValueHandler } from "../Ityped"
 import * as serialize from "./serializeDataset"
 
 export type OnError<Annotation> = (message: string, annotation: Annotation, severity: DiagnosticSeverity) => void

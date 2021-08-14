@@ -1,14 +1,14 @@
 import * as p from "pareto"
-import { Range } from "../generic"
+import { DiagnosticSeverity, Range } from "../generic"
 import { ResolvedSchema, RetrievalError, SchemaSchemaBuilder, TokenizerAnnotationData } from "../interfaces"
-import { DiagnosticSeverity, TypedTreeHandler } from "../interfaces/typed"
-import { createDeserializer } from "./deserialize/createDeserializer"
-import { loadContextSchema } from "./deserialize/loadContextSchema"
-import { printContextSchemaError } from "./deserialize/printContextSchemaError"
-import { printDeserializationDiagnostic } from "./deserialize/printDeserializeDiagnostic"
-import { printTokenError } from "./pretokenizer"
-import { createStreamPreTokenizer } from "./streamPretokenizer"
-import { createTokenizer } from "./tokenizer"
+import { TypedTreeHandler } from "../Ityped"
+import { createDeserializer } from "../deserialize/createDeserializer"
+import { loadContextSchema } from "../deserialize/loadContextSchema"
+import { printContextSchemaError } from "../deserialize/printContextSchemaError"
+import { printDeserializationDiagnostic } from "../deserialize/printDeserializeDiagnostic"
+import { createStreamPreTokenizer } from "../streamPretokenizer"
+import { createTokenizer } from "../tokenizer"
+import { printTokenError } from "../pretokenizer"
 
 export function createProcessorForASTNStreamWithContext(
     serializedDatasetBaseName: string,

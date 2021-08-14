@@ -7,7 +7,7 @@
 import { SerializationStyle } from "../interfaces"
 import * as x from "../generics/interface/IReadonlyDictionary"
 import { TypeDefinition, ValueDefinition } from "../typedHandler"
-import { TreeParserEvent } from "../interfaces/untyped"
+import { TreeParserEvent } from "../Iuntyped"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

@@ -1,4 +1,4 @@
-import { ITreeParser, Token, TreeParserEvent } from "../../interfaces/untyped"
+import { ITreeParser, Token, TreeParserEvent } from "../../Iuntyped"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

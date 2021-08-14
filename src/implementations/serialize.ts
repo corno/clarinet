@@ -1,12 +1,12 @@
 //import * as p20 from "pareto-20"
 import { InternalSchemaSpecification, SerializationStyle } from "../interfaces"
-import { TreeParserEvent } from "../interfaces/untyped"
+import { TreeParserEvent } from "../Iuntyped"
 import { createTreeParser, handleEvent, printTreeParserError } from "../treeParser"
 import { Schema } from "../typedHandler"
 import { serializeSchema } from "../typedHandler/implementation"
-import { createASTNNormalizer, createSerializedQuotedString, FormatInstructionWriter } from "./flattenedHandlers/formatting"
+import { createASTNNormalizer, createSerializedQuotedString, FormatInstructionWriter } from "../flattenedHandlers"
 import { SerializableDataset, serializeDataset, SerializeOut } from "./serializeDataset"
-import { createDummyValueHandler, flatten } from "./untypedHandlers"
+import { createDummyValueHandler, flatten } from "../untypedHandlers"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

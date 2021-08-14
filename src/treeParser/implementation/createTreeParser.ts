@@ -2,7 +2,7 @@
     no-underscore-dangle: "off",
     complexity: off,
 */
-import * as i from "../../interfaces/untyped"
+import * as i from "../../Iuntyped"
 import { TreeParserErrorType } from "../functionTypes"
 
 function assertUnreachable<RT>(_x: never): RT {

@@ -1,16 +1,8 @@
-/* eslint
-    no-console: "off",
-*/
 
-import {
-    createBuilder,
-    createSerializeInterface,
-    Datastore,
-    SerializationStyle,
-    serialize,
-} from ".."
-import { TypedTreeHandler } from "../interfaces/typed"
-import { ResolvedSchema } from "../interfaces"
+import { TypedTreeHandler } from "../Ityped"
+import { ResolvedSchema, SerializationStyle } from "../interfaces"
+import { createBuilder, createSerializeInterface, Datastore } from "./simpleDataStore"
+import { serialize } from "./serialize"
 
 
 export function createTypedSerializer<TokenAnnotation, NonTokenAnnotation>(

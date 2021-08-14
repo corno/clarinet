@@ -2,14 +2,14 @@
     quote-props: "off",
 
 */
-import * as def from "../typedHandler/interface/definitions"
+import * as def from "../typedHandler"
 import {
     AnnotatedString,
     createDictionary,
     createReference,
     createResolveRegistry,
 } from "../generics"
-import { IExpectContext, TreeHandler, ValueHandler } from "../interfaces/untyped"
+import { IExpectContext, TreeHandler, ValueHandler } from "../Iuntyped"
 
 /**
  * this function is only calls back if the value is not null

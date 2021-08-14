@@ -3,8 +3,9 @@
 */
 
 import { DiagnosticSeverity } from "../generic"
-import { createDummyTypedHandler, createDummyValueHandler, createExpectContext, ExpectSeverity, OnDuplicateEntry } from "../implementations"
 import { SchemaSchemaBuilder } from "../interfaces"
+import { createDummyTypedHandler } from "../typedHandlers"
+import { createDummyValueHandler, createExpectContext, ExpectSeverity, OnDuplicateEntry } from "../untypedHandlers"
 import { createASTNSchemaDeserializer } from "./createASTNSchemaDeserializer"
 
 
