@@ -2,12 +2,12 @@
     quote-props: "off",
 
 */
-import * as def from "./definitions"
+import * as def from "../typedHandler/interface/definitions"
 import {
     AnnotatedString,
     createReference,
     createResolveRegistry,
-} from "./Reference"
+} from "../generics"
 import { createDictionary, IExpectContext, TreeHandler, ValueHandler } from "../core"
 
 /**

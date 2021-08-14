@@ -1,4 +1,4 @@
-import { IReadonlyDictionary } from "./generics"
+import { IReadonlyDictionary } from "../interface"
 
 export interface DictionaryBuilder<T> {
     add(key: string, value: T): void

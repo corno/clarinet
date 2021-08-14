@@ -1,4 +1,4 @@
-export type RawObject<T> = { [key: string]: T }
+//export type RawObject<T> = { [key: string]: T }
 
 export interface IReadonlyLookup<T> {
     getUnsafe(key: string): T

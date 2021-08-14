@@ -1,8 +1,8 @@
 /* eslint
     "@typescript-eslint/no-shadow": "off"
  */
+import { IReadonlyDictionary } from "../../../generics"
 import * as i from "../../interfaces"
-import { IReadonlyDictionary } from "../../interfaces"
 import {
     createDummyArrayHandler,
     createDummyObjectHandler,

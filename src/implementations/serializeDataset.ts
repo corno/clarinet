@@ -6,7 +6,7 @@
 
 import { TreeParserEvent, TypeDefinition, ValueDefinition } from "../core"
 import { SerializationStyle } from "../interfaces"
-import * as x from "../schema/generics/IReadonlyDictionary"
+import * as x from "../generics/interface/IReadonlyDictionary"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

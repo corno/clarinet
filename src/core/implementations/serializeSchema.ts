@@ -1,4 +1,5 @@
-import { IReadonlyDictionary, IReference, Schema, TreeParserEvent, ValueDefinition } from "../interfaces"
+import { IReadonlyDictionary, IReference } from "../../generics"
+import { Schema, TreeParserEvent, ValueDefinition } from "../interfaces"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
