@@ -1,5 +1,6 @@
-import * as astncore from "../../core"
 import { SchemaDeserializationError } from "../../interfaces/deserialize"
+import { printTreeParserError } from "../../treeParser"
+import { printExpectError } from "../untypedHandlers"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -9,7 +10,7 @@ export function printEmbeddedSchemaDeserializationError(error: SchemaDeserializa
     switch (error[0]) {
         case "expect": {
             const $$$ = error[1]
-            return astncore.printExpectError($$$)
+            return printExpectError($$$)
         }
         case "validation": {
             const $$$ = error[1]
@@ -19,7 +20,7 @@ export function printEmbeddedSchemaDeserializationError(error: SchemaDeserializa
         case "stacked": {
             const $$$ = error[1]
 
-            return astncore.printTreeParserError($$$)
+            return printTreeParserError($$$)
         }
         default:
             return assertUnreachable(error[0])

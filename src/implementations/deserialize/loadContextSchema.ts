@@ -1,7 +1,7 @@
 import * as p from "pareto"
-import * as astncore from "../../core"
 import { ContextSchema, ContextSchemaError, SchemaSchemaBuilder, TokenizerAnnotationData } from "../../interfaces"
 import { RetrievalError } from "../../interfaces/deserialize/ResolveReferencedSchema"
+import { DiagnosticSeverity } from "../../interfaces/typed"
 import { loadExternalSchema } from "./loadExternalSchema"
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -21,11 +21,11 @@ export function loadContextSchema(
     getSchemaSchemaBuilder: (
         name: string,
     ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null,
-    onError: (error: ContextSchemaError, severity: astncore.DiagnosticSeverity) => void,
+    onError: (error: ContextSchemaError, severity: DiagnosticSeverity) => void,
 ): p.IValue<ContextSchema<TokenizerAnnotationData, null>> {
     if (data.basename === schemaFileName) {
         //don't validate the schema against itself
-        onError(["validating schema file against internal schema"], astncore.DiagnosticSeverity.warning)
+        onError(["validating schema file against internal schema"], DiagnosticSeverity.warning)
         return p.value(["ignored"])
     }
 
@@ -42,7 +42,7 @@ export function loadContextSchema(
                 const $ = error[1]
                 onError(["external schema resolving", ["loading", {
                     message: `other: ${$.description}`,
-                }]], astncore.DiagnosticSeverity.error)
+                }]], DiagnosticSeverity.error)
                 return p.value(["has errors"])
             }
             default:
@@ -54,7 +54,7 @@ export function loadContextSchema(
                 stream,
                 getSchemaSchemaBuilder,
                 error => {
-                    onError(["external schema resolving", error], astncore.DiagnosticSeverity.error)
+                    onError(["external schema resolving", error], DiagnosticSeverity.error)
                 },
             ).reworkAndCatch<ContextSchema<TokenizerAnnotationData, null>>(
                 _error => {

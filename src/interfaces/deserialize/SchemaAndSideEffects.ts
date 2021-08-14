@@ -1,12 +1,9 @@
-import * as astncore from "../../core"
+import { Schema } from "../../typedHandler"
+import { DiagnosticSeverity, TypedTreeHandler } from "../typed"
 
-/**
- * a schema implementation should provide this type
- */
 export type SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation> = {
-    schema: astncore.Schema
+    schema: Schema
     createStreamingValidator: (
-        onValidationError: (message: string, annotation: TokenAnnotation, severity: astncore.DiagnosticSeverity) => void,
-    ) => astncore.TypedTreeHandler<TokenAnnotation, NonTokenAnnotation>
-    //createAsyncValidator: () => buildAPI.Root
+        onValidationError: (message: string, annotation: TokenAnnotation, severity: DiagnosticSeverity) => void,
+    ) => TypedTreeHandler<TokenAnnotation, NonTokenAnnotation>
 }

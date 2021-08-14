@@ -1,15 +1,16 @@
 import * as p from "pareto"
-import * as astncore from "../../core"
 import { getEndLocationFromRange } from "../../generic"
 import { TokenizerAnnotationData } from "../../interfaces"
+import { TypedTreeHandler } from "../../interfaces/typed"
+import { createHoverTextsGenerator } from "../typedHandlers"
 import { isPositionBeforeLocation } from "./isPositionBeforeLocation"
 
 export function createHoverTextFinder(
     positionLine: number, //the line where the hover is requested
     positionCharacter: number, //the character where the hover is requested
     callback: (hoverText: string) => void
-): astncore.TypedTreeHandler<TokenizerAnnotationData, null> {
-    return astncore.createHoverTextsGenerator(
+): TypedTreeHandler<TokenizerAnnotationData, null> {
+    return createHoverTextsGenerator(
         (annotation, getHoverText) => {
             //console.log("LOCATION", range.start.line, range.start.column, range.end.line, range.end.column)
 

@@ -2,26 +2,26 @@
     no-console: "off",
 */
 
-import * as astn from ".."
-import {
-    DiagnosticSeverity,
-} from ".."
+import { DiagnosticSeverity } from "../generic"
+import { createDummyTypedHandler, createDummyValueHandler, createExpectContext, ExpectSeverity, OnDuplicateEntry } from "../implementations"
+import { SchemaSchemaBuilder } from "../interfaces"
+import { createASTNSchemaDeserializer } from "./createASTNSchemaDeserializer"
 
 
-export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): astn.SchemaSchemaBuilder<TokenAnnotation, NonTokenAnnotation> | null {
+export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): SchemaSchemaBuilder<TokenAnnotation, NonTokenAnnotation> | null {
     return (onError2, onSchema) => {
         let foundErrors = false
-        return astn.createASTNSchemaDeserializer(
-            astn.createExpectContext(
+        return createASTNSchemaDeserializer(
+            createExpectContext(
                 $ => {
                     if ($.severity === DiagnosticSeverity.error) {
                         onError2(["expect", $.issue], $.annotation)
                     }
                 },
-                () => astn.createDummyValueHandler(),
-                () => astn.createDummyValueHandler(),
-                astn.ExpectSeverity.warning,
-                astn.OnDuplicateEntry.ignore,
+                () => createDummyValueHandler(),
+                () => createDummyValueHandler(),
+                ExpectSeverity.warning,
+                OnDuplicateEntry.ignore,
             ),
             (message, annotation) => {
                 foundErrors = true
@@ -36,7 +36,7 @@ export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): 
                     onSchema({
                         schema: schema,
                         createStreamingValidator: () => {
-                            return astn.createDummyTypedHandler()
+                            return createDummyTypedHandler()
                         },
                     })
                 }

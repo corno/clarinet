@@ -1,9 +1,9 @@
 
-import * as astncore from "../../core"
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
 import { DeserializeError, ExternalSchemaResolvingError } from "../../interfaces/deserialize/Errors"
 import { printTokenError } from "../pretokenizer"
 import { printStructureError } from "../structureParser"
+import { printUnmarshallError } from "../unmarshall"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -30,9 +30,9 @@ export function printDeserializationDiagnostic($: DeserializeError): string {
             const $$ = $[1]
             return $$[0]
         }
-        case "deserialize": {
+        case "unmarshall": {
             const $$ = $[1]
-            return astncore.printUnmarshallError($$)
+            return printUnmarshallError($$)
         }
         case "tokenizer": {
             const $$ = $[1]

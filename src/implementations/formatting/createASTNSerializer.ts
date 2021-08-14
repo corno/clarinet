@@ -1,7 +1,8 @@
 import * as p from "pareto"
-import * as core from "../../core"
 import { TokenConsumer } from "../../interfaces"
+import { createASTNNormalizer, FormatInstructionWriter } from "../flattenedHandlers/formatting"
 import { createStructureParser, StructureErrorHandler } from "../structureParser"
+import { flatten } from "../untypedHandlers"
 
 
 export function createASTNSerializer<TokenAnnotation>(
@@ -10,7 +11,7 @@ export function createASTNSerializer<TokenAnnotation>(
     write: (str: string) => void,
     errorHandler: StructureErrorHandler<TokenAnnotation>,
 ): TokenConsumer<TokenAnnotation> {
-    const writer: core.FormatInstructionWriter<TokenAnnotation, null> = {
+    const writer: FormatInstructionWriter<TokenAnnotation, null> = {
         token: instruction => {
             write(instruction.stringBefore)
             write(instruction.token)
@@ -26,7 +27,7 @@ export function createASTNSerializer<TokenAnnotation>(
         onEmbeddedSchema: _range => {
             foundHeader = true
             write(`! `)
-            return core.flatten( core.createASTNNormalizer(
+            return flatten(createASTNNormalizer(
                 indentationString,
                 newline,
                 writer
@@ -41,7 +42,7 @@ export function createASTNSerializer<TokenAnnotation>(
             if (foundHeader) {
                 write(newline)
             }
-            return core.flatten(core.createASTNNormalizer(
+            return flatten(createASTNNormalizer(
                 indentationString,
                 newline,
                 writer,

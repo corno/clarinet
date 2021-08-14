@@ -1,8 +1,8 @@
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
 import { SchemaError } from "../../interfaces/deserialize/Errors"
-import { printTreeParserError } from "../../core/implementations/treeParser/printTreeParserErrorError"
 import { printTokenError } from "../pretokenizer"
 import { printStructureError } from "../structureParser"
+import { printTreeParserError } from "../../treeParser"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

@@ -1,7 +1,8 @@
 import * as p from "pareto"
-import * as core from "../../core"
 import { TokenConsumer } from "../../interfaces"
+import { createJSONFormatter } from "../flattenedHandlers/formatting"
 import { createStructureParser, StructureErrorHandler } from "../structureParser"
+import { createDummyTreeHandler, flatten } from "../untypedHandlers"
 
 
 export function createJSONSerializer<TokenAnnotation>(
@@ -12,12 +13,12 @@ export function createJSONSerializer<TokenAnnotation>(
 ): TokenConsumer<TokenAnnotation> {
     return createStructureParser({
         onEmbeddedSchema: _range => {
-            return core.createDummyTreeHandler()
+            return createDummyTreeHandler()
         },
         onSchemaReference: () => {
             return p.value(false)
         },
-        onBody: () => core.flatten(core.createJSONFormatter(
+        onBody: () => flatten(createJSONFormatter(
             indentationString,
             newline,
             {

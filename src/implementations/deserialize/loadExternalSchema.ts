@@ -2,13 +2,13 @@
 import * as p from "pareto"
 import { SchemaAndSideEffects } from "../../interfaces/deserialize/SchemaAndSideEffects"
 
-import * as astncore from "../../core"
 import { RetrievalError, SchemaSchemaBuilder } from "../../interfaces/deserialize"
 import { ExternalSchemaResolvingError, SchemaError } from "../../interfaces/deserialize/Errors"
 import { TokenConsumer, TokenizerAnnotationData } from "../../interfaces"
 import { createStructureParser } from "../structureParser"
 import { createTokenizer } from "../tokenizer"
 import { createStreamPreTokenizer } from "../streamPretokenizer"
+import { createDummyTreeHandler } from "../untypedHandlers"
 
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -35,7 +35,7 @@ export function createSchemaDeserializer<TokenAnnotation>(
     return createStructureParser({
         onEmbeddedSchema: $$ => {
             onSchemaError(["schema schema cannot be embedded"], $$.embeddedSchemaAnnotation)
-            return astncore.createDummyTreeHandler()
+            return createDummyTreeHandler()
         },
         onSchemaReference: $$ => {
             schemaDefinitionFound = true
@@ -50,13 +50,13 @@ export function createSchemaDeserializer<TokenAnnotation>(
             if (!schemaDefinitionFound) {
                 //console.error("missing schema schema types")
                 onSchemaError(["missing schema schema definition"], annotation)
-                return astncore.createDummyTreeHandler()
+                return createDummyTreeHandler()
             } else {
                 if (schemaSchemaBuilder === null) {
                     if (!foundError) {
                         throw new Error("UNEXPECTED: SCHEMA PROCESSOR NOT SUBSCRIBED AND NO ERRORS")
                     }
-                    return astncore.createDummyTreeHandler()
+                    return createDummyTreeHandler()
                 } else {
                     return schemaSchemaBuilder(
                         (error, annotation2) => {

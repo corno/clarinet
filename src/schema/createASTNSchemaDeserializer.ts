@@ -5,10 +5,11 @@
 import * as def from "../typedHandler/interface/definitions"
 import {
     AnnotatedString,
+    createDictionary,
     createReference,
     createResolveRegistry,
 } from "../generics"
-import { createDictionary, IExpectContext, TreeHandler, ValueHandler } from "../core"
+import { IExpectContext, TreeHandler, ValueHandler } from "../interfaces/untyped"
 
 /**
  * this function is only calls back if the value is not null

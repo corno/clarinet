@@ -1,7 +1,5 @@
 
 import * as p from "pareto"
-import * as astncore from "../../core"
-
 import { ContextSchema } from "../../interfaces/deserialize/Dataset"
 import { DeserializeError } from "../../interfaces/deserialize/Errors"
 import { ResolveReferencedSchema } from "../../interfaces/deserialize/ResolveReferencedSchema"
@@ -9,18 +7,23 @@ import { ResolvedSchema, SchemaSchemaBuilder } from "../../interfaces/deserializ
 import { loadPossibleExternalSchema } from "./loadExternalSchema"
 import { TokenConsumer, TokenizerAnnotationData } from "../../interfaces"
 import { createStructureParser } from "../structureParser"
+import { Schema } from "../../typedHandler"
+import { DiagnosticSeverity, TypedTreeHandler } from "../../interfaces/typed"
+import { TreeHandler } from "../../interfaces/untyped"
+import { createUnmarshaller } from "../unmarshall"
+import { createDummyTreeHandler } from "../untypedHandlers"
 
 export function createDeserializer($: {
     contextSchema: ContextSchema<TokenizerAnnotationData, null>
     resolveReferencedSchema: ResolveReferencedSchema
-    onError: (diagnostic: DeserializeError, annotation: TokenizerAnnotationData, severity: astncore.DiagnosticSeverity) => void
+    onError: (diagnostic: DeserializeError, annotation: TokenizerAnnotationData, severity: DiagnosticSeverity) => void
 
     getSchemaSchemaBuilder: (
         name: string,
     ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null
     handlerBuilder: (
         schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
-    ) => astncore.TypedTreeHandler<TokenizerAnnotationData, null>
+    ) => TypedTreeHandler<TokenizerAnnotationData, null>
     onEnd: () => void
 }): TokenConsumer<TokenizerAnnotationData> {
 
@@ -40,7 +43,7 @@ export function createDeserializer($: {
             }
             return schemaSchemaBuilder(
                 (error, annotation) => {
-                    $.onError(["embedded schema error", error], annotation, astncore.DiagnosticSeverity.error)
+                    $.onError(["embedded schema error", error], annotation, DiagnosticSeverity.error)
                     foundSchemaErrors = true
                 },
                 schemaAndSideEffects => {
@@ -62,7 +65,7 @@ export function createDeserializer($: {
                     $.onError(
                         ["schema reference resolving", error],
                         $$.token.annotation,
-                        astncore.DiagnosticSeverity.error,
+                        DiagnosticSeverity.error,
                     )
                 },
             ).mapResult<boolean>(schemaAndSideEffects => {
@@ -77,14 +80,14 @@ export function createDeserializer($: {
         },
         onBody: firstBodyTokenAnnotation => {
             function createRealTreeHandler(
-                schema: astncore.Schema,
+                schema: Schema,
                 schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
-            ): astncore.TreeHandler<TokenizerAnnotationData, null> {
+            ): TreeHandler<TokenizerAnnotationData, null> {
                 const handler = $.handlerBuilder(schemaSpec)
-                return astncore.createDatasetUnmarshaller(
+                return createUnmarshaller(
                     schema,
                     handler,
-                    (error, annotation, severity) => $.onError(["deserialize", error], annotation, severity),
+                    (error, annotation, severity) => $.onError(["unmarshall", error], annotation, severity),
                 )
             }
             if ($.contextSchema[0] === "available") {
@@ -92,7 +95,7 @@ export function createDeserializer($: {
                     $.onError(
                         ["found both internal and context schema. ignoring internal schema"],
                         headerAnnotation,
-                        astncore.DiagnosticSeverity.warning
+                        DiagnosticSeverity.warning
                     )
                 }
                 return createRealTreeHandler(
@@ -110,9 +113,9 @@ export function createDeserializer($: {
                     $.onError(
                         ["no valid schema"],
                         firstBodyTokenAnnotation,
-                        astncore.DiagnosticSeverity.error,
+                        DiagnosticSeverity.error,
                     )
-                    return astncore.createDummyTreeHandler()
+                    return createDummyTreeHandler()
                 } else {
                     return createRealTreeHandler(
                         internalSchema.schemaAndSideEffects.schema,
@@ -124,24 +127,24 @@ export function createDeserializer($: {
                     $.onError(
                         ["no valid schema"],
                         firstBodyTokenAnnotation,
-                        astncore.DiagnosticSeverity.error,
+                        DiagnosticSeverity.error,
                     )
                 } else {
                     $.onError(
                         ["no schema"],
                         firstBodyTokenAnnotation,
-                        astncore.DiagnosticSeverity.error,
+                        DiagnosticSeverity.error,
                     )
                 }
-                return astncore.createDummyTreeHandler()
+                return createDummyTreeHandler()
             }
         },
         errors: {
             onTreeError: $$ => {
-                $.onError(["tree", $$.error], $$.annotation, astncore.DiagnosticSeverity.error)
+                $.onError(["tree", $$.error], $$.annotation, DiagnosticSeverity.error)
             },
             onStructureError: $$ => {
-                $.onError(["structure", $$.error], $$.annotation, astncore.DiagnosticSeverity.error)
+                $.onError(["structure", $$.error], $$.annotation, DiagnosticSeverity.error)
             },
         },
         onEnd: () => {

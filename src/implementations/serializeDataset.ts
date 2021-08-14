@@ -4,9 +4,10 @@
     "complexity": 0
 */
 
-import { TreeParserEvent, TypeDefinition, ValueDefinition } from "../core"
 import { SerializationStyle } from "../interfaces"
 import * as x from "../generics/interface/IReadonlyDictionary"
+import { TypeDefinition, ValueDefinition } from "../typedHandler"
+import { TreeParserEvent } from "../interfaces/untyped"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

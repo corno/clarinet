@@ -1,10 +1,11 @@
 
 import * as p from "pareto"
-import * as core from "../../core"
 import * as Char from "../../generic/characters"
 import { StructureErrorHandler, StructureErrorType as StructureErrorType } from "./functionTypes"
 import { MultilineStringData, SimpleStringData, StructuralTokenData, TokenConsumer, TokenType } from "../../interfaces/ITokenConsumer"
-import { createDummyValueHandler, createTreeParser } from "../../core"
+import { createTreeParser } from "../../treeParser"
+import { ITreeParser, SimpleStringToken, Token, TreeHandler } from "../../interfaces/untyped"
+import { createDummyValueHandler } from "../untypedHandlers"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -14,15 +15,15 @@ export function createStructureParser<Annotation>($: {
     onEmbeddedSchema: ($: {
         headerAnnotation: Annotation
         embeddedSchemaAnnotation: Annotation
-        schemaSchemaReferenceToken: core.SimpleStringToken<Annotation>
-    }) => core.TreeHandler<Annotation, null>
+        schemaSchemaReferenceToken: SimpleStringToken<Annotation>
+    }) => TreeHandler<Annotation, null>
     onSchemaReference: ($: {
         headerAnnotation: Annotation
-        token: core.SimpleStringToken<Annotation>
+        token: SimpleStringToken<Annotation>
     }) => p.IValue<boolean>
     onBody: (
         annotation: Annotation,
-    ) => core.TreeHandler<Annotation, null>
+    ) => TreeHandler<Annotation, null>
     onEnd: (endAnnotation: Annotation) => void
     errors: StructureErrorHandler<Annotation>
 }): TokenConsumer<Annotation> {
@@ -48,15 +49,15 @@ export function createStructureParser<Annotation>($: {
             embeddedSchemaAnnotation: Annotation
         }]
         | [StructureState.EXPECTING_EMBEDDED_SCHEMA, {
-            treeHandler: core.TreeHandler<Annotation, null>
+            treeHandler: TreeHandler<Annotation, null>
         }]
         | [StructureState.PROCESSING_EMBEDDED_SCHEMA, {
-            schemaParser: core.ITreeParser<Annotation>
+            schemaParser: ITreeParser<Annotation>
         }]
         | [StructureState.EXPECTING_BODY, {
         }]
         | [StructureState.PROCESSING_BODY, {
-            bodyParser: core.ITreeParser<Annotation>
+            bodyParser: ITreeParser<Annotation>
         }]
         | [StructureState.EXPECTING_END, {
         }]
@@ -146,11 +147,11 @@ export function createStructureParser<Annotation>($: {
             }
 
             function callStackedParser(
-                parser: core.ITreeParser<Annotation>,
+                parser: ITreeParser<Annotation>,
             ) {
                 return handleToken(
                     punctuation => {
-                        function createToken<Data>(dta: Data): core.Token<Data, Annotation> {
+                        function createToken<Data>(dta: Data): Token<Data, Annotation> {
                             return {
                                 data: dta,
                                 annotation: data.annotation,

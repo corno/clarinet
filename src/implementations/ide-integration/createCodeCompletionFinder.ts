@@ -1,15 +1,16 @@
 import * as p from "pareto"
-import * as astncore from "../../core"
 
 import { getEndLocationFromRange } from "../../generic"
 import { TokenizerAnnotationData } from "../../interfaces"
+import { TypedTreeHandler } from "../../interfaces/typed"
+import { createCodeCompletionsGenerator } from "../typedHandlers"
 import { isPositionBeforeLocation } from "./isPositionBeforeLocation"
 
 export function createCodeCompletionFinder(
     completionPositionLine: number,
     completionPositionCharacter: number,
     callback: (codeCompletion: string) => void
-): astncore.TypedTreeHandler<TokenizerAnnotationData, null> {
+): TypedTreeHandler<TokenizerAnnotationData, null> {
     let positionAlreadyFound = false
     let previousAfter: null | (() => string[]) = null
     //console.log("FINDING COMPLETIONS", line, character)
@@ -25,7 +26,7 @@ export function createCodeCompletionFinder(
 
     }
 
-    return astncore.createCodeCompletionsGenerator(
+    return createCodeCompletionsGenerator(
         (annotation, intra, after) => {
             //console.log("LOCATION", range.start.line, range.start.column, range.end.line, range.end.column)
 

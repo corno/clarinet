@@ -9,7 +9,7 @@ import {
     SerializationStyle,
     serialize,
 } from ".."
-import { TypedTreeHandler } from "../core"
+import { TypedTreeHandler } from "../interfaces/typed"
 import { ResolvedSchema } from "../interfaces"
 
 

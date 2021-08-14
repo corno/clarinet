@@ -1,24 +1,12 @@
-/* eslint
-    no-console:"off",
-    complexity: "off",
-*/
 import * as p from "pareto"
 import { describe } from "mocha"
 import * as chai from "chai"
-import * as core from "../src/core"
 import * as astn from "../src"
 import { tryToConsumeString } from "./consumeString"
-import { createStreamPreTokenizer, createTokenizer, printRange, printStructureError, TokenizerAnnotationData } from "../src"
-import { createDummyTreeHandler, DiagnosticSeverity } from "../src/core"
-import { printTreeParserError } from "../src/core/implementations/treeParser/printTreeParserErrorError"
-import { printTokenError } from "../src/implementations/pretokenizer/printTokenError"
-
-//const selectedJSONTests: string[] = ["two keys"]
-//const selectedExtensionTests: string[] = []
 
 type ErrorLine = [string, string]
 
-type ParserRequiredValueHandler = core.RequiredValueHandler<TokenizerAnnotationData, null>
+type ParserRequiredValueHandler = astn.RequiredValueHandler<astn.TokenizerAnnotationData, null>
 
 
 describe('typed', () => {
@@ -27,7 +15,7 @@ describe('typed', () => {
             testName: string,
             data: string,
             callback: (
-                expect: core.IExpectContext<astn.TokenizerAnnotationData, null>,
+                expect: astn.IExpectContext<astn.TokenizerAnnotationData, null>,
                 addError: (errorLine: ErrorLine) => void
             ) => ParserRequiredValueHandler,
             expectedErrors: ErrorLine[]
@@ -35,24 +23,24 @@ describe('typed', () => {
 
             it(testName, () => {
                 const foundErrors: ErrorLine[] = []
-                const structureParser = astn.createStructureParser<TokenizerAnnotationData>({
-                    onEmbeddedSchema: () => createDummyTreeHandler(),
+                const structureParser = astn.createStructureParser<astn.TokenizerAnnotationData>({
+                    onEmbeddedSchema: () => astn.createDummyTreeHandler(),
                     onSchemaReference: () => {
                         throw new Error("IMPLEMENT ME")
                     },
                     onBody: () => {
-                        const expect = core.createExpectContext<astn.TokenizerAnnotationData, null>(
+                        const expect = astn.createExpectContext<astn.TokenizerAnnotationData, null>(
                             $ => {
-                                if ($.severity === DiagnosticSeverity.error) {
-                                    foundErrors.push(["expect error", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
+                                if ($.severity === astn.DiagnosticSeverity.error) {
+                                    foundErrors.push(["expect error", `${astn.printExpectError($.issue)} ${astn.printRange($.annotation.range)}`])
                                 } else {
-                                    foundErrors.push(["expect warning", `${core.printExpectError($.issue)} ${printRange($.annotation.range)}`])
+                                    foundErrors.push(["expect warning", `${astn.printExpectError($.issue)} ${astn.printRange($.annotation.range)}`])
                                 }
                             },
-                            () => core.createDummyValueHandler(),
-                            () => core.createDummyValueHandler(),
-                            core.ExpectSeverity.warning,
-                            core.OnDuplicateEntry.ignore,
+                            () => astn.createDummyValueHandler(),
+                            () => astn.createDummyValueHandler(),
+                            astn.ExpectSeverity.warning,
+                            astn.OnDuplicateEntry.ignore,
                         )
                         return {
                             onEnd: () => {},
@@ -66,10 +54,10 @@ describe('typed', () => {
                     },
                     errors: {
                         onStructureError: $ => {
-                            foundErrors.push(["parser error", `${printStructureError($.error)} @ ${printRange($.annotation.range)}`])
+                            foundErrors.push(["parser error", `${astn.printStructureError($.error)} @ ${astn.printRange($.annotation.range)}`])
                         },
                         onTreeError: $ => {
-                            foundErrors.push(["parser error", `${printTreeParserError($.error)} @ ${printRange($.annotation.range)}`])
+                            foundErrors.push(["parser error", `${astn.printTreeParserError($.error)} @ ${astn.printRange($.annotation.range)}`])
                         },
                     },
                     onEnd: () => {
@@ -78,10 +66,10 @@ describe('typed', () => {
                 })
                 return tryToConsumeString(
                     data,
-                    createStreamPreTokenizer(
-                        createTokenizer(structureParser),
+                    astn.createStreamPreTokenizer(
+                        astn.createTokenizer(structureParser),
                         $ => {
-                            foundErrors.push(["parser error", `${printTokenError($.error)} @ ${printRange($.range)}`])
+                            foundErrors.push(["parser error", `${astn.printTokenError($.error)} @ ${astn.printRange($.range)}`])
                         },
                     ),
                 ).convertToNativePromise().then(() => {
@@ -123,13 +111,13 @@ describe('typed', () => {
         doTest(
             'duplicate property',
             `( "a": 42, "a": 42 )`,
-            expect => core.createRequiredValueHandler(
+            expect => astn.createRequiredValueHandler(
                 expect,
                 ["verbose group", {
                     properties: {
                         a: {
                             onExists: () => {
-                                return core.createRequiredValueHandler(
+                                return astn.createRequiredValueHandler(
                                     expect,
                                     ["simple string", {
                                         callback: () => {
@@ -150,7 +138,7 @@ describe('typed', () => {
             'expected boolean, but it\'s just an unquoted string',
 
             `( "a": true )`,
-            (expect, addError) => core.createRequiredValueHandler(
+            (expect, addError) => astn.createRequiredValueHandler(
                 expect,
                 [
                     "verbose group",
@@ -158,7 +146,7 @@ describe('typed', () => {
                         properties: {
                             a: {
                                 onExists: () => {
-                                    return core.createRequiredValueHandler(
+                                    return astn.createRequiredValueHandler(
                                         expect,
                                         ["quoted string", {
                                             callback: () => {
@@ -184,7 +172,7 @@ describe('typed', () => {
         doTest(
             'unexpected empty type',
             `( )`,
-            (expect, addError) => core.createRequiredValueHandler(
+            (expect, addError) => astn.createRequiredValueHandler(
                 expect,
                 [
                     "verbose group",
@@ -192,7 +180,7 @@ describe('typed', () => {
                         properties: {
                             a: {
                                 onExists: () => {
-                                    return core.createRequiredValueHandler(
+                                    return astn.createRequiredValueHandler(
                                         expect,
                                         ["simple string", {
                                             callback: () => {
@@ -217,13 +205,13 @@ describe('typed', () => {
         doTest(
             'unexpected object',
             `{ }`,
-            (expect, _addError) => core.createRequiredValueHandler(
+            (expect, _addError) => astn.createRequiredValueHandler(
                 expect,
                 [
                     "list",
                     {
                         onElement: () => {
-                            return core.createValueHandler(
+                            return astn.createValueHandler(
                                 expect,
                                 ["simple string", {
                                     callback: () => {

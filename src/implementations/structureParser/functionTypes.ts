@@ -1,4 +1,4 @@
-import { TreeParserErrorType } from "../../core";
+import { TreeParserErrorType } from "../../treeParser";
 
 export type StructureErrorType =
     | ["expected the schema start (!) or root value"]

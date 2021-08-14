@@ -13,7 +13,6 @@ import {
     SerializationStyle,
     createProcessorForASTNStreamWithContext,
     createTypedSerializer,
-    DiagnosticSeverity,
     createASTNSchemaBuilder,
     printRange,
 } from "../src"

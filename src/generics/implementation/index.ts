@@ -1,3 +1,3 @@
-export { createDictionary } from "./createDictionary"
-export { createReference } from "./createReference"
-export { createResolveRegistry } from "./createResolveRegistry"
+export * from "./createDictionary"
+export * from "./createReference"
+export * from "./createResolveRegistry"
