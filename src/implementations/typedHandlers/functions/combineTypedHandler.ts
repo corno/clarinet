@@ -1,6 +1,6 @@
 import * as p20 from "pareto-20"
 import * as p from "pareto"
-import { ITypedTreeHandler, TypedValueHandler } from "../../../apis/Ityped"
+import { ITypedTreeHandler, TypedValueHandler } from "../../../apis/typedTreeHandler"
 
 export function combineTypedHandlers<TokenAnnotation, NonTokenAnnotation>(
     treeHandlers: ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation>[],

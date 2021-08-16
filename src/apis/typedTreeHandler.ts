@@ -1,4 +1,4 @@
-import * as def from "../implementations/typedHandler/interface/definitions"
+import * as def from "./definitions"
 
 export type Token<Data, TokenAnnotation> = {
     data: Data

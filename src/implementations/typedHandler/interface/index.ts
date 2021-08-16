@@ -1,1 +1,1 @@
-export * from "./definitions"
+export * from "../../../apis/definitions"

@@ -1,4 +1,4 @@
-import * as g from "../../../generics"
+import * as g from "../generics"
 
 /**
  * this set of types defines a schema that only describes the data structure,
