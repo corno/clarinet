@@ -1,4 +1,5 @@
-import * as i from "../../apis/Iuntyped"
+import * as i from "../../modules/expect/interfaces/IExpectContext"
+import * as h from "../../modules/treeHandler/interfaces/ITreeHandler"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -34,7 +35,7 @@ export function createRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>(
     context: i.IExpectContext<TokenAnnotation, NonTokenAnnotation>,
     valueType: ValueType<TokenAnnotation, NonTokenAnnotation>,
     onMissing?: () => void
-): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         exists: createValueHandler(
             context,
@@ -49,7 +50,7 @@ export function createRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>(
 export function createValueHandler<TokenAnnotation, NonTokenAnnotation>(
     context: i.IExpectContext<TokenAnnotation, NonTokenAnnotation>,
     valueType: ValueType<TokenAnnotation, NonTokenAnnotation>,
-): i.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
     switch (valueType[0]) {
         case "dicionary": {
             const $1 = valueType[1]

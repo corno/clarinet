@@ -1,14 +1,11 @@
 
 import * as p from "pareto"
-import { SchemaAndSideEffects } from "../imports"
-
-import { RetrievalError, SchemaSchemaBuilder } from "../imports"
-import { ExternalSchemaResolvingError, SchemaError } from "../imports"
-import { ITokenConsumer, TokenizerAnnotationData } from "../imports"
-import { createStructureParser } from "../imports"
-import { createTokenizer } from "../imports"
-import { createStreamPreTokenizer } from "../imports"
-import { createDummyTreeHandler } from "../imports"
+import { ExternalSchemaResolvingError, RetrievalError, SchemaAndSideEffects, SchemaError, SchemaSchemaBuilder } from "../../../apis/Ideserialize"
+import { ITokenConsumer, TokenizerAnnotationData } from "../../../apis/ITokenizer"
+import { createStreamPreTokenizer } from "../../streamPretokenizer"
+import { createStructureParser } from "../../structureParser"
+import { createTokenizer } from "../../tokenizer"
+import { createDummyTreeHandler } from "../../untypedHandlers"
 
 
 function assertUnreachable<RT>(_x: never): RT {

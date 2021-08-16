@@ -2,7 +2,7 @@ import {
     Range,
     Location,
     RangeSize,
-} from "../interface"
+} from "../../modules/tokenizer/types/range"
 
 export function printLocation(location: Location): string {
     return `${location.line}:${location.column}`

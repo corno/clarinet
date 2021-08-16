@@ -1,7 +1,10 @@
 /* eslint
 */
 import { DiagnosticSeverity } from "../../../generic"
-import * as i from "../../../apis/Iuntyped"
+import * as tokens from "../../../modules/treeParser/types/tokens"
+import * as i from "../../../modules/treeHandler/interfaces/ITreeHandler"
+import * as expect from "../../../modules/expect/interfaces/IExpectContext"
+import * as ee from "../../../apis/Iuntyped/interface"
 import { ExpectErrorValueType, ExpectIssueHandler, OnDuplicateEntry, ExpectSeverity } from "./functionTypes"
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -9,38 +12,38 @@ function assertUnreachable<RT>(_x: never): RT {
 }
 
 type CreateDummyOnProperty<TokenAnnotation, NonTokenAnnotation> = ($: {
-    key: i.SimpleStringToken<TokenAnnotation>
+    key: tokens.SimpleStringToken<TokenAnnotation>
 }) => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>
 
 interface ICreateContext<TokenAnnotation, NonTokenAnnotation> {
     createDictionaryHandler(
         onEntry: ($: {
-            token: i.SimpleStringToken<TokenAnnotation>
+            token: tokens.SimpleStringToken<TokenAnnotation>
         }) => i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>,
         onBegin?: ($: {
-            token: i.OpenObjectToken<TokenAnnotation>
+            token: tokens.OpenObjectToken<TokenAnnotation>
         }) => void,
         onEnd?: ($: {
             annotation: TokenAnnotation
         }) => void,
     ): i.OnObject<TokenAnnotation, NonTokenAnnotation>
     createVerboseGroupHandler(
-        expectedProperties?: i.ExpectedProperties<TokenAnnotation, NonTokenAnnotation>,
+        expectedProperties?: expect.ExpectedProperties<TokenAnnotation, NonTokenAnnotation>,
         onBegin?: ($: {
-            token: i.OpenObjectToken<TokenAnnotation>
+            token: tokens.OpenObjectToken<TokenAnnotation>
         }) => void,
         onEnd?: ($: {
             hasErrors: boolean
             annotation: TokenAnnotation
         }) => void,
         onUnexpectedProperty?: ($: {
-            token: i.SimpleStringToken<TokenAnnotation>
+            token: tokens.SimpleStringToken<TokenAnnotation>
         }) => i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>,
     ): i.OnObject<TokenAnnotation, NonTokenAnnotation>
     createShorthandGroupHandler(
-        expectedElements?: i.ExpectedElements<TokenAnnotation, NonTokenAnnotation>,
+        expectedElements?: expect.ExpectedElements<TokenAnnotation, NonTokenAnnotation>,
         onBegin?: ($: {
-            token: i.OpenArrayToken<TokenAnnotation>
+            token: tokens.OpenArrayToken<TokenAnnotation>
         }) => void,
         onEnd?: ($: {
             annotation: TokenAnnotation
@@ -49,46 +52,46 @@ interface ICreateContext<TokenAnnotation, NonTokenAnnotation> {
     createListHandler(
         onElement: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
         onBegin?: ($: {
-            token: i.OpenArrayToken<TokenAnnotation>
+            token: tokens.OpenArrayToken<TokenAnnotation>
         }) => void,
         onEnd?: ($: {
             annotation: TokenAnnotation
         }) => void,
     ): i.OnArray<TokenAnnotation, NonTokenAnnotation>
     createTaggedUnionHandler(
-        options?: i.Options<TokenAnnotation, NonTokenAnnotation>,
+        options?: expect.Options<TokenAnnotation, NonTokenAnnotation>,
         onUnexpectedOption?: ($: {
-            taggedUnionToken: i.TaggedUnionToken<TokenAnnotation>
-            optionToken: i.SimpleStringToken<TokenAnnotation>
+            taggedUnionToken: tokens.TaggedUnionToken<TokenAnnotation>
+            optionToken: tokens.SimpleStringToken<TokenAnnotation>
         }) => void,
         onMissingOption?: () => void,
     ): i.OnTaggedUnion<TokenAnnotation, NonTokenAnnotation>
     createUnexpectedSimpleStringHandler(
-        expected: i.ExpectErrorValue,
-        onInvalidType?: i.OnInvalidType<TokenAnnotation>,
+        expected: ee.ExpectErrorValue,
+        onInvalidType?: expect.OnInvalidType<TokenAnnotation>,
         onNull?: ($: {
-            token: i.SimpleStringToken<TokenAnnotation>
+            token: tokens.SimpleStringToken<TokenAnnotation>
         }) => void,
     ): i.OnSimpleString<TokenAnnotation>
     createUnexpectedMultilineStringHandler(
-        expected: i.ExpectErrorValue,
-        onInvalidType?: i.OnInvalidType<TokenAnnotation>,
+        expected: ee.ExpectErrorValue,
+        onInvalidType?: expect.OnInvalidType<TokenAnnotation>,
     ): i.OnMultilineString<TokenAnnotation>
     createNullHandler(
-        expected: i.ExpectErrorValue,
-        onInvalidType?: i.OnInvalidType<TokenAnnotation>,
+        expected: ee.ExpectErrorValue,
+        onInvalidType?: expect.OnInvalidType<TokenAnnotation>,
     ): i.OnSimpleString<TokenAnnotation>
     createUnexpectedTaggedUnionHandler(
-        expected: i.ExpectErrorValue,
-        onInvalidType?: i.OnInvalidType<TokenAnnotation>,
+        expected: ee.ExpectErrorValue,
+        onInvalidType?: expect.OnInvalidType<TokenAnnotation>,
     ): i.OnTaggedUnion<TokenAnnotation, NonTokenAnnotation>
     createUnexpectedObjectHandler(
-        expected: i.ExpectErrorValue,
-        onInvalidType?: i.OnInvalidType<TokenAnnotation>,
+        expected: ee.ExpectErrorValue,
+        onInvalidType?: expect.OnInvalidType<TokenAnnotation>,
     ): i.OnObject<TokenAnnotation, NonTokenAnnotation>
     createUnexpectedArrayHandler(
-        expected: i.ExpectErrorValue,
-        onInvalidType?: i.OnInvalidType<TokenAnnotation>,
+        expected: ee.ExpectErrorValue,
+        onInvalidType?: expect.OnInvalidType<TokenAnnotation>,
     ): i.OnArray<TokenAnnotation, NonTokenAnnotation>
 }
 
@@ -288,9 +291,9 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                 let index = 0
                 return {
                     element: () => {
-                        const ee = elements[index]
+                        const ee2 = elements[index]
                         index++
-                        if (ee === undefined) {
+                        if (ee2 === undefined) {
                             const dvh = createDummyValueHandler()
                             return {
                                 object: data => {
@@ -315,20 +318,20 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                                 },
                             }
                         } else {
-                            return ee.getHandler().exists
+                            return ee2.getHandler().exists
                         }
                     },
                     arrayEnd: $$ => {
                         const missing = elements.length - index
                         if (missing > 0) {
                             raiseError(['elements missing', {
-                                names: elements.map(ee => {
-                                    return ee.name
+                                names: elements.map(ee2 => {
+                                    return ee2.name
                                 }),
                             }], $$.token.annotation)
                             for (let x = index; x !== elements.length; x += 1) {
-                                const ee = elements[x]
-                                ee.getHandler().missing()
+                                const ee2 = elements[x]
+                                ee2.getHandler().missing()
                             }
                         }
                         if (onEnd) {
@@ -541,7 +544,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     createDummyValueHandler: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
     duplicateEntrySeverity: ExpectSeverity,
     onDuplicateEntry: OnDuplicateEntry,
-): i.IExpectContext<TokenAnnotation, NonTokenAnnotation> {
+): expect.IExpectContext<TokenAnnotation, NonTokenAnnotation> {
 
     function raiseError(issue: ExpectErrorValueType, annotation: TokenAnnotation): void {
         issueHandler({
@@ -567,11 +570,11 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     )
 
     function expectSimpleStringImp(
-        expected: i.ExpectErrorValue,
+        expected: ee.ExpectErrorValue,
         callback: ($: {
-            token: i.SimpleStringToken<TokenAnnotation>
+            token: tokens.SimpleStringToken<TokenAnnotation>
         }) => void,
-        onInvalidType?: i.OnInvalidType<TokenAnnotation>,
+        onInvalidType?: expect.OnInvalidType<TokenAnnotation>,
     ): i.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             array: createContext.createUnexpectedArrayHandler(expected, onInvalidType),
@@ -585,14 +588,14 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     return {
         expectSimpleString: $ => {
 
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "string",
                 "null allowed": $.onNull !== undefined,
             }
             return expectSimpleStringImp(expectValue, $.callback, $.onInvalidType)
         },
         expectQuotedString: $ => {
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "quoted string",
                 "null allowed": $.onNull !== undefined,
             }
@@ -624,7 +627,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
             )
         },
         expectNonWrappedString: $ => {
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "nonwrapped string",
                 "null allowed": $.onNull !== undefined,
             }
@@ -657,7 +660,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
         },
         expectDictionary: $ => {
 
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "dictionary",
                 "null allowed": false,
             }
@@ -671,7 +674,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
         },
         expectVerboseGroup: $ => {
 
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "verbose group",
                 "null allowed": $.onNull !== undefined,
             }
@@ -690,7 +693,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
         },
         expectList: $ => {
 
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "list",
                 "null allowed": false,
             }
@@ -704,7 +707,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
         },
         expectShorthandGroup: $ => {
 
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "shorthand group",
                 "null allowed": $.onNull !== undefined,
             }
@@ -719,7 +722,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
 
         expectGroup: $ => {
 
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "type or shorthand group",
                 "null allowed": $.onNull !== undefined,
             }
@@ -738,7 +741,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
         },
         expectTaggedUnion: $ => {
 
-            const expectValue: i.ExpectErrorValue = {
+            const expectValue: ee.ExpectErrorValue = {
                 "type": "tagged union",
                 "null allowed": $.onNull !== undefined,
             }

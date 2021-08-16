@@ -1,4 +1,4 @@
-import * as i from "../../apis/Iuntyped"
+import * as i from "../../modules/treeHandler/interfaces/ITreeHandler"
 
 export function createDummyRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>(
 ): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {

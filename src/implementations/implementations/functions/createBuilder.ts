@@ -1,4 +1,4 @@
-import { ITypedTreeHandler, TypedValueHandler } from "../../../apis/Ityped"
+import { ITypedTreeHandler, TypedValueHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
 import { Value, Dictionary, Datastore, Group, DSTaggedUnion } from "../types"
 
 export function createBuilder<TokenAnnotation, NonTokenAnnotation>(

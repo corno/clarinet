@@ -3,15 +3,15 @@ import {
     GroupDefinition,
     ValueDefinition,
     TaggedUnionDefinition,
-} from "../../../apis/typedTreeHandler"
+} from "../../../modules/typed/types/definitions"
 import {
     ITypedTreeHandler,
     TypedValueHandler,
     GroupHandler,
-} from "../../../apis/Ityped"
+} from "../../../modules/typed/interfaces/ITypedTreeHandler"
 import {
     Token,
-} from "../../../apis/Iuntyped"
+} from "../../../modules/treeParser/types/tokens"
 import { createSerializedNonWrappedString, createSerializedQuotedString } from "../../flattenedHandlers/functions"
 
 function assertUnreachable<RT>(_x: never): RT {

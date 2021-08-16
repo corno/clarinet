@@ -1,5 +1,5 @@
 
-import * as serialize from "../interfaces"
+import * as serialize from "../../../modules/serialize/interfaces/ISerializableDataset"
 import { Value, Datastore } from "../types"
 
 export function createSerializeInterface(

@@ -1,6 +1,6 @@
-import { SchemaDeserializationError } from "../imports"
-import { printTreeParserError } from "../imports"
-import { printExpectError } from "../imports"
+import { SchemaDeserializationError } from "../../../apis/Ideserialize"
+import { printTreeParserError } from "../../treeParser"
+import { printExpectError } from "../../untypedHandlers"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

@@ -1,4 +1,4 @@
-import * as g from "../../../generic"
+import * as g from "../../../modules/tokenizer/types/range"
 
 export type Comment = {
     text: string

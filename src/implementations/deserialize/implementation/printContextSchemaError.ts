@@ -1,5 +1,5 @@
+import { ContextSchemaError } from "../../../apis/Ideserialize"
 import { printExternalSchemaResolvingError } from "./printDeserializeDiagnostic"
-import { ContextSchemaError } from "../imports"
 
 function assertUnreachable<RT>(_x: never): RT {
 	throw new Error("unreachable")

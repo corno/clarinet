@@ -1,6 +1,6 @@
 import { DiagnosticSeverity } from "../../../generic"
-import * as i from "../../../apis/Ityped"
-import * as t from "../../../apis/typedTreeHandler"
+import * as def from "../../../modules/typed/types/definitions"
+import * as t from "../../../modules/typed/interfaces/ITypedTreeHandler"
 import { defaultInitializeValue } from "./createValueUnmarshaller"
 import {
     ValueContext,
@@ -12,15 +12,15 @@ function assertUnreachable<RT>(_x: never): RT {
 }
 
 type OptionContext<TokenAnnotation, NonTokenAnnotation> = {
-    definition: t.OptionDefinition
-    optionHandler: i.TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
-    taggedUnionHandler: i.TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
+    definition: def.OptionDefinition
+    optionHandler: t.TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    taggedUnionHandler: t.TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
 }
 
 type PropertyContext<TokenAnnotation, NonTokenAnnotation> = {
     name: string
-    definition: t.ValueDefinition
-    handler: i.GroupHandler<TokenAnnotation, NonTokenAnnotation>
+    definition: def.ValueDefinition
+    handler: t.GroupHandler<TokenAnnotation, NonTokenAnnotation>
 }
 
 type ExpectedElements<TokenAnnotation, NonTokenAnnotation> = PropertyContext<TokenAnnotation, NonTokenAnnotation>[]
@@ -28,14 +28,14 @@ type ExpectedElements<TokenAnnotation, NonTokenAnnotation> = PropertyContext<Tok
 type GroupContext<TokenAnnotation, NonTokenAnnotation> = {
     isOuterGroup: boolean
     elements: ExpectedElements<TokenAnnotation, NonTokenAnnotation>
-    handler: i.GroupHandler<TokenAnnotation, NonTokenAnnotation>
+    handler: t.GroupHandler<TokenAnnotation, NonTokenAnnotation>
     index: number
 }
 
 function createGroupContext<TokenAnnotation, NonTokenAnnotation>(
-    definition: t.GroupDefinition,
+    definition: def.GroupDefinition,
     isOuterGroup: boolean,
-    subHandler: i.GroupHandler<TokenAnnotation, NonTokenAnnotation>,
+    subHandler: t.GroupHandler<TokenAnnotation, NonTokenAnnotation>,
 ): Context<TokenAnnotation, NonTokenAnnotation> {
     const expectedElements: ExpectedElements<TokenAnnotation, NonTokenAnnotation> = []
     definition.properties.forEach((propDefinition, propKey) => {
@@ -64,8 +64,8 @@ type StateImp<TokenAnnotation, NonTokenAnnotation> = {
 }
 
 export function createState<TokenAnnotation, NonTokenAnnotation>(
-    groupDefinition: t.GroupDefinition,
-    groupHandler: i.GroupHandler<TokenAnnotation, NonTokenAnnotation>,
+    groupDefinition: def.GroupDefinition,
+    groupHandler: t.GroupHandler<TokenAnnotation, NonTokenAnnotation>,
 
 ): ShorthandParsingState<TokenAnnotation, NonTokenAnnotation> {
     const stateImp: StateImp<TokenAnnotation, NonTokenAnnotation> = {

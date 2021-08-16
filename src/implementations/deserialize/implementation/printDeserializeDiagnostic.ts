@@ -1,9 +1,9 @@
 
+import { DeserializeError, ExternalSchemaResolvingError } from "../../../apis/Ideserialize"
+import { printTokenError } from "../../pretokenizer"
+import { printStructureError } from "../../structureParser"
+import { printUnmarshallError } from "../../unmarshall"
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
-import { DeserializeError, ExternalSchemaResolvingError } from "../imports"
-import { printTokenError } from "../imports"
-import { printStructureError } from "../imports"
-import { printUnmarshallError } from "../imports"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

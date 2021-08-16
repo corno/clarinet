@@ -1,4 +1,5 @@
-import * as i from "../imports"
+import { IFlattenedHandler } from "../../../modules/flattened/interfaces/IFlattenedHandler"
+import { StackContext } from "../../../modules/flattened/types/StackContext"
 import { IFormatInstructionWriter } from "../interfaces"
 import { createSerializedNonWrappedString, createSerializedQuotedString } from "./stringSerialization"
 
@@ -10,9 +11,9 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
     indentationString: string,
     newline: string,
     writer: IFormatInstructionWriter<TokenAnnotation, NonTokenAnnotation>,
-): i.IFlattenedHandler<TokenAnnotation, NonTokenAnnotation> {
+): IFlattenedHandler<TokenAnnotation, NonTokenAnnotation> {
 
-    function createIndentation(context: i.StackContext) {
+    function createIndentation(context: StackContext) {
         let indentation = ``
         for (let x = 0; x !== context.dictionaryDepth + context.verboseGroupDepth; x += 1) {
             indentation += indentationString

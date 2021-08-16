@@ -1,9 +1,8 @@
 import * as p from "pareto"
-import { TokenizerAnnotationData } from "../imports"
-import { RetrievalError } from "../imports"
+import { ContextSchema, ContextSchemaError, RetrievalError, SchemaSchemaBuilder } from "../../../apis/Ideserialize"
+import { TokenizerAnnotationData } from "../../../apis/ITokenizer"
+import { DiagnosticSeverity } from "../../../generic"
 import { loadExternalSchema } from "./loadExternalSchema"
-import { DiagnosticSeverity } from "../imports"
-import { ContextSchema, ContextSchemaError, SchemaSchemaBuilder } from "../imports"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

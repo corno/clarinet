@@ -1,4 +1,4 @@
-import { Location } from "../../../generic";
+import { Location } from "../../../modules/tokenizer/types/location";
 
 
 export interface ILocationState {

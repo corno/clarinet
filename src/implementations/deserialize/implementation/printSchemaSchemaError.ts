@@ -1,8 +1,8 @@
+import { SchemaError } from "../../../apis/Ideserialize"
+import { printTokenError } from "../../pretokenizer"
+import { printStructureError } from "../../structureParser"
+import { printTreeParserError } from "../../treeParser"
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
-import { SchemaError } from "../imports"
-import { printTokenError } from "../imports"
-import { printStructureError } from "../imports"
-import { printTreeParserError } from "../imports"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

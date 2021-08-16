@@ -2,14 +2,15 @@
     quote-props: "off",
 
 */
-import * as def from "../../../apis/typedTreeHandler"
+import * as def from "../../../modules/typed/types/definitions"
 import {
     AnnotatedString,
     createDictionaryBuilder,
     createReference,
     createResolveRegistry,
 } from "../../../generics"
-import { IExpectContext, Schema, TreeHandler, TypeDefinition, ValueHandler } from "../../../apis/Iuntyped"
+import * as expect from "../../../modules/expect/interfaces/IExpectContext"
+import { TreeHandler, ValueHandler } from "../../../modules/treeHandler/interfaces/ITreeHandler"
 
 /**
  * this function is only calls back if the value is not null
@@ -18,12 +19,12 @@ import { IExpectContext, Schema, TreeHandler, TypeDefinition, ValueHandler } fro
  */
 
 export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation>(
-    context: IExpectContext<TokenAnnotation, NonTokenAnnotation>,
+    context: expect.IExpectContext<TokenAnnotation, NonTokenAnnotation>,
     onValidationError: (message: string, annotation: TokenAnnotation) => void,
-    callback: (metaData: Schema | null) => void,
+    callback: (metaData: def.Schema | null) => void,
 ): TreeHandler<TokenAnnotation, NonTokenAnnotation> {
     const resolveRegistry = createResolveRegistry<TokenAnnotation>()
-    const types = createDictionaryBuilder<TypeDefinition>()
+    const types = createDictionaryBuilder<def.TypeDefinition>()
     let rootTypeName: AnnotatedString<TokenAnnotation> | null = null
     function wrap(handler: ValueHandler<TokenAnnotation, NonTokenAnnotation>) {
         return {

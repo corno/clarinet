@@ -1,9 +1,9 @@
 import * as p from "pareto"
 import { getEndLocationFromRange } from "../../../generic"
 import { TokenizerAnnotationData } from "../../../apis/ITokenizer"
-import { ITypedTreeHandler } from "../../../apis/Ityped"
 import { createHoverTextsGenerator } from "../../typedHandlers"
 import { isPositionBeforeLocation } from "./isPositionBeforeLocation"
+import { ITypedTreeHandler } from "../../../modules/typed"
 
 export function createHoverTextFinder(
     positionLine: number, //the line where the hover is requested

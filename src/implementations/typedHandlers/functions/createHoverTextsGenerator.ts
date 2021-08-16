@@ -1,5 +1,5 @@
-import { ITypedTreeHandler, TypedValueHandler } from "../../../apis/Ityped"
-import { Token } from "../../../apis/Iuntyped"
+import { ITypedTreeHandler, TypedValueHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
+import { Token } from "../../../modules/treeParser/types/tokens"
 
 
 function assertUnreachable<RT>(_x: never): RT {

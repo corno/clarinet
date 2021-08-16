@@ -1,6 +1,6 @@
 
 import * as p from "pareto"
-import { Location, Range } from "../../../generic"
+import { Location, Range } from "../../../modules/tokenizer/types/range"
 
 export type WrappedStringType =
     | ["apostrophe", {

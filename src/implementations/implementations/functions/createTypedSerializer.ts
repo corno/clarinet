@@ -1,5 +1,5 @@
 
-import { ITypedTreeHandler } from "../../../apis/Ityped"
+import { ITypedTreeHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
 import { createBuilder } from "./createBuilder"
 import { serialize } from "./serialize"
 import { ResolvedSchema, SerializationStyle } from "../../../apis/Ideserialize"

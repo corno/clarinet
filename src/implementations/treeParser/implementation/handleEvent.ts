@@ -1,4 +1,6 @@
-import { ITreeParser, Token, TreeParserEvent } from "../../../apis/Iuntyped"
+import { TreeParserEvent } from "../../../apis/Iuntyped"
+import { ITreeParser } from "../../../modules/treeParser/interfaces/ITreeParser"
+import * as tokens from "../../../modules/treeParser/types/tokens"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -11,7 +13,7 @@ export function handleEvent<TokenAnnotation>(
 ): void {
     function createToken<Data>(
         data: Data,
-    ): Token<Data, TokenAnnotation> {
+    ): tokens.Token<Data, TokenAnnotation> {
         return {
             data: data,
             annotation: annotation,

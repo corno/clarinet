@@ -3,7 +3,7 @@
     no-console:"off",
 */
 import * as p from "pareto"
-import { Location, Range } from "../../../generic"
+import { Location, Range } from "../../../modules/tokenizer/types/range"
 import { IPreTokenStreamConsumer } from "../../../apis/ITokenizer"
 import {
     TokenizerOptions,

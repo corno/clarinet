@@ -1,11 +1,12 @@
 import { DiagnosticSeverity } from "../../../generic"
-import { TypedTaggedUnionHandler, TypedValueHandler, UnmarshallError } from "../../../apis/Ityped"
-import * as t from "../../../apis/typedTreeHandler"
+import { UnmarshallError } from "../../../apis/Ityped"
+import * as t from "../../../modules/typed/interfaces/ITypedTreeHandler"
+import * as def from "../../../modules/typed/types/definitions"
 
 
 export type ValueContext<TokenAnnotation, NonTokenAnnotation> = {
-    definition: t.ValueDefinition
-    handler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    definition: def.ValueDefinition
+    handler: t.TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
 }
 
 export interface ShorthandParsingState<TokenAnnotation, NonTokenAnnotation> {
@@ -15,12 +16,12 @@ export interface ShorthandParsingState<TokenAnnotation, NonTokenAnnotation> {
     ): void
     findNextValue(): ValueContext<TokenAnnotation, NonTokenAnnotation> | null
     pushGroup(
-        definition: t.GroupDefinition,
-         handler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+        definition: def.GroupDefinition,
+         handler: t.TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
          ): void
     pushTaggedUnion(
-        definition: t.OptionDefinition,
-        taggedUnionHandler: TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
-        optionHandler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>,
+        definition: def.OptionDefinition,
+        taggedUnionHandler: t.TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
+        optionHandler: t.TypedValueHandler<TokenAnnotation, NonTokenAnnotation>,
     ): void
 }

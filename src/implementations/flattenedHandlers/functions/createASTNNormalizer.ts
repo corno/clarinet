@@ -1,4 +1,5 @@
-import { IFlattenedHandler, StackContext } from "../imports"
+import { IFlattenedHandler } from "../../../modules/flattened/interfaces/IFlattenedHandler"
+import { StackContext } from "../../../modules/flattened/types/StackContext"
 import { IFormatInstructionWriter } from "../interfaces"
 import * as stringSerialization from "./stringSerialization"
 

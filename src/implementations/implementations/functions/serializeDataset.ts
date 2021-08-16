@@ -2,11 +2,11 @@
     "@typescript-eslint/no-shadow": 0,
 */
 import * as x from "../../../generics"
-import { TypeDefinition, ValueDefinition } from "../../../apis/typedTreeHandler"
+import { TypeDefinition, ValueDefinition } from "../../../modules/typed/types/definitions"
 import { TreeParserEvent } from "../../../apis/Iuntyped"
 import * as Ideserialie from "../../../apis/Ideserialize"
-import { IOut, ISerializableDataset } from "../interfaces"
-import { ISerializableValue } from "../interfaces/IValue"
+import { IOut } from "../interfaces"
+import { ISerializableDataset, ISerializableValue } from "../../../modules/serialize/interfaces/ISerializableDataset"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

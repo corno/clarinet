@@ -3,9 +3,9 @@
     no-console:"off",
 */
 import * as Char from "../../../generic"
-import { Location } from "../../../generic";
+import { Location, Range } from "../../../modules/tokenizer/types/range";
 
-import { Range, createRangeFromSingleLocation, createRangeFromLocations } from "../../../generic"
+import { createRangeFromSingleLocation, createRangeFromLocations } from "../../../generic"
 import { IChunk, IPreTokenizer } from "../../../apis/ITokenizer"
 import { PreToken, PreTokenDataType } from "../../../apis/ITokenizer"
 import { TokenError } from "./functionTypes"

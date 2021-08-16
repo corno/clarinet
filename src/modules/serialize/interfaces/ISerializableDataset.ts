@@ -1,6 +1,12 @@
-import { ISerializableDictionary } from "./ISerializableDictionary";
-import { ISerializableList } from "./ISerializableList";
+export interface ISerializableDictionary<Value> {
+    forEach(callback: (entry: Value, key: string) => void): void
+    isEmpty: () => boolean
+}
 
+export interface ISerializableList<Value> {
+    forEach(callback: (element: Value) => void): void
+    isEmpty: () => boolean
+}
 export interface ISerializableValue {
     toDictionary(callback: ($: {
         entries: ISerializableDictionary<ISerializableValue>
@@ -17,4 +23,7 @@ export interface ISerializableValue {
     }) => void): void
     toSimpleString(callback: ($: string) => void): void
     toMultilineString(callback: ($: string[]) => void): void
+}
+export interface ISerializableDataset {
+    root: ISerializableValue
 }

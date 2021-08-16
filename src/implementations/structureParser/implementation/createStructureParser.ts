@@ -1,11 +1,13 @@
 
 import * as p from "pareto"
 import * as Char from "../../../generic/interface/characters"
-import { StructureErrorHandler, StructureErrorType as StructureErrorType } from "./functionTypes"
+import { StructureErrorHandler, StructureErrorType } from "./functionTypes"
 import { MultilineStringData, SimpleStringData, StructuralTokenData, ITokenConsumer, TokenType } from "../../../apis/ITokenizer"
 import { createTreeParser } from "../../treeParser"
-import { ITreeParser, SimpleStringToken, Token, TreeHandler } from "../../../apis/Iuntyped"
 import { createDummyValueHandler } from "../../untypedHandlers"
+import { SimpleStringToken, Token } from "../../../modules/treeParser/types/tokens"
+import { ITreeParser } from "../../../modules/treeParser/interfaces/ITreeParser"
+import { TreeHandler } from "../../../modules/treeHandler/interfaces/ITreeHandler"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

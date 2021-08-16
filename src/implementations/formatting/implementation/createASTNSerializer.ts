@@ -1,8 +1,8 @@
 import * as p from "pareto"
-import { ITokenConsumer } from "../imports"
-import { createASTNNormalizer, IFormatInstructionWriter } from "../imports"
-import { createStructureParser, StructureErrorHandler } from "../imports"
-import { flatten } from "../imports"
+import { ITokenConsumer } from "../../../apis/ITokenizer"
+import { createASTNNormalizer, IFormatInstructionWriter } from "../../flattenedHandlers"
+import { createStructureParser, StructureErrorHandler } from "../../structureParser"
+import { flatten } from "../../untypedHandlers"
 
 
 export function createASTNSerializer<TokenAnnotation>(

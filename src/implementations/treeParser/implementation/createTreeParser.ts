@@ -2,7 +2,8 @@
     no-underscore-dangle: "off",
     complexity: off,
 */
-import * as i from "../../../apis/Iuntyped"
+import * as i from "../../../modules/treeHandler/interfaces/ITreeHandler"
+import { ITreeParser } from "../../../modules/treeParser/interfaces/ITreeParser"
 import { TreeParserErrorType } from "./functionTypes"
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -17,7 +18,7 @@ export function createTreeParser<TokenAnnotation>(
     }) => void,
     createUnexpectedValueHandler: () => i.ValueHandler<TokenAnnotation, null>,
     onEnd: (annotation: TokenAnnotation) => void,
-): i.ITreeParser<TokenAnnotation> {
+): ITreeParser<TokenAnnotation> {
     function raiseError(error: TreeParserErrorType, annotation: TokenAnnotation) {
         onError({
             error: error,

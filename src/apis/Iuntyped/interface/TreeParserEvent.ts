@@ -6,7 +6,7 @@ import {
     OpenObject,
     SimpleString,
     TaggedUnion,
-} from "./ITreeParser"
+} from "../../../modules/treeParser/types/tokens"
 
 export type TreeParserEvent =
     | ["close array", CloseArray]

@@ -3,11 +3,13 @@
  */
 import { DiagnosticSeverity } from "../../../generic"
 import { IReadonlyDictionary } from "../../../generics"
-import { TypedTaggedUnionHandler, TypedValueHandler, UnmarshallError } from "../../../apis/Ityped"
-import { ArrayHandler, IObjectHandler, RequiredValueHandler, SimpleStringToken, TaggedUnionHandler, ValueHandler } from "../../../apis/Iuntyped"
-import { GroupDefinition, OptionDefinition, TaggedUnionDefinition, ValueDefinition } from "../../../apis/typedTreeHandler"
+import { UnmarshallError } from "../../../apis/Ityped"
+import * as h from "../../../modules/treeHandler/interfaces/ITreeHandler"
+import { GroupDefinition, OptionDefinition, TaggedUnionDefinition, ValueDefinition } from "../../../modules/typed/types/definitions"
 import { createDummyArrayHandler, createDummyObjectHandler, createDummyRequiredValueHandler, createDummyTaggedUnionHandler } from "../../untypedHandlers/dummyHandlers"
 import { createState } from "./createState"
+import { TypedTaggedUnionHandler, TypedValueHandler } from "../../../modules/typed"
+import * as tokens from "../../../modules/treeParser/types/tokens"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("Unreachable")
@@ -16,9 +18,9 @@ function assertUnreachable<RT>(_x: never): RT {
 type OnError<TokenAnnotation> = (message: UnmarshallError, annotation: TokenAnnotation, severity: DiagnosticSeverity) => void
 
 function wrap<TokenAnnotation, NonTokenAnnotation>(
-    handler: ValueHandler<TokenAnnotation, NonTokenAnnotation>,
+    handler: h.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
     onMissing: () => void,
-): RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         exists: handler,
         missing: (): void => {
@@ -31,7 +33,7 @@ function createUnexpectedArrayHandler<TokenAnnotation, NonTokenAnnotation>(
     message: UnmarshallError,
     annotation: TokenAnnotation,
     onError: OnError<TokenAnnotation>,
-): ArrayHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.ArrayHandler<TokenAnnotation, NonTokenAnnotation> {
     onError(message, annotation, DiagnosticSeverity.error)
     return createDummyArrayHandler()
 }
@@ -40,7 +42,7 @@ function createUnexpectedObjectHandler<TokenAnnotation, NonTokenAnnotation>(
     message: UnmarshallError,
     annotation: TokenAnnotation,
     onError: OnError<TokenAnnotation>,
-): IObjectHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.IObjectHandler<TokenAnnotation, NonTokenAnnotation> {
     onError(message, annotation, DiagnosticSeverity.error)
     return createDummyObjectHandler()
 }
@@ -49,7 +51,7 @@ function createUnexpectedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
     message: UnmarshallError,
     annotation: TokenAnnotation,
     onError: OnError<TokenAnnotation>,
-): TaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.TaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
     onError(message, annotation, DiagnosticSeverity.error)
     return createDummyTaggedUnionHandler()
 }
@@ -182,7 +184,7 @@ type MixidIn<TokenAnnotation, NonTokenAnnotation> = {
     pushGroup: (
         definition: GroupDefinition,
         groupContainerHandler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
-    ) => ValueHandler<TokenAnnotation, NonTokenAnnotation>
+    ) => h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     pushTaggedUnion: (
         definition: OptionDefinition,
         taggedUnionHandler: TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
@@ -196,7 +198,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
     onError: OnError<TokenAnnotation>,
     flagNonDefaultPropertiesFound: () => void,
     mixedIn: null | MixidIn<TokenAnnotation, NonTokenAnnotation>,
-): ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
     function defInitializeValue() {
         defaultInitializeValue(
             definition,
@@ -395,7 +397,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
         case "tagged union": {
             const $d = definition.type[1]
             function doOption<T>(
-                optionToken: SimpleStringToken<TokenAnnotation>,
+                optionToken: tokens.SimpleStringToken<TokenAnnotation>,
                 definition: TaggedUnionDefinition,
                 tuHandler: TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
                 unknownCallback: () => T,
@@ -712,7 +714,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                             }),
                         )
 
-                        function createUnmarshallerForNextValue(): ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+                        function createUnmarshallerForNextValue(): h.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
                             const nextValue = state.findNextValue()
                             if (nextValue === null) {
                                 return {

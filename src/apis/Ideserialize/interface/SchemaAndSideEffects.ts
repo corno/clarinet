@@ -1,9 +1,11 @@
 import { DiagnosticSeverity } from "../../../generic"
-import { ITypedTreeHandler, Schema } from "../../typedTreeHandler"
+import * as def from "../../../modules/typed/types/definitions"
+import * as h from "../../../modules/typed/interfaces/ITypedTreeHandler"
+
 
 export type SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation> = {
-    schema: Schema
+    schema: def.Schema
     createStreamingValidator: (
         onValidationError: (message: string, annotation: TokenAnnotation, severity: DiagnosticSeverity) => void,
-    ) => ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation>
+    ) => h.ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation>
 }

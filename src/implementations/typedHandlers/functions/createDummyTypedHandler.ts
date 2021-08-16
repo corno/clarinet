@@ -7,7 +7,7 @@ import {
     TypedTaggedUnionHandler,
     ITypedTreeHandler,
     TypedValueHandler,
-} from "../../../apis/Ityped"
+} from "../../../modules/typed/interfaces/ITypedTreeHandler"
 
 export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
 ): ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {

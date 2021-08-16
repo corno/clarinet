@@ -1,44 +1,5 @@
-import * as h from "./handlers"
-import * as sp from "./ITreeParser"
-
-
-export type ExpectError =
-    | "array"
-    | "boolean"
-    | "dictionary"
-    | "list"
-    | "nothing"
-    | "null"
-    | "number"
-    | "object"
-    | "nonwrapped string"
-    | "quoted string"
-    | "shorthand group"
-    | "string"
-    | "tagged union"
-    | "type or shorthand group"
-    | "type"
-    | "verbose group"
-
-export type ExpectErrorValue = {
-    type: ExpectError
-    "null allowed": boolean
-}
-
-export type ExpectedToken =
-    | "close angle bracket"
-    | "close bracket"
-    | "close curly"
-    | "close paren"
-    | "open angle bracket"
-    | "open bracket"
-    | "open curly"
-    | "open paren"
-
-
-export type OnInvalidType<TokenAnnotation> = null | (($: {
-    annotation: TokenAnnotation
-}) => void)
+import * as sp from "../../treeParser/types/tokens"
+import * as h from "../../treeHandler/interfaces/ITreeHandler"
 
 export type ExpectedElement<TokenAnnotation, NonTokenAnnotation> = {
     name: string
@@ -67,6 +28,10 @@ export type Options<TokenAnnotation, NonTokenAnnotation> = {
         optionData: sp.SimpleStringToken<TokenAnnotation>,
     ) => h.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
 }
+
+export type OnInvalidType<TokenAnnotation> = null | (($: {
+    annotation: TokenAnnotation
+}) => void)
 
 export type ExpectDictionaryParameters<TokenAnnotation, NonTokenAnnotation> = {
     onBegin?: ($: {
@@ -198,10 +163,6 @@ export type ExpectGroupParameters<TokenAnnotation, NonTokenAnnotation> = {
     onNull?: ($: {
         token: sp.SimpleStringToken<TokenAnnotation>
     }) => void
-}
-
-export type ExpectNothingParameters<TokenAnnotation> = {
-    onInvalidType?: OnInvalidType<TokenAnnotation>
 }
 
 export interface IExpectContext<TokenAnnotation, NonTokenAnnotation> {

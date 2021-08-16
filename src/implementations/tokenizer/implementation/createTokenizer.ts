@@ -2,11 +2,12 @@
 */
 import * as p from "pareto"
 import * as generic from "../../../generic"
+import * as rng from "../../../modules/tokenizer/types/range"
 import { IPreTokenStreamConsumer } from "../../../apis/ITokenizer"
 import { ITokenConsumer, TokenType } from "../../../apis/ITokenizer"
 import { PreToken, PreTokenDataType, WrappedStringType } from "../../../apis/ITokenizer"
 import { TokenizerAnnotationData } from "../../../apis/ITokenizer"
-import { printRange, Range } from "../../../generic"
+import { printRange } from "../../../generic"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -15,16 +16,16 @@ function assertUnreachable<RT>(_x: never): RT {
 
 type NonWrappedStringContext = {
     nonwrappedStringNode: string
-    readonly start: generic.Location
+    readonly start: rng.Location
 }
 type WhitespaceContext = {
     whitespaceNode: string
-    readonly start: generic.Location
+    readonly start: rng.Location
 }
 
 type CommentContext = {
     commentNode: string
-    readonly start: generic.Range
+    readonly start: rng.Range
     readonly indentation: null | string
 }
 
@@ -40,7 +41,7 @@ enum CurrentTokenType {
 
 type WrappedStringContext = {
     readonly type: WrappedStringType
-    readonly start: generic.Range
+    readonly start: rng.Range
     wrappedStringNode: string
     indentation: string
 
@@ -57,13 +58,13 @@ type CurrentToken =
 
 
 export class RangeError extends Error {
-    public readonly range: Range
+    public readonly range: rng.Range
     /**
      * as a RangeError extends a regular Error, it will have a message. In this message there will be range information
      * If you need a message without the range information, use this property
      */
     public readonly rangeLessMessage: string
-    constructor(message: string, range: Range) {
+    constructor(message: string, range: rng.Range) {
         super(`${message} @ ${printRange(range)}`)
         this.rangeLessMessage = message
         this.range = range
@@ -71,7 +72,7 @@ export class RangeError extends Error {
 }
 
 class TokenizerStackPanicError extends RangeError {
-    constructor(message: string, range: generic.Range) {
+    constructor(message: string, range: rng.Range) {
         super(`stack panic: ${message}`, range)
     }
 }
@@ -103,7 +104,7 @@ export function createTokenizer(
     const indentationState = new IndentationState()
 
     function createAnnotation(
-        range: generic.Range,
+        range: rng.Range,
         tokenString: string | null,
     ): TokenizerAnnotationData {
         return {
@@ -122,13 +123,13 @@ export function createTokenizer(
     let currentToken: CurrentToken = [CurrentTokenType.NONE]
 
 
-    function setCurrentToken(contextType: CurrentToken, range: generic.Range) {
+    function setCurrentToken(contextType: CurrentToken, range: rng.Range) {
         if (currentToken[0] !== CurrentTokenType.NONE) {
             throw new TokenizerStackPanicError(`unexpected start of token`, range)
         }
         currentToken = contextType
     }
-    function unsetCurrentToken(range: generic.Range) {
+    function unsetCurrentToken(range: rng.Range) {
         if (currentToken[0] === CurrentTokenType.NONE) {
             throw new TokenizerStackPanicError(`unexpected, parser is already in 'none' mode`, range)
         }
@@ -204,7 +205,7 @@ export function createTokenizer(
                 }
                 case PreTokenDataType.LineCommentEnd: {
                     const $ = data.type[1]
-                    function onLineCommentEnd(location: generic.Location): p.IValue<boolean> {
+                    function onLineCommentEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.LINE_COMMENT) {
                             throw new TokenizerStackPanicError(`Unexpected line comment end`, generic.createRangeFromSingleLocation(location))
@@ -239,7 +240,7 @@ export function createTokenizer(
                 }
                 case PreTokenDataType.NewLine: {
                     const $ = data.type[1]
-                    function onNewLine(_range: generic.Range, _tokenString: string): p.IValue<boolean> {
+                    function onNewLine(_range: rng.Range, _tokenString: string): p.IValue<boolean> {
 
                         indentationState.onNewline()
 
@@ -343,7 +344,7 @@ export function createTokenizer(
                 case PreTokenDataType.WrappedStringBegin: {
                     const $ = data.type[1]
                     indentationState.setLineDirty()
-                    function onWrappedStringBegin(begin: generic.Range, quote: WrappedStringType): p.IValue<boolean> {
+                    function onWrappedStringBegin(begin: rng.Range, quote: WrappedStringType): p.IValue<boolean> {
                         setCurrentToken(
                             [CurrentTokenType.QUOTED_STRING, {
                                 wrappedStringNode: "",
@@ -359,7 +360,7 @@ export function createTokenizer(
                 }
                 case PreTokenDataType.WrappedStringEnd: {
                     const $ = data.type[1]
-                    function onWrappedStringEnd(end: generic.Range, wrapper: string | null): p.IValue<boolean> {
+                    function onWrappedStringEnd(end: rng.Range, wrapper: string | null): p.IValue<boolean> {
                         if (currentToken[0] !== CurrentTokenType.QUOTED_STRING) {
                             throw new TokenizerStackPanicError(`Unexpected nonwrapped string end`, end)
                         }
@@ -431,7 +432,7 @@ export function createTokenizer(
                 }
                 case PreTokenDataType.NonWrappedStringBegin: {
                     const $ = data.type[1]
-                    function onNonWrappedStringBegin(location: generic.Location): p.IValue<boolean> {
+                    function onNonWrappedStringBegin(location: rng.Location): p.IValue<boolean> {
 
                         indentationState.setLineDirty()
 
@@ -442,7 +443,7 @@ export function createTokenizer(
                 }
                 case PreTokenDataType.NonWrappedStringEnd: {
                     const $ = data.type[1]
-                    function onNonWrappedStringEnd(location: generic.Location): p.IValue<boolean> {
+                    function onNonWrappedStringEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.NONWRAPPED_STRING) {
                             throw new TokenizerStackPanicError(`Unexpected nonwrapped string end`, generic.createRangeFromSingleLocation(location))
@@ -472,7 +473,7 @@ export function createTokenizer(
                 }
                 case PreTokenDataType.WhiteSpaceBegin: {
                     const $ = data.type[1]
-                    function onWhitespaceBegin(location: generic.Location): p.IValue<boolean> {
+                    function onWhitespaceBegin(location: rng.Location): p.IValue<boolean> {
                         const $: WhitespaceContext = { whitespaceNode: "", start: location }
 
                         setCurrentToken([CurrentTokenType.WHITESPACE, $], generic.createRangeFromSingleLocation(location))
@@ -483,7 +484,7 @@ export function createTokenizer(
                 }
                 case PreTokenDataType.WhiteSpaceEnd: {
                     const $ = data.type[1]
-                    function onWhitespaceEnd(location: generic.Location): p.IValue<boolean> {
+                    function onWhitespaceEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.WHITESPACE) {
                             throw new TokenizerStackPanicError(`Unexpected whitespace end`, generic.createRangeFromSingleLocation(location))
@@ -510,7 +511,7 @@ export function createTokenizer(
                     return assertUnreachable(data.type[0])
             }
         },
-        onEnd: (aborted: boolean, location: generic.Location): p.IValue<null> => {
+        onEnd: (aborted: boolean, location: rng.Location): p.IValue<null> => {
             parser.onEnd(
                 aborted,
                 createAnnotation(

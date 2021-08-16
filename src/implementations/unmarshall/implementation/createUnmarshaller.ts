@@ -1,8 +1,9 @@
 import { DiagnosticSeverity } from "../../../generic"
-import { ITypedTreeHandler, UnmarshallError } from "../../../apis/Ityped"
-import { TreeHandler } from "../../../apis/Iuntyped"
-import { Schema } from "../../../apis/typedTreeHandler"
+import {UnmarshallError } from "../../../apis/Ityped"
+import { Schema } from "../../../modules/typed/types/definitions"
 import { createValueUnmarshaller, defaultInitializeValue } from "./createValueUnmarshaller"
+import { ITypedTreeHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
+import { TreeHandler } from "../../../modules/treeHandler/interfaces/ITreeHandler"
 
 export function createUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
     schema: Schema,
