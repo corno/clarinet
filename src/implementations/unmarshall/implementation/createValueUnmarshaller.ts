@@ -5,7 +5,7 @@ import { DiagnosticSeverity } from "../../../generic"
 import { IReadonlyDictionary } from "../../../generics"
 import { TypedTaggedUnionHandler, TypedValueHandler, UnmarshallError } from "../../../apis/Ityped"
 import { ArrayHandler, IObjectHandler, RequiredValueHandler, SimpleStringToken, TaggedUnionHandler, ValueHandler } from "../../../apis/Iuntyped"
-import { GroupDefinition, OptionDefinition, TaggedUnionDefinition, ValueDefinition } from "../../typedHandler"
+import { GroupDefinition, OptionDefinition, TaggedUnionDefinition, ValueDefinition } from "../../../apis/typedTreeHandler"
 import { createDummyArrayHandler, createDummyObjectHandler, createDummyRequiredValueHandler, createDummyTaggedUnionHandler } from "../../untypedHandlers/dummyHandlers"
 import { createState } from "./createState"
 

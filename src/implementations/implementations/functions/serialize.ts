@@ -1,7 +1,6 @@
 //import * as p20 from "pareto-20"
-import { TreeParserEvent } from "../../../apis/Iuntyped"
+import { Schema, TreeParserEvent } from "../../../apis/Iuntyped"
 import { createTreeParser, handleEvent, printTreeParserError } from "../../treeParser"
-import { Schema } from "../../typedHandler"
 import { serializeSchema } from "../../typedHandler"
 import { createASTNNormalizer, createSerializedQuotedString, IFormatInstructionWriter } from "../../flattenedHandlers"
 import { serializeDataset, SerializeOut } from "./serializeDataset"

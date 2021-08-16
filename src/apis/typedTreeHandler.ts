@@ -1,4 +1,61 @@
-import * as def from "./definitions"
+
+export type TypeReferenceDefinition = {
+    readonly "type": g.IReference<TypeDefinition>
+}
+
+export type TypeDefinition = {
+    readonly "value": ValueDefinition
+}
+
+export type DictionaryDefinition = {
+    readonly "key": SimpleStringDefinition
+    readonly "value": ValueDefinition
+}
+
+export type ListDefinition = {
+    readonly "value": ValueDefinition
+}
+
+export type GroupDefinition = {
+    readonly "properties": g.IReadonlyDictionary<ValueDefinition>
+}
+
+export type ValueDefinition = {
+    readonly "type": ValueTypeDefinition
+}
+
+export type ValueTypeDefinition =
+    | ["group", GroupDefinition]
+    | ["dictionary", DictionaryDefinition]
+    | ["list", ListDefinition]
+    | ["type reference", TypeReferenceDefinition]
+    | ["tagged union", TaggedUnionDefinition]
+    | ["simple string", SimpleStringDefinition]
+    | ["multiline string", MultiLineStringDefinition]
+
+export type Schema = {
+    readonly "types": g.IReadonlyDictionary<TypeDefinition>
+    readonly "root type": g.IReference<TypeDefinition>
+}
+
+import * as g from "../generics"
+
+export type OptionDefinition = {
+    readonly "value": ValueDefinition
+}
+
+export type TaggedUnionDefinition = {
+    readonly "options": g.IReadonlyDictionary<OptionDefinition>
+    readonly "default option": g.IReference<OptionDefinition>
+}
+
+export type SimpleStringDefinition = {
+    readonly "default value": string
+    readonly "quoted": boolean
+}
+
+export type MultiLineStringDefinition = {
+}
 
 export type Token<Data, TokenAnnotation> = {
     data: Data
@@ -46,12 +103,12 @@ export interface GroupHandler<TokenAnnotation, NonTokenAnnotation> {
     onUnexpectedProperty($: {
         token: SimpleStringToken<TokenAnnotation> //cannot be shorthand, so there must be a token, so no null
         expectedProperties: string[]
-        groupDefinition: def.GroupDefinition
+        groupDefinition: GroupDefinition
     }): void
     onProperty($: {
         key: string
         token: null | SimpleStringToken<TokenAnnotation>
-        definition: def.ValueDefinition
+        definition: ValueDefinition
     }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onClose($: {
         token: null | CloseObjectToken<TokenAnnotation>
@@ -101,7 +158,7 @@ export interface TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
     onOption($: {
         name: string
         token: null | SimpleStringToken<TokenAnnotation>
-        definition: def.OptionDefinition
+        definition: OptionDefinition
     }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onUnexpectedOption($: {
         token: SimpleStringToken<TokenAnnotation>
@@ -117,31 +174,31 @@ export interface TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
 export interface TypedValueHandler<TokenAnnotation, NonTokenAnnotation> {
     onGroup($: {
         type: GroupType<TokenAnnotation>
-        definition: def.GroupDefinition
+        definition: GroupDefinition
     }): GroupHandler<TokenAnnotation, NonTokenAnnotation>
     onList($: {
         token: null | OpenArrayToken<TokenAnnotation>
-        definition: def.ListDefinition
+        definition: ListDefinition
     }): ListHandler<TokenAnnotation, NonTokenAnnotation>
     onDictionary($: {
         token: null | OpenObjectToken<TokenAnnotation>
-        definition: def.DictionaryDefinition
+        definition: DictionaryDefinition
     }): DictionaryHandler<TokenAnnotation, NonTokenAnnotation>
     onTypeReference($: {
-        definition: def.TypeReference
+        definition: TypeReferenceDefinition
     }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onTaggedUnion($: {
-        definition: def.TaggedUnionDefinition
+        definition: TaggedUnionDefinition
         token: null | TaggedUnionToken<TokenAnnotation>
     }): TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
     onSimpleString($: {
         value: string
         token: null | SimpleStringToken<TokenAnnotation>
-        definition: def.SimpleStringDefinition
+        definition: SimpleStringDefinition
     }): void
     onMultilineString($: {
         token: null | MultilineStringToken<TokenAnnotation>
-        definition: def.MultiLineStringDefinition
+        definition: MultiLineStringDefinition
     }): void
 }
 
@@ -149,4 +206,30 @@ export interface ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
     root: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onEnd: ($: {
     }) => void
+}
+export interface ITreeParser<TokenAnnotation> {
+    closeArray(
+        token: CloseArrayToken<TokenAnnotation>,
+    ): void
+    closeObject(
+        token: CloseObjectToken<TokenAnnotation>,
+    ): void
+    openArray(
+        token: OpenArrayToken<TokenAnnotation>,
+    ): void
+    openObject(
+        token: OpenObjectToken<TokenAnnotation>,
+    ): void
+    simpleString(
+        token: SimpleStringToken<TokenAnnotation>,
+    ): void
+    multilineString(
+        token: MultilineStringToken<TokenAnnotation>,
+    ): void
+    taggedUnion(
+        token: TaggedUnionToken<TokenAnnotation>,
+    ): void
+    forceEnd(
+        annotation: TokenAnnotation
+    ): void
 }

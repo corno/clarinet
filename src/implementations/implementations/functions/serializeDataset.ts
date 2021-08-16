@@ -2,7 +2,7 @@
     "@typescript-eslint/no-shadow": 0,
 */
 import * as x from "../../../generics"
-import { TypeDefinition, ValueDefinition } from "../../typedHandler"
+import { TypeDefinition, ValueDefinition } from "../../../apis/typedTreeHandler"
 import { TreeParserEvent } from "../../../apis/Iuntyped"
 import * as Ideserialie from "../../../apis/Ideserialize"
 import { IOut, ISerializableDataset } from "../interfaces"

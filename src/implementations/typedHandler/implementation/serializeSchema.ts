@@ -1,6 +1,6 @@
 import { IReadonlyDictionary, IReference } from "../../../generics"
-import { Schema, ValueDefinition } from ".."
-import { TreeParserEvent } from "../../../apis/Iuntyped"
+import { Schema, ValueDefinition } from "../../../apis/typedTreeHandler"
+import { TreeParserEvent } from "../../deserialize/imports"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

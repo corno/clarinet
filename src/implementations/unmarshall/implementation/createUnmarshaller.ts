@@ -1,7 +1,7 @@
 import { DiagnosticSeverity } from "../../../generic"
 import { ITypedTreeHandler, UnmarshallError } from "../../../apis/Ityped"
 import { TreeHandler } from "../../../apis/Iuntyped"
-import { Schema } from "../../typedHandler"
+import { Schema } from "../../../apis/typedTreeHandler"
 import { createValueUnmarshaller, defaultInitializeValue } from "./createValueUnmarshaller"
 
 export function createUnmarshaller<TokenAnnotation, NonTokenAnnotation>(

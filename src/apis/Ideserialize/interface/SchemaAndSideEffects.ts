@@ -1,6 +1,5 @@
 import { DiagnosticSeverity } from "../../../generic"
-import { Schema } from "../../../implementations/typedHandler"
-import { ITypedTreeHandler } from "../../typedTreeHandler"
+import { ITypedTreeHandler, Schema } from "../../typedTreeHandler"
 
 export type SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation> = {
     schema: Schema

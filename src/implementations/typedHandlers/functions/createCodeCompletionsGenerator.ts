@@ -3,7 +3,7 @@ import {
     GroupDefinition,
     ValueDefinition,
     TaggedUnionDefinition,
-} from "../../typedHandler"
+} from "../../../apis/typedTreeHandler"
 import {
     ITypedTreeHandler,
     TypedValueHandler,

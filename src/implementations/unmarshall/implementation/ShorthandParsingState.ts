@@ -1,6 +1,6 @@
 import { DiagnosticSeverity } from "../../../generic"
 import { TypedTaggedUnionHandler, TypedValueHandler, UnmarshallError } from "../../../apis/Ityped"
-import * as t from "../../typedHandler"
+import * as t from "../../../apis/typedTreeHandler"
 
 
 export type ValueContext<TokenAnnotation, NonTokenAnnotation> = {
