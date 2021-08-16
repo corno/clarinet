@@ -9,13 +9,6 @@ import * as p from "pareto"
 import { describe } from "mocha"
 import * as astn from "../src"
 import * as p20 from "pareto-20"
-import {
-    SerializationStyle,
-    createProcessorForASTNStreamWithContext,
-    createTypedSerializer,
-    createASTNSchemaBuilder,
-    printRange,
-} from "../src"
 
 function readFileFromFileSystem(
     dir: string,
@@ -117,16 +110,16 @@ export function directoryTests(): void {
                 onError: (error: string, severity: astn.DiagnosticSeverity, range: astn.Range | null) => void,
                 getRootHandler: (
                     schema: astn.ResolvedSchema<astn.TokenizerAnnotationData, null>
-                ) => astn.TypedTreeHandler<astn.TokenizerAnnotationData, null>,
+                ) => astn.ITypedTreeHandler<astn.TokenizerAnnotationData, null>,
             ): p.IValue<null> {
-                return createProcessorForASTNStreamWithContext(
+                return astn.createProcessorForASTNStreamWithContext(
                     path.basename(serializedDatasetPath),
                     path.dirname(serializedDatasetPath),
                     name => {
                         if (name !== "astn/schema@0.1") {
                             return null
                         }
-                        return createASTNSchemaBuilder()
+                        return astn.createASTNSchemaBuilder()
                     },
                     readFileFromFileSystem,
                     schemaID => {
@@ -149,7 +142,7 @@ export function directoryTests(): void {
                     const actualIssues: Issues = []
                     return parse(
                         (error, severity, range) => {
-                            actualIssues.push([error + (range === null ? "": ` @ ${printRange(range)}`), null, severity === astn.DiagnosticSeverity.warning ? "warning" : "error"])
+                            actualIssues.push([error + (range === null ? "": ` @ ${astn.printRange(range)}`), null, severity === astn.DiagnosticSeverity.warning ? "warning" : "error"])
                         },
                         schema => schema.schemaAndSideEffects.createStreamingValidator(
                             (error, annotation, severity) => {
@@ -162,7 +155,7 @@ export function directoryTests(): void {
                     })
                 })
                 function testNormalize(
-                    style: SerializationStyle,
+                    style: astn.SerializationStyle,
                     file: string,
                 ) {
                     let out = ""
@@ -170,7 +163,7 @@ export function directoryTests(): void {
                         () => {
 
                         },
-                        rs => createTypedSerializer(
+                        rs => astn.createTypedSerializer(
                             rs,
                             style,
                             str => {

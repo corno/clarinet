@@ -9,7 +9,7 @@ export function formatCLI(
         newline: string,
         write: (str: string) => void,
         errorHandler: astn.StructureErrorHandler<astn.TokenizerAnnotationData>,
-    ) => astn.TokenConsumer<astn.TokenizerAnnotationData>
+    ) => astn.ITokenConsumer<astn.TokenizerAnnotationData>
 ): void {
 
     const astnFormatter = astn.createStreamPreTokenizer(

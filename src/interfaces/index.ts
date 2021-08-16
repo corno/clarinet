@@ -1,5 +1,0 @@
-export * from "./IPreTokenStreamConsumer"
-export * from "./IPreTokenizer"
-export * from "./ITokenConsumer"
-export * from "./TokenizerAnnotationData"
-export * from "../Ideserialize"

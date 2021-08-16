@@ -1,3 +1,3 @@
-export * from "./interfaces"
 export * from "./functions"
+export * from "./interfaces"
 export * from "./types"
