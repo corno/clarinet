@@ -7,11 +7,36 @@ import { IPreTokenStreamConsumer } from "../../../apis/ITokenizer"
 import { ITokenConsumer, TokenType } from "../../../apis/ITokenizer"
 import { PreToken, PreTokenDataType, WrappedStringType } from "../../../apis/ITokenizer"
 import { TokenizerAnnotationData } from "../../../apis/ITokenizer"
-import { printRange } from "../../../generic"
+import { printRange } from "../../../modules/tokenizer/functions/printRange"
+import { getEndLocationFromRange } from "../../../modules/tokenizer/functions/getEndLocationFromRange"
+
+function createRangeFromLocations(start: rng.Location, end: rng.Location): rng.Range {
+    return {
+        start: start,
+        length: end.position - start.position,
+        size: ((): rng.RangeSize => {
+            if (start.line === end.line) {
+                return ["single line", { "column offset": end.column - start.column }]
+            } else {
+                return ["multi line", { "line offset": end.line - start.line, "column": end.column }]
+            }
+        })(),
+    }
+}
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
+
+
+function createRangeFromSingleLocation(location: rng.Location): rng.Range {
+    return {
+        start: location,
+        length: 0,
+        size: ["single line", { "column offset": 0 }],
+    }
+}
+
 
 
 type NonWrappedStringContext = {
@@ -208,7 +233,7 @@ export function createTokenizer(
                     function onLineCommentEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.LINE_COMMENT) {
-                            throw new TokenizerStackPanicError(`Unexpected line comment end`, generic.createRangeFromSingleLocation(location))
+                            throw new TokenizerStackPanicError(`Unexpected line comment end`, createRangeFromSingleLocation(location))
                         }
 
                         //const $ = currentToken[1]
@@ -233,7 +258,7 @@ export function createTokenizer(
                         //         }],
                         //     }],
                         // })
-                        unsetCurrentToken(generic.createRangeFromSingleLocation(location))
+                        unsetCurrentToken(createRangeFromSingleLocation(location))
                         return p.value(false)
                     }
                     return onLineCommentEnd($.location)
@@ -367,7 +392,7 @@ export function createTokenizer(
                         const $tok = currentToken[1]
                         const $ = currentToken[1]
 
-                        const range = generic.createRangeFromLocations($tok.start.start, generic.getEndLocationFromRange(end))
+                        const range = createRangeFromLocations($tok.start.start, getEndLocationFromRange(end))
 
                         unsetCurrentToken(end)
 
@@ -436,7 +461,7 @@ export function createTokenizer(
 
                         indentationState.setLineDirty()
 
-                        setCurrentToken([CurrentTokenType.NONWRAPPED_STRING, { nonwrappedStringNode: "", start: location }], generic.createRangeFromSingleLocation(location))
+                        setCurrentToken([CurrentTokenType.NONWRAPPED_STRING, { nonwrappedStringNode: "", start: location }], createRangeFromSingleLocation(location))
                         return p.value(false)
                     }
                     return onNonWrappedStringBegin($.location)
@@ -446,14 +471,14 @@ export function createTokenizer(
                     function onNonWrappedStringEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.NONWRAPPED_STRING) {
-                            throw new TokenizerStackPanicError(`Unexpected nonwrapped string end`, generic.createRangeFromSingleLocation(location))
+                            throw new TokenizerStackPanicError(`Unexpected nonwrapped string end`, createRangeFromSingleLocation(location))
                         }
                         const $ = currentToken[1]
 
                         const $tok = currentToken[1]
                         const value = $tok.nonwrappedStringNode
-                        const range = generic.createRangeFromLocations($.start, location)
-                        unsetCurrentToken(generic.createRangeFromSingleLocation(location))
+                        const range = createRangeFromLocations($.start, location)
+                        unsetCurrentToken(createRangeFromSingleLocation(location))
                         return parser.onData({
                             annotation: createAnnotation(
                                 range,
@@ -476,7 +501,7 @@ export function createTokenizer(
                     function onWhitespaceBegin(location: rng.Location): p.IValue<boolean> {
                         const $: WhitespaceContext = { whitespaceNode: "", start: location }
 
-                        setCurrentToken([CurrentTokenType.WHITESPACE, $], generic.createRangeFromSingleLocation(location))
+                        setCurrentToken([CurrentTokenType.WHITESPACE, $], createRangeFromSingleLocation(location))
                         return p.value(false)
                     }
 
@@ -487,7 +512,7 @@ export function createTokenizer(
                     function onWhitespaceEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.WHITESPACE) {
-                            throw new TokenizerStackPanicError(`Unexpected whitespace end`, generic.createRangeFromSingleLocation(location))
+                            throw new TokenizerStackPanicError(`Unexpected whitespace end`, createRangeFromSingleLocation(location))
                         }
                         const $ = currentToken[1]
                         //const range = createRangeFromLocations($.start, location)
@@ -501,7 +526,7 @@ export function createTokenizer(
                         //         }],
                         //     }],
                         // })
-                        unsetCurrentToken(generic.createRangeFromSingleLocation(location))
+                        unsetCurrentToken(createRangeFromSingleLocation(location))
                         //return od
                         return p.value(false)
                     }
@@ -515,7 +540,7 @@ export function createTokenizer(
             parser.onEnd(
                 aborted,
                 createAnnotation(
-                    generic.createRangeFromLocations(location, location),
+                    createRangeFromLocations(location, location),
                     null,
                 )
             )

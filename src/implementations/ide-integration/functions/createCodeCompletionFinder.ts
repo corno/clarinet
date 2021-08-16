@@ -1,10 +1,10 @@
 import * as p from "pareto"
 
-import { getEndLocationFromRange } from "../../../generic"
 import { TokenizerAnnotationData } from "../../../apis/ITokenizer"
 import { createCodeCompletionsGenerator } from "../../typedHandlers"
 import { isPositionBeforeLocation } from "./isPositionBeforeLocation"
 import { ITypedTreeHandler } from "../../../modules/typed"
+import { getEndLocationFromRange } from "../../../modules/tokenizer/functions/getEndLocationFromRange"
 
 export function createCodeCompletionFinder(
     completionPositionLine: number,

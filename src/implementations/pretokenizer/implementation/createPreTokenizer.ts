@@ -2,10 +2,9 @@
     complexity:"off",
     no-console:"off",
 */
-import * as Char from "../../../generic"
-import { Location, Range } from "../../../modules/tokenizer/types/range";
+import * as Char from "../../../generic/interface/characters"
+import { Location, Range, RangeSize } from "../../../modules/tokenizer/types/range";
 
-import { createRangeFromSingleLocation, createRangeFromLocations } from "../../../generic"
 import { IChunk, IPreTokenizer } from "../../../apis/ITokenizer"
 import { PreToken, PreTokenDataType } from "../../../apis/ITokenizer"
 import { TokenError } from "./functionTypes"
@@ -13,6 +12,29 @@ import { TokenError } from "./functionTypes"
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
+
+function createRangeFromLocations(start: Location, end: Location): Range {
+    return {
+        start: start,
+        length: end.position - start.position,
+        size: ((): RangeSize => {
+            if (start.line === end.line) {
+                return ["single line", { "column offset": end.column - start.column }]
+            } else {
+                return ["multi line", { "line offset": end.line - start.line, "column": end.column }]
+            }
+        })(),
+    }
+}
+
+function createRangeFromSingleLocation(location: Location): Range {
+    return {
+        start: location,
+        length: 0,
+        size: ["single line", { "column offset": 0 }],
+    }
+}
+
 export interface ILocationState {
     getCurrentLocation(): Location
     getNextLocation(): Location
