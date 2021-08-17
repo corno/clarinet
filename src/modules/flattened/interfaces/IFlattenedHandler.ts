@@ -1,4 +1,4 @@
-import * as tokens from "../../treeParser/types/tokens"
+import * as tokens from "../../parser/types/tokens"
 import * as sc from "../types/StackContext"
 
 export interface IFlattenedHandler<InTokenAnnotation, InNonTokenAnnotation> {

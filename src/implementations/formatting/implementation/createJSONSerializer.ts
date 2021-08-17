@@ -1,8 +1,9 @@
 import * as p from "pareto"
 import { ITokenConsumer } from "../../../apis/ITokenizer/interfaces"
+import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
 import { createJSONFormatter } from "../../flattenedHandlers/functions"
 import { createStructureParser, StructureErrorHandler } from "../../structureParser"
-import { createDummyTreeHandler, flatten } from "../../untypedHandlers"
+import { flatten } from "../../untypedHandlers"
 
 
 export function createJSONSerializer<TokenAnnotation>(

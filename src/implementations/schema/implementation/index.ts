@@ -1,2 +1,2 @@
-export * from "./createASTNSchemaDeserializer"
+export * from "../../../modules/typed/functions/createASTNSchemaDeserializer"
 export * from "./createASTNSchemaBuilder"

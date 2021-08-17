@@ -32,9 +32,9 @@ describe('typed', () => {
                         const expect = astn.createExpectContext<astn.TokenizerAnnotationData, null>(
                             $ => {
                                 if ($.severity === astn.DiagnosticSeverity.error) {
-                                    foundErrors.push(["expect error", `${astn.printExpectError($.issue)} ${astn.printRange($.annotation.range)}`])
+                                    foundErrors.push(["expect error", `${astn.printExpectX($.issue)} ${astn.printRange($.annotation.range)}`])
                                 } else {
-                                    foundErrors.push(["expect warning", `${astn.printExpectError($.issue)} ${astn.printRange($.annotation.range)}`])
+                                    foundErrors.push(["expect warning", `${astn.printExpectX($.issue)} ${astn.printRange($.annotation.range)}`])
                                 }
                             },
                             () => astn.createDummyValueHandler(),

@@ -17,7 +17,7 @@ import {
 } from "../../../apis/ITokenizer"
 import { TokenError } from "../../pretokenizer"
 
-import * as Char from "../../../generic/interface/characters"
+import * as Char from "../../characters"
 
 const DEBUG = false
 

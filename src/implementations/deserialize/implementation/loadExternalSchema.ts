@@ -2,10 +2,10 @@
 import * as p from "pareto"
 import { ExternalSchemaResolvingError, RetrievalError, SchemaAndSideEffects, SchemaError, SchemaSchemaBuilder } from "../../../apis/Ideserialize"
 import { ITokenConsumer, TokenizerAnnotationData } from "../../../apis/ITokenizer"
+import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
 import { createStreamPreTokenizer } from "../../streamPretokenizer"
 import { createStructureParser } from "../../structureParser"
 import { createTokenizer } from "../../tokenizer"
-import { createDummyTreeHandler } from "../../untypedHandlers"
 
 
 function assertUnreachable<RT>(_x: never): RT {

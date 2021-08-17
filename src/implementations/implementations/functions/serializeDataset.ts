@@ -3,10 +3,10 @@
 */
 import * as x from "../../../generics"
 import { TypeDefinition, ValueDefinition } from "../../../modules/typed/types/definitions"
-import { TreeParserEvent } from "../../../apis/Iuntyped"
 import * as Ideserialie from "../../../apis/Ideserialize"
 import { IOut } from "../interfaces"
 import { ISerializableDataset, ISerializableValue } from "../../../modules/serialize/interfaces/ISerializableDataset"
+import { TreeParserEvent } from "../../../modules/parser/types/TreeParserEvent"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

@@ -2,14 +2,14 @@
 import * as p from "pareto"
 import * as loadExtenalSchema from "./loadExternalSchema"
 import * as def from "../../../modules/typed/types/definitions"
-import * as th from "../../../modules/treeHandler/interfaces/ITreeHandler"
+import * as th from "../../../modules/parser/interfaces/ITreeHandler"
 import { ITypedTreeHandler } from "../../../modules/typed"
 import { ContextSchema, DeserializeError, ResolvedSchema, ResolveReferencedSchema, SchemaSchemaBuilder } from "../../../apis/Ideserialize"
-import { DiagnosticSeverity } from "../../../generic"
-import { createDummyTreeHandler } from "../../untypedHandlers"
 import * as i from "../../../apis/ITokenizer"
 import { createStructureParser } from "../../structureParser"
 import { createUnmarshaller } from "../../unmarshall"
+import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
+import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
 
 export function createDeserializer($: {
     contextSchema: ContextSchema<i.TokenizerAnnotationData, null>

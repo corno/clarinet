@@ -1,7 +1,6 @@
 /* eslint
 */
 import * as p from "pareto"
-import * as generic from "../../../generic"
 import * as rng from "../../../modules/tokenizer/types/range"
 import { IPreTokenStreamConsumer } from "../../../apis/ITokenizer"
 import { ITokenConsumer, TokenType } from "../../../apis/ITokenizer"

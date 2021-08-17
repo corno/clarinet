@@ -1,5 +1,5 @@
 import * as i from "../../modules/expect/interfaces/IExpectContext"
-import * as h from "../../modules/treeHandler/interfaces/ITreeHandler"
+import * as h from "../../modules/parser/interfaces/ITreeHandler"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

@@ -2,7 +2,7 @@
     complexity:"off",
     no-console:"off",
 */
-import * as Char from "../../../generic/interface/characters"
+import * as Char from "../../characters"
 import { Location, Range, RangeSize } from "../../../modules/tokenizer/types/range";
 
 import { IChunk, IPreTokenizer } from "../../../apis/ITokenizer"

@@ -1,13 +1,16 @@
 //import * as p20 from "pareto-20"
-import { TreeParserEvent } from "../../../apis/Iuntyped"
-import { createTreeParser, handleEvent, printTreeParserError } from "../../treeParser"
-import { serializeSchema } from "../../typedHandler"
+import { handleEvent } from "../../treeParser"
 import { createASTNNormalizer, createSerializedQuotedString, IFormatInstructionWriter } from "../../flattenedHandlers"
 import { serializeDataset, SerializeOut } from "./serializeDataset"
-import { createDummyValueHandler, flatten } from "../../untypedHandlers"
+import { flatten } from "../../untypedHandlers"
 import { InternalSchemaSpecification, SerializationStyle } from "../../../apis/Ideserialize"
 import * as def from "../../../modules/typed/types/definitions"
 import { ISerializableDataset } from "../../../modules/serialize/interfaces/ISerializableDataset"
+import { TreeParserEvent } from "../../../modules/parser/types/TreeParserEvent"
+import { createTreeParser } from "../../../modules/parser/functions/createTreeParser"
+import { printTreeParserError } from "../../../modules/parser/functions/printTreeParserErrorError"
+import { createDummyValueHandler } from "../../../modules/parser/functions/dummyHandlers"
+import { serializeSchema } from "../../../modules/typed/functions/serializeSchema"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

@@ -10,7 +10,7 @@ import { createStreamPreTokenizer } from "../../streamPretokenizer"
 import { createTokenizer } from "../../tokenizer"
 import { printTokenError } from "../../pretokenizer"
 import { ResolvedSchema, RetrievalError, SchemaSchemaBuilder } from "../../../apis/Ideserialize"
-import { DiagnosticSeverity } from "../../../generic"
+import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
 
 export function createProcessorForASTNStreamWithContext(
     serializedDatasetBaseName: string,

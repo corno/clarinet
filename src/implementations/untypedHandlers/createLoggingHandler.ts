@@ -1,5 +1,5 @@
-import { TreeParserEvent } from "../../apis/Iuntyped"
-import * as i from "../../modules/treeHandler/interfaces/ITreeHandler"
+import * as i from "../../modules/parser/interfaces/ITreeHandler"
+import { TreeParserEvent } from "../../modules/parser/types/TreeParserEvent"
 
 export function createLoggingHandler<TokenAnnotation, NonTokenAnnotation>(
     onEvent: (event: TreeParserEvent, annotation: TokenAnnotation) => void,

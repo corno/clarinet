@@ -1,6 +1,4 @@
 
-export * from "./flatten"
-export * from "./dummyHandlers"
-export * from "./expect"
+export * from "../../modules/flattened/functions/flatten"
 export * from "./expect2"
 export * from "./createLoggingHandler"

@@ -11,7 +11,7 @@ import {
 } from "../../../modules/typed/interfaces/ITypedTreeHandler"
 import {
     Token,
-} from "../../../modules/treeParser/types/tokens"
+} from "../../../modules/parser/types/tokens"
 import { createSerializedNonWrappedString, createSerializedQuotedString } from "../../flattenedHandlers/functions"
 
 function assertUnreachable<RT>(_x: never): RT {

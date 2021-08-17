@@ -1,5 +1,5 @@
 
-import { SimpleString } from "../../../modules/treeParser/types/tokens"
+import { SimpleString } from "../../../modules/parser/types/tokens"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

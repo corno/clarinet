@@ -1,8 +1,8 @@
 import { TokenError } from "../../../implementations/pretokenizer"
 import { StructureErrorType } from "../../../implementations/structureParser"
-import { TreeParserErrorType } from "../../../implementations/treeParser"
-import { ExpectErrorValueType } from "../../../implementations/untypedHandlers"
-import { UnmarshallError } from "../../Ityped"
+import { ExpectErrorValueTypeX } from "../../../modules/expect/types/expectedError"
+import { TreeParserErrorType } from "../../../modules/parser/types/TreeParserError"
+import { UnmarshallError } from "../../../modules/typed/types/UnmarshallError"
 
 export type SchemaError =
     | ["schema schema cannot be embedded"]
@@ -30,7 +30,7 @@ export type SchemaDeserializationError =
     | ["validation", {
         "message": string
     }]
-    | ["expect", ExpectErrorValueType]
+    | ["expect", ExpectErrorValueTypeX]
     | ["stacked", TreeParserErrorType]
 
 export type DeserializeError =

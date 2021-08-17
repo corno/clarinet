@@ -1,6 +1,6 @@
-import { TreeParserEvent } from "../../../apis/Iuntyped"
-import { ITreeParser } from "../../../modules/treeParser/interfaces/ITreeParser"
-import * as tokens from "../../../modules/treeParser/types/tokens"
+import { TreeParserEvent } from "../../../modules/parser/types/TreeParserEvent"
+import { ITreeParser } from "../../../modules/parser/interfaces/ITreeParser"
+import * as tokens from "../../../modules/parser/types/tokens"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

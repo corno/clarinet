@@ -1,5 +1,5 @@
-import * as sp from "../../treeParser/types/tokens"
-import * as h from "../../treeHandler/interfaces/ITreeHandler"
+import * as sp from "../../parser/types/tokens"
+import * as h from "../../parser/interfaces/ITreeHandler"
 
 export type ExpectedElement<TokenAnnotation, NonTokenAnnotation> = {
     name: string

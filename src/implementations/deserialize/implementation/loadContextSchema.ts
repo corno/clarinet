@@ -1,7 +1,7 @@
 import * as p from "pareto"
 import { ContextSchema, ContextSchemaError, RetrievalError, SchemaSchemaBuilder } from "../../../apis/Ideserialize"
 import { TokenizerAnnotationData } from "../../../apis/ITokenizer"
-import { DiagnosticSeverity } from "../../../generic"
+import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
 import { loadExternalSchema } from "./loadExternalSchema"
 
 function assertUnreachable<RT>(_x: never): RT {

@@ -1,5 +1,5 @@
-export * from "./functionTypes"
+export * from "../../../modules/parser/interfaces/IStructureErrorHandler"
 
-export * from "./createStructureParser"
+export * from "../../../modules/parser/functions/createStructureParser"
 export * from "./printStructureError"
 

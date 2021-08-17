@@ -1,5 +1,5 @@
 import * as def from "../types/definitions"
-import * as tokens from "../../treeParser/types/tokens"
+import * as tokens from "../../parser/types/tokens"
 
 export interface GroupHandler<TokenAnnotation, NonTokenAnnotation> {
     onUnexpectedProperty($: {

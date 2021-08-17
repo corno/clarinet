@@ -1,7 +1,7 @@
 import { SchemaError } from "../../../apis/Ideserialize"
+import { printTreeParserError } from "../../../modules/parser/functions/printTreeParserErrorError"
 import { printTokenError } from "../../pretokenizer"
 import { printStructureError } from "../../structureParser"
-import { printTreeParserError } from "../../treeParser"
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
 
 function assertUnreachable<RT>(_x: never): RT {

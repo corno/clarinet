@@ -2,11 +2,14 @@
     no-console: "off",
 */
 
-import { DiagnosticSeverity } from "../../../generic"
 import { SchemaSchemaBuilder } from "../../../apis/Ideserialize"
+import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
+import { createExpectContext } from "../../../modules/expect/functions/createExpectContext"
+import { ExpectSeverity } from "../../../modules/expect/types/expectSeverity"
+import { OnDuplicateEntry } from "../../../modules/expect/types/onDuplicateEntry"
+import { createDummyValueHandler } from "../../../modules/parser/functions/dummyHandlers"
 import { createDummyTypedHandler } from "../../typedHandlers"
-import { createDummyValueHandler, createExpectContext, ExpectSeverity, OnDuplicateEntry } from "../../untypedHandlers"
-import { createASTNSchemaDeserializer } from "./createASTNSchemaDeserializer"
+import { createASTNSchemaDeserializer } from "../../../modules/typed/functions/createASTNSchemaDeserializer"
 
 
 export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): SchemaSchemaBuilder<TokenAnnotation, NonTokenAnnotation> | null {
