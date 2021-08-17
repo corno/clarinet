@@ -159,13 +159,33 @@ export function directoryTests(): void {
                     file: string,
                 ) {
                     let out = ""
+                    function createTypedSerializer<TokenAnnotation, NonTokenAnnotation>(
+                        rs: astn.ResolvedSchema<TokenAnnotation, NonTokenAnnotation>,
+                        write: (str: string) => void,
+                    ): astn.ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
+                        const simpleDS: astn.Datastore = {
+                            root: { type: null },
+                        }
+                        return astn.createBuilder(
+                            simpleDS,
+                            () => {
+                                astn.marshall(
+                                    astn.createSerializeInterface(simpleDS),
+                                    rs.schemaAndSideEffects.schema,
+                                    rs.specification,
+                                    style,
+                                    write,
+                                )
+                    
+                            }
+                        )
+                    }
                     return parse(
                         () => {
 
                         },
-                        rs => astn.createTypedSerializer(
+                        rs => createTypedSerializer(
                             rs,
-                            style,
                             str => {
                                 out += str
                             }

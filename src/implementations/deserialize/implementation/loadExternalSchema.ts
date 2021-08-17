@@ -1,11 +1,15 @@
 
 import * as p from "pareto"
-import { ExternalSchemaResolvingError, RetrievalError, SchemaAndSideEffects, SchemaError, SchemaSchemaBuilder } from "../../../apis/Ideserialize"
-import { ITokenConsumer, TokenizerAnnotationData } from "../../../apis/ITokenizer"
+import { ExternalSchemaResolvingError, SchemaError } from "../../../apis/Ideserialize/interface/Errors"
+import { RetrievalError } from "../../../apis/Ideserialize/interface/ResolveReferencedSchema"
+import { SchemaAndSideEffects } from "../../../apis/Ideserialize/interface/SchemaAndSideEffects"
+import { SchemaSchemaBuilder } from "../../../apis/Ideserialize/interface/SchemaSchemaBuilder"
+import { createStructureParser } from "../../../modules/parser/functions/createStructureParser"
 import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
-import { createStreamPreTokenizer } from "../../streamPretokenizer"
-import { createStructureParser } from "../../structureParser"
-import { createTokenizer } from "../../tokenizer"
+import { IParser } from "../../../modules/parser/interfaces/IParser"
+import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
+import { createStreamPreTokenizer } from "../../../modules/tokenizer/functions/createStreamPreTokenizer"
+import { createTokenizer } from "../../../modules/tokenizer/functions/createTokenizer"
 
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -19,7 +23,7 @@ export function createSchemaDeserializer<TokenAnnotation>(
     onError: (error: SchemaError, annotation: TokenAnnotation) => void,
     onSchema: (schema: SchemaAndSideEffects<TokenAnnotation, null> | null) => void,
     //SchemaAndSideEffects<TokenAnnotation>,
-): ITokenConsumer<TokenAnnotation> {
+): IParser<TokenAnnotation> {
     let foundError = false
 
     let schemaDefinitionFound = false

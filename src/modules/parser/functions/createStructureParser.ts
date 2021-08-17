@@ -1,14 +1,20 @@
 
 import * as p from "pareto"
+
 import * as Char from "../../../implementations/characters"
-import { StructureErrorHandler } from "../interfaces/IStructureErrorHandler"
-import { MultilineStringData, SimpleStringData, StructuralTokenData, ITokenConsumer, TokenType } from "../../../apis/ITokenizer"
+
+import { MultilineStringData, SimpleStringData, StructuralTokenData, TokenType } from "../types/rawToken"
 import { SimpleStringToken, Token } from "../types/tokens"
+import { StructureErrorType } from "../types/StructureErrorType"
+
 import { ITreeParser } from "../interfaces/ITreeParser"
 import { TreeHandler } from "../interfaces/ITreeHandler"
+import { StructureErrorHandler } from "../interfaces/IStructureErrorHandler"
+import { IParser } from "../interfaces/IParser"
+
+
 import { createTreeParser } from "./createTreeParser"
 import { createDummyValueHandler } from "./dummyHandlers"
-import { StructureErrorType } from "../types/StructureErrorType"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -29,7 +35,7 @@ export function createStructureParser<Annotation>($: {
     ) => TreeHandler<Annotation, null>
     onEnd: (endAnnotation: Annotation) => void
     errors: StructureErrorHandler<Annotation>
-}): ITokenConsumer<Annotation> {
+}): IParser<Annotation> {
 
     enum StructureState {
         EXPECTING_HEADER_OR_BODY,
@@ -69,7 +75,7 @@ export function createStructureParser<Annotation>($: {
     const rootContext: RootContext = { state: [StructureState.EXPECTING_HEADER_OR_BODY] }
 
     return {
-        onEnd: (_aborted, annotation) => {
+        onEnd: annotation => {
             function raiseError(error: StructureErrorType) {
                 $.errors.onStructureError({
                     error: error,
@@ -119,7 +125,7 @@ export function createStructureParser<Annotation>($: {
             }
             $.onEnd(annotation)
         },
-        onData: data => {
+        onToken: data => {
             function raiseError(error: StructureErrorType) {
                 $.errors.onStructureError({
                     error: error,

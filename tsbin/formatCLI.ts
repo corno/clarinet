@@ -1,6 +1,4 @@
 import * as stream from "stream"
-// import * as core from "../src/core"
-// import { createASTNTextFormatter, TokenizerAnnotationData } from "../src"
 import * as astn from "../src"
 
 export function formatCLI(
@@ -9,7 +7,7 @@ export function formatCLI(
         newline: string,
         write: (str: string) => void,
         errorHandler: astn.StructureErrorHandler<astn.TokenizerAnnotationData>,
-    ) => astn.ITokenConsumer<astn.TokenizerAnnotationData>
+    ) => astn.IParser<astn.TokenizerAnnotationData>
 ): void {
 
     const astnFormatter = astn.createStreamPreTokenizer(

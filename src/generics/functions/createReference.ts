@@ -1,5 +1,6 @@
-import { IReadonlyLookup, IReference, IRegistrater } from "../interfaces"
-import { AnnotatedString } from "../interfaces"
+import { IReadonlyLookup } from "../interfaces/IReadonlyLookup"
+import { IReference } from "../interfaces/IReference"
+import { AnnotatedString, IRegistrater } from "../interfaces/IResolveRegistry"
 
 export function createReference<T, Annotation>(
     propertyName: string,

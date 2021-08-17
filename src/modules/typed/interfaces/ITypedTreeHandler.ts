@@ -1,7 +1,7 @@
 import * as def from "../types/definitions"
 import * as tokens from "../../parser/types/tokens"
 
-export interface GroupHandler<TokenAnnotation, NonTokenAnnotation> {
+export interface IGroupHandler<TokenAnnotation, NonTokenAnnotation> {
     onUnexpectedProperty($: {
         token: tokens.SimpleStringToken<TokenAnnotation> //cannot be shorthand, so there must be a token, so no null
         expectedProperties: string[]
@@ -11,72 +11,72 @@ export interface GroupHandler<TokenAnnotation, NonTokenAnnotation> {
         key: string
         token: null | tokens.SimpleStringToken<TokenAnnotation>
         definition: def.ValueDefinition
-    }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    }): ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onClose($: {
         token: null | tokens.CloseObjectToken<TokenAnnotation>
     }): void
 }
 
-export interface DictionaryHandler<TokenAnnotation, NonTokenAnnotation> {
+export interface IDictionaryHandler<TokenAnnotation, NonTokenAnnotation> {
     onEntry($: {
         token: tokens.SimpleStringToken<TokenAnnotation>
-    }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    }): ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onClose($: {
         token: null | tokens.CloseObjectToken<TokenAnnotation>
     }): void
 }
 
-export interface ListHandler<TokenAnnotation, NonTokenAnnotation> {
+export interface IListHandler<TokenAnnotation, NonTokenAnnotation> {
     onClose($: {
         token: null | tokens.CloseArrayToken<TokenAnnotation>
     }): void
     onElement($: {
         annotation: NonTokenAnnotation
-    }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    }): ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
 }
 
-export interface TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
+export interface ITypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
     onOption($: {
         name: string
         token: null | tokens.SimpleStringToken<TokenAnnotation>
         definition: def.OptionDefinition
-    }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    }): ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onUnexpectedOption($: {
         token: tokens.SimpleStringToken<TokenAnnotation>
         expectedOptions: string[]
         defaultOption: string //the unmarshaller will initialize the default option.
-    }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    }): ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onEnd($: {
         annotation: NonTokenAnnotation
     }): void
 }
 
-export type GroupType<TokenAnnotation> =
+export type IGroupType<TokenAnnotation> =
     | ["verbose", tokens.OpenObjectToken<TokenAnnotation>]
     | ["shorthand", tokens.OpenArrayToken<TokenAnnotation>]
     | ["mixin"]
     | ["omitted"]
 
-export interface TypedValueHandler<TokenAnnotation, NonTokenAnnotation> {
+export interface ITypedValueHandler<TokenAnnotation, NonTokenAnnotation> {
     onGroup($: {
-        type: GroupType<TokenAnnotation>
+        type: IGroupType<TokenAnnotation>
         definition: def.GroupDefinition
-    }): GroupHandler<TokenAnnotation, NonTokenAnnotation>
+    }): IGroupHandler<TokenAnnotation, NonTokenAnnotation>
     onList($: {
         token: null | tokens.OpenArrayToken<TokenAnnotation>
         definition: def.ListDefinition
-    }): ListHandler<TokenAnnotation, NonTokenAnnotation>
+    }): IListHandler<TokenAnnotation, NonTokenAnnotation>
     onDictionary($: {
         token: null | tokens.OpenObjectToken<TokenAnnotation>
         definition: def.DictionaryDefinition
-    }): DictionaryHandler<TokenAnnotation, NonTokenAnnotation>
+    }): IDictionaryHandler<TokenAnnotation, NonTokenAnnotation>
     onTypeReference($: {
         definition: def.TypeReferenceDefinition
-    }): TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    }): ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onTaggedUnion($: {
         definition: def.TaggedUnionDefinition
         token: null | tokens.TaggedUnionToken<TokenAnnotation>
-    }): TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
+    }): ITypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
     onSimpleString($: {
         value: string
         token: null | tokens.SimpleStringToken<TokenAnnotation>
@@ -89,7 +89,7 @@ export interface TypedValueHandler<TokenAnnotation, NonTokenAnnotation> {
 }
 
 export interface ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
-    root: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+    root: ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     onEnd: ($: {
     }) => void
 }

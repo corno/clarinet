@@ -3,32 +3,37 @@ import * as p from "pareto"
 import * as loadExtenalSchema from "./loadExternalSchema"
 import * as def from "../../../modules/typed/types/definitions"
 import * as th from "../../../modules/parser/interfaces/ITreeHandler"
-import { ITypedTreeHandler } from "../../../modules/typed"
-import { ContextSchema, DeserializeError, ResolvedSchema, ResolveReferencedSchema, SchemaSchemaBuilder } from "../../../apis/Ideserialize"
-import * as i from "../../../apis/ITokenizer"
-import { createStructureParser } from "../../structureParser"
-import { createUnmarshaller } from "../../unmarshall"
 import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
 import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
+import { createStructureParser } from "../../../modules/parser/functions/createStructureParser"
+import { createUnmarshaller } from "../../../modules/typed/functions/createUnmarshaller"
+import { ITypedTreeHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
+import { IParser } from "../../../modules/parser/interfaces/IParser"
+import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
+import { ContextSchema } from "../../../apis/Ideserialize/interface/Dataset"
+import { ResolveReferencedSchema } from "../../../apis/Ideserialize/interface/ResolveReferencedSchema"
+import { DeserializeError } from "../../../apis/Ideserialize/interface/Errors"
+import { SchemaSchemaBuilder } from "../../../apis/Ideserialize/interface/SchemaSchemaBuilder"
+import { ResolvedSchema } from "../../../apis/Ideserialize/interface/ResolvedSchema"
 
 export function createDeserializer($: {
-    contextSchema: ContextSchema<i.TokenizerAnnotationData, null>
+    contextSchema: ContextSchema<TokenizerAnnotationData, null>
     resolveReferencedSchema: ResolveReferencedSchema
-    onError: (diagnostic: DeserializeError, annotation: i.TokenizerAnnotationData, severity: DiagnosticSeverity) => void
+    onError: (diagnostic: DeserializeError, annotation: TokenizerAnnotationData, severity: DiagnosticSeverity) => void
 
     getSchemaSchemaBuilder: (
         name: string,
-    ) => SchemaSchemaBuilder<i.TokenizerAnnotationData, null> | null
+    ) => SchemaSchemaBuilder<TokenizerAnnotationData, null> | null
     handlerBuilder: (
-        schemaSpec: ResolvedSchema<i.TokenizerAnnotationData, null>,
-    ) => ITypedTreeHandler<i.TokenizerAnnotationData, null>
+        schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
+    ) => ITypedTreeHandler<TokenizerAnnotationData, null>
     onEnd: () => void
-}): i.ITokenConsumer<i.TokenizerAnnotationData> {
+}): IParser<TokenizerAnnotationData> {
 
-    let headerAnnotation: null | i.TokenizerAnnotationData = null
+    let headerAnnotation: null | TokenizerAnnotationData = null
     let foundSchemaErrors = false
 
-    let internalSchema: ResolvedSchema<i.TokenizerAnnotationData, null> | null = null
+    let internalSchema: ResolvedSchema<TokenizerAnnotationData, null> | null = null
 
     return createStructureParser({
         onEmbeddedSchema: $$ => {
@@ -79,8 +84,8 @@ export function createDeserializer($: {
         onBody: firstBodyTokenAnnotation => {
             function createRealTreeHandler(
                 schema: def.Schema,
-                schemaSpec: ResolvedSchema<i.TokenizerAnnotationData, null>,
-            ): th.TreeHandler<i.TokenizerAnnotationData, null> {
+                schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
+            ): th.TreeHandler<TokenizerAnnotationData, null> {
                 const handler = $.handlerBuilder(schemaSpec)
                 return createUnmarshaller(
                     schema,

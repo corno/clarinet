@@ -1,7 +1,7 @@
 import { IFlattenedHandler } from "../../../modules/flattened/interfaces/IFlattenedHandler"
 import { StackContext } from "../../../modules/flattened/types/StackContext"
-import { IFormatInstructionWriter } from "../interfaces"
-import * as stringSerialization from "./stringSerialization"
+import { IFormatInstructionWriter } from "../../../modules/marshallDataset/interfaces/IFormatInstructionWriter"
+import * as stringSerialization from "../../../modules/parser/functions/stringSerialization"
 
 
 function assertUnreachable<RT>(_x: never): RT {

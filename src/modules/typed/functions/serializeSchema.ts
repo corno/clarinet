@@ -1,5 +1,6 @@
-import { IReadonlyDictionary, IReference } from "../../../generics"
 
+import { IReadonlyDictionary } from "../../../generics/interfaces/IReadonlyDictionary"
+import { IReference } from "../../../generics/interfaces/IReference"
 import { TreeParserEvent } from "../../parser/types/TreeParserEvent"
 import { Schema, ValueDefinition } from "../types/definitions"
 

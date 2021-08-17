@@ -1,5 +1,6 @@
-import { IResolveRegistry, Resolve } from "../interfaces"
-import { ResolveError } from "../types"
+import { IResolveRegistry, Resolve } from "../interfaces/IResolveRegistry"
+import { ResolveError } from "../types/ResolveError"
+
 
 export function createResolveRegistry<Annotation>(): IResolveRegistry<Annotation> {
     class ResolveRegistry {

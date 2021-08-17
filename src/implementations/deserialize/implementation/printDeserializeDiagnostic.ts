@@ -1,8 +1,8 @@
 
-import { DeserializeError, ExternalSchemaResolvingError } from "../../../apis/Ideserialize"
+import { DeserializeError, ExternalSchemaResolvingError } from "../../../apis/Ideserialize/interface/Errors"
+import { printStructureError } from "../../../modules/parser/functions/printStructureError"
 import { printUnmarshallError } from "../../../modules/typed/functions/printUnmarshallError"
-import { printTokenError } from "../../pretokenizer"
-import { printStructureError } from "../../structureParser"
+import { printTokenError } from "../../../modules/tokenizer/functions/printTokenError"
 import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
 
 function assertUnreachable<RT>(_x: never): RT {

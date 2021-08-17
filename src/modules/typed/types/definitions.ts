@@ -1,8 +1,9 @@
+import { IReadonlyDictionary } from "../../../generics/interfaces/IReadonlyDictionary"
+import { IReference } from "../../../generics/interfaces/IReference"
 
-import * as def from "../../../generics"
 
 export type TypeReferenceDefinition = {
-    readonly "type": def.IReference<TypeDefinition>
+    readonly "type": IReference<TypeDefinition>
 }
 
 export type TypeDefinition = {
@@ -19,7 +20,7 @@ export type ListDefinition = {
 }
 
 export type GroupDefinition = {
-    readonly "properties": def.IReadonlyDictionary<ValueDefinition>
+    readonly "properties": IReadonlyDictionary<ValueDefinition>
 }
 
 export type ValueDefinition = {
@@ -36,8 +37,8 @@ export type ValueTypeDefinition =
     | ["multiline string", MultiLineStringDefinition]
 
 export type Schema = {
-    readonly "types": def.IReadonlyDictionary<TypeDefinition>
-    readonly "root type": def.IReference<TypeDefinition>
+    readonly "types": IReadonlyDictionary<TypeDefinition>
+    readonly "root type": IReference<TypeDefinition>
 }
 
 export type OptionDefinition = {
@@ -45,8 +46,8 @@ export type OptionDefinition = {
 }
 
 export type TaggedUnionDefinition = {
-    readonly "options": def.IReadonlyDictionary<OptionDefinition>
-    readonly "default option": def.IReference<OptionDefinition>
+    readonly "options": IReadonlyDictionary<OptionDefinition>
+    readonly "default option": IReference<OptionDefinition>
 }
 
 export type SimpleStringDefinition = {

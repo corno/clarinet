@@ -1,4 +1,4 @@
-import { SchemaDeserializationError } from "../../../apis/Ideserialize"
+import { SchemaDeserializationError } from "../../../apis/Ideserialize/interface/Errors"
 import { printExpectX } from "../../../modules/expect/functions/printExpectError"
 import { printTreeParserError } from "../../../modules/parser/functions/printTreeParserErrorError"
 

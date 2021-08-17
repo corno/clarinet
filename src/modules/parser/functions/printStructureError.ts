@@ -1,4 +1,4 @@
-import { StructureErrorType } from "../../../modules/parser/interfaces/IStructureErrorHandler"
+import { StructureErrorType } from "../types/StructureErrorType"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

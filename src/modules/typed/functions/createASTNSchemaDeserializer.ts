@@ -3,14 +3,12 @@
 
 */
 import * as def from "../types/definitions"
-import {
-    AnnotatedString,
-    createDictionaryBuilder,
-    createReference,
-    createResolveRegistry,
-} from "../../../generics"
 import * as expect from "../../expect/interfaces/IExpectContext"
 import { TreeHandler, ValueHandler } from "../../parser/interfaces/ITreeHandler"
+import { createResolveRegistry } from "../../../generics/functions/createResolveRegistry"
+import { createDictionaryBuilder } from "../../../generics/functions/createDictionaryBuilder"
+import { AnnotatedString } from "../../../generics/interfaces/IResolveRegistry"
+import { createReference } from "../../../generics/functions/createReference"
 
 /**
  * this function is only calls back if the value is not null

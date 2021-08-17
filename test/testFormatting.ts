@@ -20,7 +20,7 @@ function format(
         newline: string,
         write: (str: string) => void,
         errorHandler: astn.StructureErrorHandler<astn.TokenizerAnnotationData>,
-    ) => astn.ITokenConsumer<astn.TokenizerAnnotationData>,
+    ) => astn.IParser<astn.TokenizerAnnotationData>,
     outBasename: string,
     outExtension: string
 ): Promise<null | void> {

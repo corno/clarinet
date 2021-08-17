@@ -1,8 +1,10 @@
 import * as p from "pareto"
-import { ITokenConsumer } from "../../../apis/ITokenizer"
-import { createASTNNormalizer, IFormatInstructionWriter } from "../../flattenedHandlers"
-import { createStructureParser, StructureErrorHandler } from "../../structureParser"
-import { flatten } from "../../untypedHandlers"
+import { flatten } from "../../../modules/flattened/functions/flatten"
+import { createStructureParser } from "../../../modules/parser/functions/createStructureParser"
+import { IParser } from "../../../modules/parser/interfaces/IParser"
+import { StructureErrorHandler } from "../../../modules/parser/interfaces/IStructureErrorHandler"
+import { IFormatInstructionWriter } from "../../../modules/marshallDataset/interfaces/IFormatInstructionWriter"
+import { createASTNNormalizer } from "../../flattenedHandlers/functions/createASTNNormalizer"
 
 
 export function createASTNSerializer<TokenAnnotation>(
@@ -10,7 +12,7 @@ export function createASTNSerializer<TokenAnnotation>(
     newline: string,
     write: (str: string) => void,
     errorHandler: StructureErrorHandler<TokenAnnotation>,
-): ITokenConsumer<TokenAnnotation> {
+): IParser<TokenAnnotation> {
     const writer: IFormatInstructionWriter<TokenAnnotation, null> = {
         token: instruction => {
             write(instruction.stringBefore)

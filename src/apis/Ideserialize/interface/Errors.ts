@@ -1,6 +1,6 @@
-import { TokenError } from "../../../implementations/pretokenizer"
-import { StructureErrorType } from "../../../implementations/structureParser"
+import { TokenError } from "../../../modules/tokenizer/types/TokenError"
 import { ExpectErrorValueTypeX } from "../../../modules/expect/types/expectedError"
+import { StructureErrorType } from "../../../modules/parser/types/StructureErrorType"
 import { TreeParserErrorType } from "../../../modules/parser/types/TreeParserError"
 import { UnmarshallError } from "../../../modules/typed/types/UnmarshallError"
 

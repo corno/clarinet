@@ -1,18 +1,18 @@
 
 import * as p from "pareto"
 import {
-    DictionaryHandler,
-    GroupHandler,
-    ListHandler,
-    TypedTaggedUnionHandler,
+    IDictionaryHandler,
+    IGroupHandler,
+    IListHandler,
+    ITypedTaggedUnionHandler,
     ITypedTreeHandler,
-    TypedValueHandler,
+    ITypedValueHandler,
 } from "../interfaces/ITypedTreeHandler"
 
 export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
 ): ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
 
-    function createGroupNOPSideEffects(): GroupHandler<TokenAnnotation, NonTokenAnnotation> {
+    function createGroupNOPSideEffects(): IGroupHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             onUnexpectedProperty: () => {
                 //
@@ -29,7 +29,7 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
         }
     }
 
-    function createTaggedUnionNOPSideEffects(): TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
+    function createTaggedUnionNOPSideEffects(): ITypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             onUnexpectedOption: () => {
                 return createValueNOPSideEffects()
@@ -43,7 +43,7 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
         }
     }
 
-    function createValueNOPSideEffects(): TypedValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    function createValueNOPSideEffects(): ITypedValueHandler<TokenAnnotation, NonTokenAnnotation> {
 
         return {
             onDictionary: () => {
@@ -71,7 +71,7 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
     }
 
 
-    function createDictionaryNOPSideEffects(): DictionaryHandler<TokenAnnotation, NonTokenAnnotation> {
+    function createDictionaryNOPSideEffects(): IDictionaryHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             onClose: () => {
                 //
@@ -82,7 +82,7 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
         }
     }
 
-    function createListNOPSideEffects(): ListHandler<TokenAnnotation, NonTokenAnnotation> {
+    function createListNOPSideEffects(): IListHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             onClose: () => {
                 //

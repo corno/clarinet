@@ -1,15 +1,15 @@
 /* eslint
     "@typescript-eslint/no-shadow": "off"
  */
-import { IReadonlyDictionary } from "../../../generics"
 import * as h from "../../parser/interfaces/ITreeHandler"
 import { GroupDefinition, OptionDefinition, TaggedUnionDefinition, ValueDefinition } from "../types/definitions"
 import { createDummyArrayHandler, createDummyObjectHandler, createDummyRequiredValueHandler, createDummyTaggedUnionHandler } from "../../parser/functions/dummyHandlers"
-import { TypedTaggedUnionHandler, TypedValueHandler } from ".."
 import * as tokens from "../../parser/types/tokens"
 import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"
 import { UnmarshallError } from "../types/UnmarshallError"
 import { createShorthandParsingState } from "../states/ShorthandParsingState"
+import { ITypedTaggedUnionHandler, ITypedValueHandler } from "../interfaces/ITypedTreeHandler"
+import { IReadonlyDictionary } from "../../../generics/interfaces/IReadonlyDictionary"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("Unreachable")
@@ -67,7 +67,7 @@ function createUnexpectedStringHandler<TokenAnnotation>(
 
 export function defaultInitializeValue<TokenAnnotation, NonTokenAnnotation>(
     definition: ValueDefinition,
-    handler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>,
+    handler: ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>,
     onError: OnError<TokenAnnotation>,
 ): void {
     switch (definition.type[0]) {
@@ -183,18 +183,18 @@ function find<T, RT>(
 type MixidIn<TokenAnnotation, NonTokenAnnotation> = {
     pushGroup: (
         definition: GroupDefinition,
-        groupContainerHandler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>
+        groupContainerHandler: ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
     ) => h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
     pushTaggedUnion: (
         definition: OptionDefinition,
-        taggedUnionHandler: TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
-        optionHandler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>,
+        taggedUnionHandler: ITypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
+        optionHandler: ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>,
     ) => void
 }
 
 export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
     definition: ValueDefinition,
-    handler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>,
+    handler: ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>,
     onError: OnError<TokenAnnotation>,
     flagNonDefaultPropertiesFound: () => void,
     mixedIn: null | MixidIn<TokenAnnotation, NonTokenAnnotation>,
@@ -399,9 +399,9 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
             function doOption<T>(
                 optionToken: tokens.SimpleStringToken<TokenAnnotation>,
                 definition: TaggedUnionDefinition,
-                tuHandler: TypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
+                tuHandler: ITypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
                 unknownCallback: () => T,
-                knownCallback: (option: OptionDefinition, handler: TypedValueHandler<TokenAnnotation, NonTokenAnnotation>) => T,
+                knownCallback: (option: OptionDefinition, handler: ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>) => T,
             ): T {
                 return find(
                     definition.options,

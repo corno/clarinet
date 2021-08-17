@@ -1,5 +1,4 @@
-import { IDictionaryBuilder } from "../interfaces"
-
+import { IDictionaryBuilder } from "../interfaces/IDictionaryBuilder"
 
 export function createDictionaryBuilder<T>(): IDictionaryBuilder<T> {
     const imp: { [key: string]: T } = {}

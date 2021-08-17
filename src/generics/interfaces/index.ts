@@ -1,5 +1,0 @@
-export * from "./IDictionaryBuilder"
-export * from "./IReadonlyLookup"
-export * from "./IReadonlyDictionary"
-export * from "./IReference"
-export * from "./IResolveRegistry"
