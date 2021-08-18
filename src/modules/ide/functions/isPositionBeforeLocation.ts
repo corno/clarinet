@@ -1,4 +1,4 @@
-import { Location } from "../../../modules/tokenizer/types/location";
+import { Location } from "../../tokenizer/types/location";
 
 export function isPositionBeforeLocation(
     positionLine: number,

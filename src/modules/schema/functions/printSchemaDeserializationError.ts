@@ -1,12 +1,13 @@
-import { SchemaDeserializationError } from "../../../apis/Ideserialize/interface/Errors"
-import { printExpectX } from "../../../modules/expect/functions/printExpectError"
-import { printTreeParserError } from "../../../modules/parser/functions/printTreeParserErrorError"
+import { SchemaDeserializationError } from "../types/SchemaDeserializationError"
+
+import { printExpectX } from "../../expect/functions/printExpectError"
+import { printTreeParserError } from "../../parser/functions/printTreeParserErrorError"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
 
-export function printEmbeddedSchemaDeserializationError(error: SchemaDeserializationError): string {
+export function printSchemaDeserializationError(error: SchemaDeserializationError): string {
     switch (error[0]) {
         case "expect": {
             const $$$ = error[1]

@@ -1,5 +1,5 @@
 import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"
-import * as def from "../types/definitions"
+import * as def from "../../schema/types/definitions"
 import { UnmarshallError } from "../types/UnmarshallError"
 
 import * as t from "../interfaces/ITypedTreeHandler"

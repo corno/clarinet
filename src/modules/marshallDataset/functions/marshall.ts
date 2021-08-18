@@ -3,20 +3,20 @@
 import { SerializationStyle } from "../types/SerializationStyle"
 import { InternalSchemaSpecification } from "../types/InternalSchemaSpecification"
 import { TreeParserEvent } from "../../parser/types/TreeParserEvent"
-import * as def from "../../typed/types/definitions"
+import * as def from "../../schema/types/definitions"
 
 import { IMarshallableDataset } from "../interfaces/IMarshallableDataset"
 
 import { createTreeParser } from "../../parser/functions/createTreeParser"
 import { printTreeParserError } from "../../parser/functions/printTreeParserErrorError"
 import { createDummyValueHandler } from "../../parser/functions/dummyHandlers"
-import { serializeSchema } from "../../typed/functions/serializeSchema"
+import { serializeSchema } from "../../schema/functions/serializeSchema"
 import { handleEvent } from "../../parser/functions/handleEvent"
 import { flatten } from "../../flattened/functions/flatten"
 import { marshallDataset, SerializeOut } from "./marshallDataset"
-import { IFormatInstructionWriter } from "../interfaces/IFormatInstructionWriter"
-import { createASTNNormalizer } from "../../../implementations/flattenedHandlers/functions/createASTNNormalizer"
-import { createSerializedQuotedString } from "../../parser/functions/stringSerialization"
+import { IFormatInstructionWriter } from "../../serializers/interfaces/IFormatInstructionWriter"
+import { createASTNNormalizer } from "../../serializers/functions/createASTNNormalizer"
+import { createSerializedQuotedString } from "../../serializers/functions/stringSerialization"
 
 
 function assertUnreachable<RT>(_x: never): RT {

@@ -131,10 +131,10 @@ export function createTokenizer(
 
     function createAnnotation(
         range: rng.Range,
-        tokenString: string | null,
+        //tokenString: string | null,
     ): TokenizerAnnotationData {
         return {
-            tokenString: tokenString,
+            //tokenString: tokenString,
             range: range,
             indentation: indentationState.getIndentation(),
             // contextData: {
@@ -314,16 +314,16 @@ export function createTokenizer(
                     }
                     return onNewLine($.range, "FIXME NEWLINE TOKEN STRING")
                 }
-                case PreTokenDataType.Punctuation: {
+                case PreTokenDataType.Structural: {
                     const $ = data.type[1]
                     indentationState.setLineDirty()
                     return parser.onToken({
                         annotation: createAnnotation(
                             $.range,
-                            String.fromCharCode($.char),
                         ),
                         type: [TokenType.Structural, {
-                            char: $.char,
+                            //char: $.char,
+                            type: $.type,
                         }],
                     })
                 }
@@ -402,7 +402,6 @@ export function createTokenizer(
                                 return parser.onToken({
                                     annotation: createAnnotation(
                                         range,
-                                        `'${$.wrappedStringNode}'`,
                                     ),
                                     type: [TokenType.SimpleString, {
                                         value: $.wrappedStringNode,
@@ -428,7 +427,6 @@ export function createTokenizer(
                                 return parser.onToken({
                                     annotation: createAnnotation(
                                         range,
-                                        `\`${$.type[1].previousLines.concat([$.wrappedStringNode]).join("\n")}\``,
                                     ),
                                     type: [TokenType.MultilineString, {
                                         lines: trimStringLines($$.previousLines.concat([$.wrappedStringNode]), $.indentation),
@@ -440,7 +438,6 @@ export function createTokenizer(
                                 return parser.onToken({
                                     annotation: createAnnotation(
                                         range,
-                                        `'${$.wrappedStringNode}'`,
                                     ),
                                     type: [TokenType.SimpleString, {
                                         value: $.wrappedStringNode,
@@ -483,7 +480,6 @@ export function createTokenizer(
                         return parser.onToken({
                             annotation: createAnnotation(
                                 range,
-                                ""
                             ),
                             type: [TokenType.SimpleString, {
                                 value: value,
@@ -541,7 +537,6 @@ export function createTokenizer(
             parser.onEnd(
                 createAnnotation(
                     createRangeFromLocations(location, location),
-                    null,
                 )
             )
             return p.value(null)

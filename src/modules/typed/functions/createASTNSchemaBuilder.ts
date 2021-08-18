@@ -2,14 +2,16 @@
     no-console: "off",
 */
 
-import { SchemaSchemaBuilder } from "../../../apis/Ideserialize/interface/SchemaSchemaBuilder"
-import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
-import { createExpectContext } from "../../../modules/expect/functions/createExpectContext"
-import { ExpectSeverity } from "../../../modules/expect/types/expectSeverity"
-import { OnDuplicateEntry } from "../../../modules/expect/types/onDuplicateEntry"
-import { createDummyValueHandler } from "../../../modules/parser/functions/dummyHandlers"
-import { createASTNSchemaDeserializer } from "../../../modules/typed/functions/createASTNSchemaDeserializer"
-import { createDummyTypedHandler } from "../../../modules/typed/functions/createDummyTypedHandler"
+import { SchemaSchemaBuilder } from "../../schema/types/SchemaSchemaBuilder"
+
+import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"
+import { ExpectSeverity } from "../../expect/types/expectSeverity"
+import { OnDuplicateEntry } from "../../expect/types/onDuplicateEntry"
+
+import { createExpectContext } from "../../expect/functions/createExpectContext"
+import { createDummyValueHandler } from "../../parser/functions/dummyHandlers"
+import { createASTNSchemaDeserializer } from "../../schema/functions/createASTNSchemaDeserializer"
+import { createDummyTypedHandler } from "./createDummyTypedHandler"
 
 
 export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): SchemaSchemaBuilder<TokenAnnotation, NonTokenAnnotation> | null {

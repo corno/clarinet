@@ -1,7 +1,9 @@
-import { IFlattenedHandler } from "../../../modules/flattened/interfaces/IFlattenedHandler"
-import { StackContext } from "../../../modules/flattened/types/StackContext"
-import { IFormatInstructionWriter } from "../../../modules/marshallDataset/interfaces/IFormatInstructionWriter"
-import { createSerializedNonWrappedString, createSerializedQuotedString } from "../../../modules/parser/functions/stringSerialization"
+import { StackContext } from "../../flattened/types/StackContext"
+
+import { IFlattenedHandler } from "../../flattened/interfaces/IFlattenedHandler"
+import { IFormatInstructionWriter } from "../interfaces/IFormatInstructionWriter"
+
+import { createSerializedNonWrappedString, createSerializedQuotedString } from "./stringSerialization"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

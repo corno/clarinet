@@ -7,9 +7,5 @@ export type StructureErrorType =
 | ["expected the schema"]
 | ["expected rootvalue"]
 | ["unexpected data after end", {
-    data: string
 }]
 | ["unexpected '!'"]
-| ["unknown punctuation", {
-    found: string
-}]

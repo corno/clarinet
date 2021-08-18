@@ -2,7 +2,7 @@ import { SchemaError } from "../../../apis/Ideserialize/interface/Errors"
 import { printStructureError } from "../../../modules/parser/functions/printStructureError"
 import { printTreeParserError } from "../../../modules/parser/functions/printTreeParserErrorError"
 import { printTokenError } from "../../../modules/tokenizer/functions/printTokenError"
-import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
+import { printSchemaDeserializationError } from "../../../modules/schema/functions/printSchemaDeserializationError"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -28,7 +28,7 @@ export function printSchemaSchemaError($$: SchemaError): string {
         }
         case "schema processing": {
             const $$$ = $$[1]
-            return printEmbeddedSchemaDeserializationError($$$)
+            return printSchemaDeserializationError($$$)
         }
         case "schema schema cannot be embedded": {
             return "schema schema cannot be embedded"

@@ -56,19 +56,21 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
                 (event, annotation) => {
                     switch (event[0]) {
                         case "close array": {
-                            actualEvents.push(["token", "closearray", annotation.tokenString, getRange(test.testForLocation, annotation.range)])
+                            actualEvents.push(["token", "closearray", getRange(test.testForLocation, annotation.range)])
                             break
                         }
                         case "close object": {
-                            actualEvents.push(["token", "closeobject", annotation.tokenString, getRange(test.testForLocation, annotation.range)])
+                            actualEvents.push(["token", "closeobject", getRange(test.testForLocation, annotation.range)])
                             break
                         }
                         case "open array": {
-                            actualEvents.push(["token", "openarray", annotation.tokenString, getRange(test.testForLocation, annotation.range)])
+                            const $ = event[1]
+                            actualEvents.push(["token", "openarray", $.type[0] === "list" ? "[" : "<", getRange(test.testForLocation, annotation.range)])
                             break
                         }
                         case "open object": {
-                            actualEvents.push(["token", "openobject", annotation.tokenString, getRange(test.testForLocation, annotation.range)])
+                            const $ = event[1]
+                            actualEvents.push(["token", "openobject", $.type[0] === "dictionary" ? "{" : "(", getRange(test.testForLocation, annotation.range)])
                             break
                         }
                         case "simple string": {

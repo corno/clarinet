@@ -1,11 +1,12 @@
 import * as p from "pareto"
-import { flatten } from "../../../modules/flattened/functions/flatten"
-import { createStructureParser } from "../../../modules/parser/functions/createStructureParser"
-import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
-import { IParser } from "../../../modules/parser/interfaces/IParser"
-import { StructureErrorHandler } from "../../../modules/parser/interfaces/IStructureErrorHandler"
-import { createJSONFormatter } from "../../flattenedHandlers/functions/createJSONFormatter"
 
+import { IParser } from "../../parser/interfaces/IParser"
+import { StructureErrorHandler } from "../../parser/interfaces/IStructureErrorHandler"
+
+import { flatten } from "../../flattened/functions/flatten"
+import { createStructureParser } from "../../parser/functions/createStructureParser"
+import { createDummyTreeHandler } from "../../parser/functions/dummyHandlers"
+import { createJSONFormatter } from "./createJSONFormatter"
 
 export function createJSONSerializer<TokenAnnotation>(
     indentationString: string,
@@ -38,7 +39,6 @@ export function createJSONSerializer<TokenAnnotation>(
         errors: errorHandler,
         onEnd: () => {
             write(newline)
-            return p.value(null)
         },
     })
 }

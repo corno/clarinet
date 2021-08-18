@@ -1,11 +1,12 @@
 import * as p from "pareto"
-import { flatten } from "../../../modules/flattened/functions/flatten"
-import { createStructureParser } from "../../../modules/parser/functions/createStructureParser"
-import { IParser } from "../../../modules/parser/interfaces/IParser"
-import { StructureErrorHandler } from "../../../modules/parser/interfaces/IStructureErrorHandler"
-import { IFormatInstructionWriter } from "../../../modules/marshallDataset/interfaces/IFormatInstructionWriter"
-import { createASTNNormalizer } from "../../flattenedHandlers/functions/createASTNNormalizer"
 
+import { IParser } from "../../parser/interfaces/IParser"
+import { StructureErrorHandler } from "../../parser/interfaces/IStructureErrorHandler"
+import { IFormatInstructionWriter } from "../interfaces/IFormatInstructionWriter"
+
+import { flatten } from "../../flattened/functions/flatten"
+import { createStructureParser } from "../../parser/functions/createStructureParser"
+import { createASTNNormalizer } from "./createASTNNormalizer"
 
 export function createASTNSerializer<TokenAnnotation>(
     indentationString: string,
@@ -53,7 +54,6 @@ export function createASTNSerializer<TokenAnnotation>(
         errors: errorHandler,
         onEnd: () => {
             write(newline)
-            return p.value(null)
         },
     })
 }

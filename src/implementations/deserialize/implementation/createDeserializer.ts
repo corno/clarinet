@@ -1,19 +1,19 @@
 
 import * as p from "pareto"
 import * as loadExtenalSchema from "./loadExternalSchema"
-import * as def from "../../../modules/typed/types/definitions"
+import * as def from "../../../modules/schema/types/definitions"
 import * as th from "../../../modules/parser/interfaces/ITreeHandler"
 import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
 import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
 import { createStructureParser } from "../../../modules/parser/functions/createStructureParser"
-import { createUnmarshaller } from "../../../modules/typed/functions/createUnmarshaller"
+import { createTreeUnmarshaller } from "../../../modules/typed/functions/createTreeUnmarshaller"
 import { ITypedTreeHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
 import { IParser } from "../../../modules/parser/interfaces/IParser"
 import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
-import { ContextSchema } from "../../../apis/Ideserialize/interface/Dataset"
+import { ContextSchema } from "../../../apis/Ideserialize/interface/ContextSchema"
 import { ResolveReferencedSchema } from "../../../apis/Ideserialize/interface/ResolveReferencedSchema"
 import { DeserializeError } from "../../../apis/Ideserialize/interface/Errors"
-import { SchemaSchemaBuilder } from "../../../apis/Ideserialize/interface/SchemaSchemaBuilder"
+import { SchemaSchemaBuilder } from "../../../modules/schema/types/SchemaSchemaBuilder"
 import { ResolvedSchema } from "../../../apis/Ideserialize/interface/ResolvedSchema"
 
 export function createDeserializer($: {
@@ -87,7 +87,7 @@ export function createDeserializer($: {
                 schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
             ): th.TreeHandler<TokenizerAnnotationData, null> {
                 const handler = $.handlerBuilder(schemaSpec)
-                return createUnmarshaller(
+                return createTreeUnmarshaller(
                     schema,
                     handler,
                     (error, annotation, severity) => $.onError(["unmarshall", error], annotation, severity),

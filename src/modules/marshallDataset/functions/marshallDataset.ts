@@ -2,7 +2,7 @@
     "@typescript-eslint/no-shadow": 0,
 */
 
-import { TypeDefinition, ValueDefinition } from "../../typed/types/definitions"
+import { TypeDefinition, ValueDefinition } from "../../schema/types/definitions"
 import { SerializationStyle } from "../types/SerializationStyle"
 import { TreeParserEvent } from "../../parser/types/TreeParserEvent"
 

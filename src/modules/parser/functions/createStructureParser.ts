@@ -1,8 +1,6 @@
 
 import * as p from "pareto"
 
-import * as Char from "../../../implementations/characters"
-
 import { MultilineStringData, SimpleStringData, StructuralTokenData, TokenType } from "../types/rawToken"
 import { SimpleStringToken, Token } from "../types/tokens"
 import { StructureErrorType } from "../types/StructureErrorType"
@@ -166,67 +164,57 @@ export function createStructureParser<Annotation>($: {
                                 annotation: data.annotation,
                             }
                         }
-                        switch (punctuation.char) {
-                            case Char.Punctuation.exclamationMark:
+                        switch (punctuation.type[0]) {
+                            case "header start":
                                 raiseError(["unexpected '!'"])
                                 break
-                            case Char.Punctuation.closeAngleBracket:
+                            case "close shorthand group":
                                 parser.closeArray(createToken({
 
                                 }))
                                 break
-                            case Char.Punctuation.closeBracket:
+                            case "close list":
                                 parser.closeArray(createToken({
 
                                 }))
                                 break
-                            case Char.Punctuation.comma:
-                                //TODO add as annotation to next token
-                                break
-                            case Char.Punctuation.openAngleBracket:
+                            case "open shorthand group":
                                 parser.openArray(createToken({
                                     type: ["shorthand group"],
                                 }))
                                 break
-                            case Char.Punctuation.openBracket:
+                            case "open list":
                                 parser.openArray(createToken({
                                     type: ["list"],
                                 }))
                                 break
-                            case Char.Punctuation.closeBrace:
+                            case "close dictionary":
                                 parser.closeObject(createToken({
 
                                 }))
                                 break
-                            case Char.Punctuation.closeParen:
+                            case "close verbose group":
                                 parser.closeObject(createToken({
 
                                 }))
                                 break
-                            case Char.Punctuation.colon:
-                                //TODO add as annotation to next token
-                                break
-                            case Char.Punctuation.openBrace:
+                            case "open dictionary":
                                 parser.openObject(createToken({
                                     type: ["dictionary"],
                                 }))
                                 break
-                            case Char.Punctuation.openParen:
+                            case "open verbose group":
                                 parser.openObject(createToken({
                                     type: ["verbose group"],
                                 }))
                                 break
-                            case Char.Punctuation.verticalLine:
+                            case "tagged union start":
                                 parser.taggedUnion(createToken({
 
                                 }))
                                 break
                             default:
-                                raiseError(
-                                    ['unknown punctuation', {
-                                        found: String.fromCharCode(punctuation.char),
-                                    }],
-                                )
+                                assertUnreachable(punctuation.type[0])
                         }
                         return p.value(false)
                     },
@@ -279,8 +267,8 @@ export function createStructureParser<Annotation>($: {
                 case StructureState.EXPECTING_HEADER_OR_BODY: {
                     return handleToken(
                         punctuation => {
-                            switch (punctuation.char) {
-                                case Char.Punctuation.exclamationMark:
+                            switch (punctuation.type[0]) {
+                                case "header start":
                                     rootContext.state = [StructureState.EXPECTING_SCHEMA_REFERENCE_OR_EMBEDDED_SCHEMA, {
                                         headerAnnotation: data.annotation,
                                     }]
@@ -304,7 +292,7 @@ export function createStructureParser<Annotation>($: {
                     const headerAnnotation = rootContext.state[1].headerAnnotation
                     return handleToken(
                         structuralToken => {
-                            if (structuralToken.char !== Char.Punctuation.exclamationMark) {
+                            if (structuralToken.type[0] !== "header start") {
                                 raiseError(["expected a schema reference or an embedded schema"])
                                 return p.value(false)
                             }
@@ -390,9 +378,8 @@ export function createStructureParser<Annotation>($: {
                 }
                 case StructureState.EXPECTING_END: {
                     return handleToken(
-                        punctuation => {
+                        _punctuation => {
                             raiseError([`unexpected data after end`, {
-                                data: String.fromCharCode(punctuation.char),
                             }])
                             return p.value(false)
                         },

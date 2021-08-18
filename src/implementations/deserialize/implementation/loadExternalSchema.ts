@@ -1,15 +1,16 @@
 
 import * as p from "pareto"
-import { ExternalSchemaResolvingError, SchemaError } from "../../../apis/Ideserialize/interface/Errors"
+import { SchemaError } from "../../../apis/Ideserialize/interface/Errors"
 import { RetrievalError } from "../../../apis/Ideserialize/interface/ResolveReferencedSchema"
-import { SchemaAndSideEffects } from "../../../apis/Ideserialize/interface/SchemaAndSideEffects"
-import { SchemaSchemaBuilder } from "../../../apis/Ideserialize/interface/SchemaSchemaBuilder"
+import { SchemaAndSideEffects } from "../../../modules/schema/types/SchemaAndSideEffects"
+import { SchemaSchemaBuilder } from "../../../modules/schema/types/SchemaSchemaBuilder"
 import { createStructureParser } from "../../../modules/parser/functions/createStructureParser"
 import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
 import { IParser } from "../../../modules/parser/interfaces/IParser"
 import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
 import { createStreamPreTokenizer } from "../../../modules/tokenizer/functions/createStreamPreTokenizer"
 import { createTokenizer } from "../../../modules/tokenizer/functions/createTokenizer"
+import { ExternalSchemaResolvingError } from "../../../apis/Ideserialize/interface/ContextSchemaError"
 
 
 function assertUnreachable<RT>(_x: never): RT {

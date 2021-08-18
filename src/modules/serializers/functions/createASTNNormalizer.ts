@@ -1,7 +1,10 @@
-import { IFlattenedHandler } from "../../../modules/flattened/interfaces/IFlattenedHandler"
-import { StackContext } from "../../../modules/flattened/types/StackContext"
-import { IFormatInstructionWriter } from "../../../modules/marshallDataset/interfaces/IFormatInstructionWriter"
-import * as stringSerialization from "../../../modules/parser/functions/stringSerialization"
+import { SimpleString } from "../../parser/types/tokens"
+import { StackContext } from "../../flattened/types/StackContext"
+
+import { IFlattenedHandler } from "../../flattened/interfaces/IFlattenedHandler"
+import { IFormatInstructionWriter } from "../interfaces/IFormatInstructionWriter"
+
+import * as stringSerialization from "./stringSerialization"
 
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -101,10 +104,27 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
         },
 
         simpleStringValue: $ => {
+            function serializeSimpleString(
+                $: SimpleString,
+            ): string {
+                switch ($.wrapping[0]) {
+                    case "none": {
+                        return stringSerialization.createSerializedNonWrappedString($.value)
+                    }
+                    case "quote": {
+                        return stringSerialization.createSerializedQuotedString($.value)
+                    }
+                    case "apostrophe": {
+                        return stringSerialization.createSerializedApostrophedString($.value)
+                    }
+                    default:
+                        return assertUnreachable($.wrapping[0])
+                }
+            }
             writer.token(
                 {
                     stringBefore: ``,
-                    token: stringSerialization.serializeSimpleString(
+                    token: serializeSimpleString(
                         $.token.data,
                     ),
                     stringAfter: ``,

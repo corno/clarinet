@@ -1,27 +1,13 @@
 
-import { DeserializeError, ExternalSchemaResolvingError } from "../../../apis/Ideserialize/interface/Errors"
+import { DeserializeError } from "../../../apis/Ideserialize/interface/Errors"
 import { printStructureError } from "../../../modules/parser/functions/printStructureError"
 import { printUnmarshallError } from "../../../modules/typed/functions/printUnmarshallError"
 import { printTokenError } from "../../../modules/tokenizer/functions/printTokenError"
-import { printEmbeddedSchemaDeserializationError } from "./printEmbeddedSchemaDeserializationError"
+import { printSchemaDeserializationError } from "../../../modules/schema/functions/printSchemaDeserializationError"
+import { printExternalSchemaResolvingError } from "./printExternalSchemaResolvingError"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
-}
-
-export function printExternalSchemaResolvingError(error: ExternalSchemaResolvingError): string {
-
-    switch (error[0]) {
-        case "errors in external schema": {
-            return `errors in external schema`
-        }
-        case "loading": {
-            const $$$$ = error[1]
-            return $$$$.message
-        }
-        default:
-            return assertUnreachable(error[0])
-    }
 }
 
 export function printDeserializationDiagnostic($: DeserializeError): string {
@@ -44,7 +30,7 @@ export function printDeserializationDiagnostic($: DeserializeError): string {
         }
         case "embedded schema error": {
             const $$ = $[1]
-            return printEmbeddedSchemaDeserializationError($$)
+            return printSchemaDeserializationError($$)
         }
         case "found both internal and context schema. ignoring internal schema": {
             return `found both internal and context schema. ignoring internal schema`

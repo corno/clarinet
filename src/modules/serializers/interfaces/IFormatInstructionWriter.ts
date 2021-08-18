@@ -1,4 +1,4 @@
-import { NonTokenFormatInstruction, TokenFormatInstruction } from "../types/FormatInstruction";
+import { NonTokenFormatInstruction, TokenFormatInstruction } from "../../marshallDataset/types/FormatInstruction";
 
 export interface IFormatInstructionWriter<TokenAnnotation, NonTokenAnnotation> {
     token: (instruction: TokenFormatInstruction, annotation: TokenAnnotation) => void

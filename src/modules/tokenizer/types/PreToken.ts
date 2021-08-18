@@ -1,4 +1,5 @@
 
+import { StructuralTokenType } from "../../parser/types/rawToken"
 import { Location, Range } from "../types/range"
 
 export type WrappedStringType =
@@ -18,7 +19,7 @@ export enum PreTokenDataType {
     LineCommentBegin,
     LineCommentEnd,
     NewLine,
-    Punctuation,
+    Structural,
     WrappedStringBegin,
     WrappedStringEnd,
     Snippet,
@@ -48,8 +49,8 @@ export enum PreTokenDataType {
     | [PreTokenDataType.NewLine, {
         range: Range //| null
     }]
-    | [PreTokenDataType.Punctuation, {
-        char: number
+    | [PreTokenDataType.Structural, {
+        type: StructuralTokenType
         range: Range
     }]
     | [PreTokenDataType.WrappedStringBegin, {

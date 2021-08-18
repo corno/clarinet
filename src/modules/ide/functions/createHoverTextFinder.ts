@@ -1,8 +1,8 @@
 import * as p from "pareto"
 import { isPositionBeforeLocation } from "./isPositionBeforeLocation"
-import { getEndLocationFromRange } from "../../../modules/tokenizer/functions/getEndLocationFromRange"
-import { ITypedTreeHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
-import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
+import { getEndLocationFromRange } from "../../tokenizer/functions/getEndLocationFromRange"
+import { ITypedTreeHandler } from "../../typed/interfaces/ITypedTreeHandler"
+import { TokenizerAnnotationData } from "../../tokenizer/types/TokenizerAnnotationData"
 import { createHoverTextsGenerator } from "./createHoverTextsGenerator"
 
 export function createHoverTextFinder(

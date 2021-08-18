@@ -1,8 +1,9 @@
 import { TokenError } from "../../../modules/tokenizer/types/TokenError"
-import { ExpectErrorValueTypeX } from "../../../modules/expect/types/expectedError"
 import { StructureErrorType } from "../../../modules/parser/types/StructureErrorType"
 import { TreeParserErrorType } from "../../../modules/parser/types/TreeParserError"
 import { UnmarshallError } from "../../../modules/typed/types/UnmarshallError"
+import { ExternalSchemaResolvingError } from "./ContextSchemaError"
+import { SchemaDeserializationError } from "../../../modules/schema/types/SchemaDeserializationError"
 
 export type SchemaError =
     | ["schema schema cannot be embedded"]
@@ -14,24 +15,6 @@ export type SchemaError =
     | ["structure", StructureErrorType]
     | ["tree", TreeParserErrorType]
     | ["schema processing", SchemaDeserializationError]
-
-
-export type ExternalSchemaResolvingError =
-    | ["errors in external schema"]
-    | ["loading", {
-        message: string
-    }]
-
-export type ContextSchemaError =
-    | ["validating schema file against internal schema"]
-    | ["external schema resolving", ExternalSchemaResolvingError]
-
-export type SchemaDeserializationError =
-    | ["validation", {
-        "message": string
-    }]
-    | ["expect", ExpectErrorValueTypeX]
-    | ["stacked", TreeParserErrorType]
 
 export type DeserializeError =
 | ["no valid schema"]

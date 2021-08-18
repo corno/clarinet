@@ -1,4 +1,4 @@
-import * as def from "../types/definitions"
+import * as def from "../../schema/types/definitions"
 import * as tokens from "../../parser/types/tokens"
 
 export interface IGroupHandler<TokenAnnotation, NonTokenAnnotation> {

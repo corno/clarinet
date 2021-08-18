@@ -1,6 +1,6 @@
-import * as def from "../../../modules/typed/types/definitions"
-import * as h from "../../../modules/typed/interfaces/ITypedTreeHandler"
-import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
+import * as def from "./definitions"
+import * as h from "../../typed/interfaces/ITypedTreeHandler"
+import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"
 
 
 export type SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation> = {

@@ -1,4 +1,4 @@
-import { PreToken } from "../../../modules/tokenizer/types/PreToken";
+import { PreToken } from "../../tokenizer/types/PreToken";
 import { IChunk } from "./IChunk";
 
 export interface IPreTokenizer {

@@ -1,14 +1,13 @@
-/* eslint
-    quote-props: "off",
 
-*/
-import * as def from "../types/definitions"
-import * as expect from "../../expect/interfaces/IExpectContext"
-import { TreeHandler, ValueHandler } from "../../parser/interfaces/ITreeHandler"
 import { createResolveRegistry } from "../../../generics/functions/createResolveRegistry"
 import { createDictionaryBuilder } from "../../../generics/functions/createDictionaryBuilder"
 import { AnnotatedString } from "../../../generics/interfaces/IResolveRegistry"
 import { createReference } from "../../../generics/functions/createReference"
+
+import * as def from "../types/definitions"
+
+import * as expect from "../../expect/interfaces/IExpectContext"
+import { TreeHandler, ValueHandler } from "../../parser/interfaces/ITreeHandler"
 
 /**
  * this function is only calls back if the value is not null

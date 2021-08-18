@@ -3,16 +3,16 @@ import {
     GroupDefinition,
     ValueDefinition,
     TaggedUnionDefinition,
-} from "../../../modules/typed/types/definitions"
+} from "../../schema/types/definitions"
 import {
     ITypedTreeHandler,
     ITypedValueHandler,
     IGroupHandler,
-} from "../../../modules/typed/interfaces/ITypedTreeHandler"
+} from "../../typed/interfaces/ITypedTreeHandler"
 import {
     Token,
-} from "../../../modules/parser/types/tokens"
-import { createSerializedNonWrappedString, createSerializedQuotedString } from "../../parser/functions/stringSerialization"
+} from "../../parser/types/tokens"
+import { createSerializedNonWrappedString, createSerializedQuotedString } from "../../serializers/functions/stringSerialization"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

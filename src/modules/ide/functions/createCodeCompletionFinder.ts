@@ -1,15 +1,35 @@
-import * as p from "pareto"
+import { TokenizerAnnotationData } from "../../tokenizer/types/TokenizerAnnotationData"
+import { Range } from "../../tokenizer/types/range"
 
-import { isPositionBeforeLocation } from "./isPositionBeforeLocation"
-import { getEndLocationFromRange } from "../../../modules/tokenizer/functions/getEndLocationFromRange"
-import { ITypedTreeHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
-import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
+import { ITypedTreeHandler } from "../../typed/interfaces/ITypedTreeHandler"
+
+import { getEndLocationFromRange } from "../../tokenizer/functions/getEndLocationFromRange"
 import { createCodeCompletionsGenerator } from "./createCodeCompletionsGenerator"
+import { isPositionBeforeLocation } from "./isPositionBeforeLocation"
+
+function onPositionInContextOfRange(
+    positionLine: number,
+    positionCharacter: number,
+    range: Range,
+    onBefore: () => void,
+    onIn: () => void,
+    onAfter: () => void,
+) {
+    if (isPositionBeforeLocation(positionLine, positionCharacter, range.start)) {
+        onBefore()
+        return
+    }
+    if (isPositionBeforeLocation(positionLine, positionCharacter, getEndLocationFromRange(range))) {
+        onIn()
+        return
+    }
+    onAfter()
+}
 
 export function createCodeCompletionFinder(
     completionPositionLine: number,
     completionPositionCharacter: number,
-    callback: (codeCompletion: string) => void
+    callback: (codeCompletion: string) => void,
 ): ITypedTreeHandler<TokenizerAnnotationData, null> {
     let positionAlreadyFound = false
     let previousAfter: null | (() => string[]) = null
@@ -23,7 +43,6 @@ export function createCodeCompletionFinder(
                 callback(codeCompletion)
             })
         }
-
     }
 
     return createCodeCompletionsGenerator(
@@ -32,23 +51,27 @@ export function createCodeCompletionFinder(
             if (positionAlreadyFound) {
                 return
             }
-            if (isPositionBeforeLocation(completionPositionLine, completionPositionCharacter, annotation.range.start)) {
-                generate(previousAfter)
-                positionAlreadyFound = true
-                return
-            }
-            if (isPositionBeforeLocation(completionPositionLine, completionPositionCharacter, getEndLocationFromRange(annotation.range))) {
-                generate(intra)
-                positionAlreadyFound = true
-                return
-            }
-            previousAfter = after
+            onPositionInContextOfRange(
+                completionPositionLine,
+                completionPositionCharacter,
+                annotation.range,
+                () => {
+                    generate(previousAfter)
+                    positionAlreadyFound = true
+                },
+                () => {
+                    generate(intra)
+                    positionAlreadyFound = true
+                },
+                () => {
+                    previousAfter = after
+                }
+            )
         },
         () => {
             if (!positionAlreadyFound) {
                 generate(previousAfter)
             }
-            return p.value(null)
         }
     )
 }

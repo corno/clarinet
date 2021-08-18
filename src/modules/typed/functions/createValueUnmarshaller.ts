@@ -2,7 +2,7 @@
     "@typescript-eslint/no-shadow": "off"
  */
 import * as h from "../../parser/interfaces/ITreeHandler"
-import { GroupDefinition, OptionDefinition, TaggedUnionDefinition, ValueDefinition } from "../types/definitions"
+import { GroupDefinition, OptionDefinition, TaggedUnionDefinition, ValueDefinition } from "../../schema/types/definitions"
 import { createDummyArrayHandler, createDummyObjectHandler, createDummyRequiredValueHandler, createDummyTaggedUnionHandler } from "../../parser/functions/dummyHandlers"
 import * as tokens from "../../parser/types/tokens"
 import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"

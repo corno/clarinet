@@ -1,6 +1,6 @@
 import { SchemaAndSideEffects } from "./SchemaAndSideEffects"
-import { SchemaDeserializationError } from "./Errors"
-import { TreeHandler } from "../../../modules/parser/interfaces/ITreeHandler"
+import { TreeHandler } from "../../parser/interfaces/ITreeHandler"
+import { SchemaDeserializationError } from "./SchemaDeserializationError"
 
 export type SchemaSchemaBuilder<TokenAnnotation, NonTokenAnnotation> = (
     onSchemaError: (error: SchemaDeserializationError, annotation: TokenAnnotation) => void,

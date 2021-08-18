@@ -6,9 +6,6 @@ function assertUnreachable<RT>(_x: never): RT {
 
 export function printStructureError($$: StructureErrorType): string {
     switch ($$[0]) {
-        case "unknown punctuation": {
-            return `unknown punctuation`
-        }
         case "unexpected '!'": {
             return `unexpected '!'`
         }
@@ -31,8 +28,7 @@ export function printStructureError($$: StructureErrorType): string {
             return `expected a schema reference or an embedded schema`
         }
         case "unexpected data after end": {
-            const $$$ = $$[1]
-            return `unexpected data after end: ${$$$.data}`
+            return `unexpected data after end`
         }
         default:
             return assertUnreachable($$[0])

@@ -1,10 +1,3 @@
-
-import { SimpleString } from "../types/tokens"
-
-function assertUnreachable<RT>(_x: never): RT {
-    throw new Error("unreachable")
-}
-
 export function createSerializedMultilineString(
     lines: string[],
     indentation: string,
@@ -57,22 +50,4 @@ function escapeCharacters(
         }
     }
     return out
-}
-
-export function serializeSimpleString(
-    $: SimpleString,
-): string {
-    switch ($.wrapping[0]) {
-        case "none": {
-            return createSerializedNonWrappedString($.value)
-        }
-        case "quote": {
-            return createSerializedQuotedString($.value)
-        }
-        case "apostrophe": {
-            return createSerializedApostrophedString($.value)
-        }
-        default:
-            return assertUnreachable($.wrapping[0])
-    }
 }

@@ -26,7 +26,7 @@ export const WrappedString = {
     u: 0x75,                 // u
 }
 
-export const Punctuation = {
+export const Structural = {
     exclamationMark: 0x21,   // !
     verticalLine: 0x7C,      // |
     comma: 0x2C,             // ,

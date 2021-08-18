@@ -21,6 +21,6 @@ import * as g from "./range"
 
 export type TokenizerAnnotationData = {
     indentation: string
-    tokenString: string | null
+    //tokenString: string | null
     range: g.Range
 }
