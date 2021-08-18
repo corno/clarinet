@@ -1,4 +1,4 @@
-import { ExpectError } from "../../expect/types/expectedError";
+import { ExpectError } from "../../expect/types/ExpectError";
 import { TreeParserErrorType } from "../../parser/types/TreeParserError";
 
 export type SchemaDeserializationError =

@@ -1,5 +1,5 @@
 import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity";
-import { ExpectError } from "../types/expectedError";
+import { ExpectError } from "../types/ExpectError";
 
 export type ExpectIssueHandler<TokenAnnotation> = ($: {
     issue: ExpectError

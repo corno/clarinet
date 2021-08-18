@@ -1,4 +1,4 @@
-import { ExpectError } from "../types/expectedError"
+import { ExpectError } from "../types/ExpectError"
 import { printExpectedValue, printExpectedValueType } from "./printExpectedValue"
 
 function assertUnreachable<RT>(_x: never): RT {
