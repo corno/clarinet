@@ -1,5 +1,3 @@
-//import * as p20 from "pareto-20"
-
 import { SerializationStyle } from "../types/SerializationStyle"
 import { InternalSchemaSpecification } from "../types/InternalSchemaSpecification"
 import { TreeParserEvent } from "../../parser/types/TreeParserEvent"

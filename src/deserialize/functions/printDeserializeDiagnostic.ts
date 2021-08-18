@@ -1,10 +1,10 @@
 
-import { DeserializeError } from "../../../apis/Ideserialize/interface/Errors"
-import { printStructureError } from "../../../modules/parser/functions/printStructureError"
-import { printUnmarshallError } from "../../../modules/typed/functions/printUnmarshallError"
-import { printTokenError } from "../../../modules/tokenizer/functions/printTokenError"
-import { printSchemaDeserializationError } from "../../../modules/schema/functions/printSchemaDeserializationError"
+import { printStructureError } from "../../modules/parser/functions/printStructureError"
+import { printUnmarshallError } from "../../modules/typed/functions/printUnmarshallError"
+import { printTokenError } from "../../modules/tokenizer/functions/printTokenError"
+import { printSchemaDeserializationError } from "../../modules/schema/functions/printSchemaDeserializationError"
 import { printExternalSchemaResolvingError } from "./printExternalSchemaResolvingError"
+import { DeserializeError } from "../types/DeserializeError"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

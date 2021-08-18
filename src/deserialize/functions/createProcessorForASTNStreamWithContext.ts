@@ -1,18 +1,18 @@
 import * as p from "pareto"
-import { Range } from "../../../modules/tokenizer/types/range"
-import { ITypedTreeHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
-import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
-import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
-import { SchemaSchemaBuilder } from "../../../modules/schema/types/SchemaSchemaBuilder"
-import { RetrievalError } from "../../../apis/Ideserialize/interface/ResolveReferencedSchema"
-import { ResolvedSchema } from "../../../apis/Ideserialize/interface/ResolvedSchema"
-import { loadContextSchema } from "../../deserialize/implementation/loadContextSchema"
-import { printContextSchemaError } from "../../deserialize/implementation/printContextSchemaError"
-import { createStreamPreTokenizer } from "../../../modules/tokenizer/functions/createStreamPreTokenizer"
-import { createTokenizer } from "../../../modules/tokenizer/functions/createTokenizer"
-import { createDeserializer } from "../../deserialize/implementation/createDeserializer"
-import { printDeserializationDiagnostic } from "../../deserialize/implementation/printDeserializeDiagnostic"
-import { printTokenError } from "../../../modules/tokenizer/functions/printTokenError"
+import { Range } from "../../modules/tokenizer/types/range"
+import { ITypedTreeHandler } from "../../modules/typed/interfaces/ITypedTreeHandler"
+import { DiagnosticSeverity } from "../../modules/diagnosticSeverity/types/DiagnosticSeverity"
+import { TokenizerAnnotationData } from "../../modules/tokenizer/types/TokenizerAnnotationData"
+import { SchemaSchemaBuilder } from "../../modules/typed/interfaces/SchemaSchemaBuilder"
+import { RetrievalError } from "../types/RetrievalError"
+import { ResolvedSchema } from "../types/ResolvedSchema"
+import { loadContextSchema } from "./loadContextSchema"
+import { printContextSchemaError } from "./printContextSchemaError"
+import { createStreamPreTokenizer } from "../../modules/tokenizer/functions/createStreamPreTokenizer"
+import { createTokenizer } from "../../modules/tokenizer/functions/createTokenizer"
+import { createUnmarshaller } from "./createUnmarshaller"
+import { printDeserializationDiagnostic } from "./printDeserializeDiagnostic"
+import { printTokenError } from "../../modules/tokenizer/functions/printTokenError"
 
 export function createProcessorForASTNStreamWithContext(
     serializedDatasetBaseName: string,
@@ -45,7 +45,7 @@ export function createProcessorForASTNStreamWithContext(
     ).mapResult(contextSchema => {
         return p.value(createStreamPreTokenizer(
             createTokenizer(
-                createDeserializer({
+                createUnmarshaller({
                     contextSchema: contextSchema,
                     resolveReferencedSchema: getReferencedSchema,
                     onError: (error, annotation, severity) => {

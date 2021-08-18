@@ -1,12 +1,4 @@
-import {
-    CloseArray,
-    CloseObject,
-    MultilineString,
-    OpenArray,
-    OpenObject,
-    SimpleString,
-    TaggedUnion,
-} from "./tokens"
+import { CloseArray, CloseObject, MultilineString, OpenArray, OpenObject, SimpleString, TaggedUnion } from "./tokens"
 
 export type TreeParserEvent =
     | ["close array", CloseArray]

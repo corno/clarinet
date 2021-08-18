@@ -142,7 +142,7 @@ export function directoryTests(): void {
                     const actualIssues: Issues = []
                     return parse(
                         (error, severity, range) => {
-                            actualIssues.push([error + (range === null ? "": ` @ ${astn.printRange(range)}`), null, severity === astn.DiagnosticSeverity.warning ? "warning" : "error"])
+                            actualIssues.push([error + (range === null ? "" : ` @ ${astn.printRange(range)}`), null, severity === astn.DiagnosticSeverity.warning ? "warning" : "error"])
                         },
                         schema => schema.schemaAndSideEffects.createStreamingValidator(
                             (error, annotation, severity) => {
@@ -171,12 +171,11 @@ export function directoryTests(): void {
                             () => {
                                 astn.marshall(
                                     astn.createSerializeInterface(simpleDS),
-                                    rs.schemaAndSideEffects.schema,
+                                    rs.schemaAndSideEffects.getSchema(),
                                     rs.specification,
                                     style,
                                     write,
                                 )
-                    
                             }
                         )
                     }

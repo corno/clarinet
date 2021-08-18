@@ -2,7 +2,7 @@
     no-console: "off",
 */
 
-import { SchemaSchemaBuilder } from "../../schema/types/SchemaSchemaBuilder"
+import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
 
 import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"
 import { ExpectSeverity } from "../../expect/types/expectSeverity"
@@ -40,7 +40,7 @@ export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): 
                     }
                 } else {
                     onSchema({
-                        schema: schema,
+                        getSchema: () => schema,
                         createStreamingValidator: () => {
                             return createDummyTypedHandler()
                         },

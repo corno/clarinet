@@ -4,7 +4,12 @@
 */
 import * as p from "pareto"
 
-import * as Char from "../../../implementations/characters"
+const Whitespace = {
+    tab: 0x09,               // \t
+    lineFeed: 0x0A,          // \n
+    carriageReturn: 0x0D,    // \r
+    space: 0x20,             //
+}
 
 import { Location, Range } from "../types/range"
 import { TokenizerOptions } from "../types/TokenizerOptions"
@@ -49,13 +54,13 @@ class LocationState implements ILocationState {
         this.location.position++
         //set the position
         switch (character) {
-            case Char.Whitespace.lineFeed:
+            case Whitespace.lineFeed:
                 this.location.line++
                 this.location.column = 0
                 break
-            case Char.Whitespace.carriageReturn:
+            case Whitespace.carriageReturn:
                 break
-            case Char.Whitespace.tab:
+            case Whitespace.tab:
                 this.location.column += this.spacesPerTab
                 break
             default:

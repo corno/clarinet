@@ -1,17 +1,7 @@
 
-import {
-    GroupDefinition,
-    ValueDefinition,
-    TaggedUnionDefinition,
-} from "../../schema/types/definitions"
-import {
-    ITypedTreeHandler,
-    ITypedValueHandler,
-    IGroupHandler,
-} from "../../typed/interfaces/ITypedTreeHandler"
-import {
-    Token,
-} from "../../parser/types/tokens"
+import { GroupDefinition, ValueDefinition, TaggedUnionDefinition } from "../../schema/types/definitions"
+import { ITypedTreeHandler, ITypedValueHandler, IGroupHandler } from "../../typed/interfaces/ITypedTreeHandler"
+import { Token } from "../../parser/types/tokens"
 import { createSerializedNonWrappedString, createSerializedQuotedString } from "../../serializers/functions/stringSerialization"
 
 function assertUnreachable<RT>(_x: never): RT {

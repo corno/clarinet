@@ -1,13 +1,6 @@
 
 import * as p from "pareto"
-import {
-    IDictionaryHandler,
-    IGroupHandler,
-    IListHandler,
-    ITypedTaggedUnionHandler,
-    ITypedTreeHandler,
-    ITypedValueHandler,
-} from "../interfaces/ITypedTreeHandler"
+import { IDictionaryHandler, IGroupHandler, IListHandler, ITypedTaggedUnionHandler, ITypedTreeHandler, ITypedValueHandler } from "../interfaces/ITypedTreeHandler"
 
 export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
 ): ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation> {
@@ -16,11 +9,9 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
         return {
             onUnexpectedProperty: () => {
                 //
-            },
-            onProperty: () => {
+            }, onProperty: () => {
                 return createValueNOPSideEffects()
-            },
-            // onUnexpectedProperty: () => {
+            },             // onUnexpectedProperty: () => {
             //     //
             // }
             onClose: () => {
@@ -33,11 +24,9 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
         return {
             onUnexpectedOption: () => {
                 return createValueNOPSideEffects()
-            },
-            onOption: () => {
+            }, onOption: () => {
                 return createValueNOPSideEffects()
-            },
-            onEnd: () => {
+            }, onEnd: () => {
                 //
             },
         }
@@ -48,23 +37,17 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
         return {
             onDictionary: () => {
                 return createDictionaryNOPSideEffects()
-            },
-            onList: () => {
+            }, onList: () => {
                 return createListNOPSideEffects()
-            },
-            onTaggedUnion: () => {
+            }, onTaggedUnion: () => {
                 return createTaggedUnionNOPSideEffects()
-            },
-            onSimpleString: () => {
+            }, onSimpleString: () => {
                 //
-            },
-            onMultilineString: () => {
+            }, onMultilineString: () => {
                 //
-            },
-            onTypeReference: () => {
+            }, onTypeReference: () => {
                 return createValueNOPSideEffects()
-            },
-            onGroup: () => {
+            }, onGroup: () => {
                 return createGroupNOPSideEffects()
             },
         }
@@ -75,8 +58,7 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
         return {
             onClose: () => {
                 //
-            },
-            onEntry: () => {
+            }, onEntry: () => {
                 return createValueNOPSideEffects()
             },
         }
@@ -86,15 +68,13 @@ export function createDummyTypedHandler<TokenAnnotation, NonTokenAnnotation>(
         return {
             onClose: () => {
                 //
-            },
-            onElement: () => {
+            }, onElement: () => {
                 return createValueNOPSideEffects()
             },
         }
     }
     return {
-        root: createValueNOPSideEffects(),
-        onEnd: () => {
+        root: createValueNOPSideEffects(), onEnd: () => {
             return p.value(null)
         },
     }

@@ -1,22 +1,28 @@
 
 import * as p from "pareto"
-import * as loadExtenalSchema from "./loadExternalSchema"
-import * as def from "../../../modules/schema/types/definitions"
-import * as th from "../../../modules/parser/interfaces/ITreeHandler"
-import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
-import { createDummyTreeHandler } from "../../../modules/parser/functions/dummyHandlers"
-import { createStructureParser } from "../../../modules/parser/functions/createStructureParser"
-import { createTreeUnmarshaller } from "../../../modules/typed/functions/createTreeUnmarshaller"
-import { ITypedTreeHandler } from "../../../modules/typed/interfaces/ITypedTreeHandler"
-import { IParser } from "../../../modules/parser/interfaces/IParser"
-import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
-import { ContextSchema } from "../../../apis/Ideserialize/interface/ContextSchema"
-import { ResolveReferencedSchema } from "../../../apis/Ideserialize/interface/ResolveReferencedSchema"
-import { DeserializeError } from "../../../apis/Ideserialize/interface/Errors"
-import { SchemaSchemaBuilder } from "../../../modules/schema/types/SchemaSchemaBuilder"
-import { ResolvedSchema } from "../../../apis/Ideserialize/interface/ResolvedSchema"
 
-export function createDeserializer($: {
+import * as def from "../../modules/schema/types/definitions"
+import { DiagnosticSeverity } from "../../modules/diagnosticSeverity/types/DiagnosticSeverity"
+import { TokenizerAnnotationData } from "../../modules/tokenizer/types/TokenizerAnnotationData"
+import { SchemaSchemaBuilder } from "../../modules/typed/interfaces/SchemaSchemaBuilder"
+import { ResolvedSchema } from "../types/ResolvedSchema"
+import { DeserializeError } from "../types/DeserializeError"
+import { RetrievalError } from "../types/RetrievalError"
+
+import * as th from "../../modules/parser/interfaces/ITreeHandler"
+import { ITypedTreeHandler } from "../../modules/typed/interfaces/ITypedTreeHandler"
+import { IParser } from "../../modules/parser/interfaces/IParser"
+import { ContextSchema } from "../interfaces/ContextSchema"
+
+import { createDummyTreeHandler } from "../../modules/parser/functions/dummyHandlers"
+import { createStructureParser } from "../../modules/parser/functions/createStructureParser"
+import { createTreeUnmarshaller } from "../../modules/typed/functions/createTreeUnmarshaller"
+
+import { loadPossibleExternalSchema } from "./loadPossibleExternalSchema"
+
+type ResolveReferencedSchema = (id: string) => p.IUnsafeValue<p.IStream<string, null>, RetrievalError>
+
+export function createUnmarshaller($: {
     contextSchema: ContextSchema<TokenizerAnnotationData, null>
     resolveReferencedSchema: ResolveReferencedSchema
     onError: (diagnostic: DeserializeError, annotation: TokenizerAnnotationData, severity: DiagnosticSeverity) => void
@@ -60,7 +66,7 @@ export function createDeserializer($: {
         onSchemaReference: $$ => {
             headerAnnotation = $$.token.annotation
 
-            return loadExtenalSchema.loadPossibleExternalSchema(
+            return loadPossibleExternalSchema(
                 $.resolveReferencedSchema($$.token.data.value),
                 $.getSchemaSchemaBuilder,
                 error => {
@@ -102,7 +108,7 @@ export function createDeserializer($: {
                     )
                 }
                 return createRealTreeHandler(
-                    $.contextSchema[1].schema,
+                    $.contextSchema[1].getSchema(),
                     {
                         schemaAndSideEffects: $.contextSchema[1],
                         specification: ["none"],
@@ -121,7 +127,7 @@ export function createDeserializer($: {
                     return createDummyTreeHandler()
                 } else {
                     return createRealTreeHandler(
-                        internalSchema.schemaAndSideEffects.schema,
+                        internalSchema.schemaAndSideEffects.getSchema(),
                         internalSchema,
                     )
                 }

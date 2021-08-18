@@ -9,12 +9,6 @@ import * as def from "../types/definitions"
 import * as expect from "../../expect/interfaces/IExpectContext"
 import { TreeHandler, ValueHandler } from "../../parser/interfaces/ITreeHandler"
 
-/**
- * this function is only calls back if the value is not null
- * @param value value
- * @param callback
- */
-
 export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation>(
     context: expect.IExpectContext<TokenAnnotation, NonTokenAnnotation>,
     onValidationError: (message: string, annotation: TokenAnnotation) => void,

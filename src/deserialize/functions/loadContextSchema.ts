@@ -1,10 +1,10 @@
 import * as p from "pareto"
-import { ContextSchemaError } from "../../../apis/Ideserialize/interface/ContextSchemaError"
-import { ContextSchema } from "../../../apis/Ideserialize/interface/ContextSchema"
-import { RetrievalError } from "../../../apis/Ideserialize/interface/ResolveReferencedSchema"
-import { SchemaSchemaBuilder } from "../../../modules/schema/types/SchemaSchemaBuilder"
-import { DiagnosticSeverity } from "../../../modules/diagnosticSeverity/types/DiagnosticSeverity"
-import { TokenizerAnnotationData } from "../../../modules/tokenizer/types/TokenizerAnnotationData"
+import { ContextSchemaError } from "../types/ContextSchemaError"
+import { ContextSchema } from "../interfaces/ContextSchema"
+import { RetrievalError } from "../types/RetrievalError"
+import { SchemaSchemaBuilder } from "../../modules/typed/interfaces/SchemaSchemaBuilder"
+import { DiagnosticSeverity } from "../../modules/diagnosticSeverity/types/DiagnosticSeverity"
+import { TokenizerAnnotationData } from "../../modules/tokenizer/types/TokenizerAnnotationData"
 import { loadExternalSchema } from "./loadExternalSchema"
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -71,11 +71,4 @@ export function loadContextSchema(
     ).catch(error => {
         return p.value(error)
     })
-    // return loadExternalSchema(
-    //     ,
-    //     getSchemaSchemaBuilder,
-    //     error => {
-    //         onError(["external schema resolving", error], astncore.DiagnosticSeverity.error)
-    //     },
-    // )
 }

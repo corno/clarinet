@@ -2,7 +2,6 @@
     complexity:"off",
     no-console:"off",
 */
-import * as Char from "../../../implementations/characters"
 
 import { Location, Range, RangeSize } from "../types/range";
 import { TokenError } from "../types/TokenError"
@@ -15,6 +14,59 @@ import { StructuralTokenType } from "../../parser/types/rawToken";
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
+}
+
+
+const CommentChar = {
+    solidus: 0x2F,           // /
+    asterisk: 0x2A,          // *
+}
+
+const Whitespace = {
+    tab: 0x09,               // \t
+    lineFeed: 0x0A,          // \n
+    carriageReturn: 0x0D,    // \r
+    space: 0x20,             //
+}
+
+const WrappedString = {
+    quotationMark: 0x22,     // ?
+    apostrophe: 0x27,        // '
+    backtick: 0x60,          // `
+    reverseSolidus: 0x5C,    // \
+    solidus: 0x2F,           // /
+
+    b: 0x62,                 // b
+    f: 0x66,                 // f
+    n: 0x6E,                 // n
+    r: 0x72,                 // r
+    t: 0x74,                 // t
+    u: 0x75,                 // u
+}
+
+const Structural = {
+    exclamationMark: 0x21,   // !
+    verticalLine: 0x7C,      // |
+    comma: 0x2C,             // ,
+    colon: 0x3A,             // :
+    openBrace: 0x7B,         // {
+    closeBrace: 0x7D,        // }
+    openParen: 0x28,         // )
+    closeParen: 0x29,        // )
+    openBracket: 0x5B,       // [
+    closeBracket: 0x5D,      // ]
+    openAngleBracket: 0x3C,  // <
+    closeAngleBracket: 0x3E, // >
+}
+
+const UnicodeChars = {
+    0: 0x30,
+    9: 0x39,
+    A: 0x41,
+    F: 0x46,
+    a: 0x61,
+    f: 0x66,
+
 }
 
 function createRangeFromLocations(start: Location, end: Location): Range {
@@ -300,13 +352,13 @@ export function createPreTokenizer(
             switch (fnlc.type) {
                 case FoundNewlineCharacterType.CARRIAGE_RETURN: {
                     /*
-                    if nextChar === Char.Whitespace.lineFeed
+                    if nextChar === Whitespace.lineFeed
                         windows style newlines (\r\n)
                     else
                         old style Mac OS newlines (\r)
                     */
                     return {
-                        consumeCharacter: nextChar === Char.Whitespace.lineFeed,
+                        consumeCharacter: nextChar === Whitespace.lineFeed,
                         preToken: changeCurrentTokenType(
                             [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
                             {
@@ -320,14 +372,14 @@ export function createPreTokenizer(
                 }
                 case FoundNewlineCharacterType.LINE_FEED: {
                     /*
-                    if nextChar === Char.Whitespace.carriageReturn
+                    if nextChar === Whitespace.carriageReturn
                         //strange style newline (\n\r)
                     else
                         //unix style newlines (\n)
                         //don't consume character
                     */
                     return {
-                        consumeCharacter: nextChar === Char.Whitespace.carriageReturn,
+                        consumeCharacter: nextChar === Whitespace.carriageReturn,
                         preToken: changeCurrentTokenType(
                             [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
                             {
@@ -351,7 +403,7 @@ export function createPreTokenizer(
                         currentChunk,
                         (nextChar, snippet) => {
                             if ($$.locationOfFoundAsterisk !== null) {
-                                if (nextChar === Char.CommentChar.solidus) {
+                                if (nextChar === CommentChar.solidus) {
                                     //end of block comment
                                     return {
                                         consumeCharacter: true,
@@ -373,7 +425,7 @@ export function createPreTokenizer(
                                 }
                             } else {
 
-                                if (nextChar === Char.CommentChar.asterisk) {
+                                if (nextChar === CommentChar.asterisk) {
                                     return snippet.ensureFlushed(() => {
                                         $$.locationOfFoundAsterisk = locationState.getCurrentLocation()
                                         return {
@@ -398,8 +450,8 @@ export function createPreTokenizer(
                     return this.processUntilFirstNotIncludedCharacter(
                         currentChunk,
                         char => {
-                            return char !== Char.Whitespace.lineFeed &&
-                                char !== Char.Whitespace.carriageReturn
+                            return char !== Whitespace.lineFeed &&
+                                char !== Whitespace.carriageReturn
                         },
                         () => {
                             return {
@@ -426,7 +478,7 @@ export function createPreTokenizer(
                                 return this.handleNewlineCharacter($.foundNewlineCharacter, nextChar)
                             } else if ($.foundSolidus !== null) {
 
-                                if (nextChar === Char.CommentChar.solidus) {
+                                if (nextChar === CommentChar.solidus) {
                                     return {
                                         consumeCharacter: true,
                                         preToken: changeCurrentTokenType(
@@ -439,7 +491,7 @@ export function createPreTokenizer(
                                         ),
                                     }
 
-                                } else if (nextChar === Char.CommentChar.asterisk) {
+                                } else if (nextChar === CommentChar.asterisk) {
 
                                     return {
                                         consumeCharacter: true,
@@ -468,7 +520,7 @@ export function createPreTokenizer(
                             } else {
 
                                 switch (nextChar) {
-                                    case Char.Whitespace.carriageReturn: {
+                                    case Whitespace.carriageReturn: {
 
                                         $.foundNewlineCharacter = {
                                             type: FoundNewlineCharacterType.CARRIAGE_RETURN,
@@ -479,7 +531,7 @@ export function createPreTokenizer(
                                             preToken: null,
                                         }
                                     }
-                                    case Char.Whitespace.lineFeed: {
+                                    case Whitespace.lineFeed: {
 
                                         $.foundNewlineCharacter = {
                                             type: FoundNewlineCharacterType.LINE_FEED,
@@ -490,7 +542,7 @@ export function createPreTokenizer(
                                             preToken: null,
                                         }
                                     }
-                                    case Char.Whitespace.space: {
+                                    case Whitespace.space: {
                                         return {
                                             consumeCharacter: false,
                                             preToken: changeCurrentTokenType(
@@ -503,14 +555,14 @@ export function createPreTokenizer(
                                             ),
                                         }
                                     }
-                                    case Char.CommentChar.solidus: {
+                                    case CommentChar.solidus: {
                                         $.foundSolidus = locationState.getCurrentLocation()
                                         return {
                                             consumeCharacter: true,
                                             preToken: null,
                                         }
                                     }
-                                    case Char.Whitespace.tab: {
+                                    case Whitespace.tab: {
                                         return {
                                             consumeCharacter: false,
                                             preToken: changeCurrentTokenType(
@@ -523,7 +575,7 @@ export function createPreTokenizer(
                                             ),
                                         }
                                     }
-                                    case Char.WrappedString.apostrophe: {
+                                    case WrappedString.apostrophe: {
                                         return {
                                             consumeCharacter: true,
                                             preToken: changeCurrentTokenType(
@@ -542,7 +594,7 @@ export function createPreTokenizer(
                                             ),
                                         }
                                     }
-                                    case Char.WrappedString.backtick: {
+                                    case WrappedString.backtick: {
                                         return {
                                             consumeCharacter: true,
                                             preToken: changeCurrentTokenType(
@@ -563,7 +615,7 @@ export function createPreTokenizer(
                                             ),
                                         }
                                     }
-                                    case Char.WrappedString.quotationMark: {
+                                    case WrappedString.quotationMark: {
                                         return {
                                             consumeCharacter: true,
                                             preToken: changeCurrentTokenType(
@@ -595,18 +647,18 @@ export function createPreTokenizer(
                                             }
                                         }
                                         switch (nextChar) {
-                                            case Char.Structural.closeAngleBracket: return createStructuralToken(["close shorthand group"])
-                                            case Char.Structural.closeBrace: return createStructuralToken(["close dictionary"])
-                                            case Char.Structural.closeBracket: return createStructuralToken(["close list"])
-                                            case Char.Structural.closeParen: return createStructuralToken(["close verbose group"])
-                                            case Char.Structural.colon: return { consumeCharacter: true, preToken: null }
-                                            case Char.Structural.comma: return { consumeCharacter: true, preToken: null }
-                                            case Char.Structural.exclamationMark: return createStructuralToken(["header start"])
-                                            case Char.Structural.openAngleBracket: return createStructuralToken(["open shorthand group"])
-                                            case Char.Structural.openBrace: return createStructuralToken(["open dictionary"])
-                                            case Char.Structural.openBracket: return createStructuralToken(["open list"])
-                                            case Char.Structural.openParen: return createStructuralToken(["open verbose group"])
-                                            case Char.Structural.verticalLine: return createStructuralToken(["tagged union start"])
+                                            case Structural.closeAngleBracket: return createStructuralToken(["close shorthand group"])
+                                            case Structural.closeBrace: return createStructuralToken(["close dictionary"])
+                                            case Structural.closeBracket: return createStructuralToken(["close list"])
+                                            case Structural.closeParen: return createStructuralToken(["close verbose group"])
+                                            case Structural.colon: return { consumeCharacter: true, preToken: null }
+                                            case Structural.comma: return { consumeCharacter: true, preToken: null }
+                                            case Structural.exclamationMark: return createStructuralToken(["header start"])
+                                            case Structural.openAngleBracket: return createStructuralToken(["open shorthand group"])
+                                            case Structural.openBrace: return createStructuralToken(["open dictionary"])
+                                            case Structural.openBracket: return createStructuralToken(["open list"])
+                                            case Structural.openParen: return createStructuralToken(["open verbose group"])
+                                            case Structural.verticalLine: return createStructuralToken(["tagged union start"])
                                             default:
                                                 return {
                                                     consumeCharacter: false,
@@ -646,17 +698,17 @@ export function createPreTokenizer(
                                     }
                                 }
 
-                                if (nextChar === Char.WrappedString.quotationMark) { return flushChar('"') }
-                                else if (nextChar === Char.WrappedString.apostrophe) { return flushChar('\'') } //deviation from the JSON standard
-                                else if (nextChar === Char.WrappedString.apostrophe) { return flushChar('`') } //deviation from the JSON standard
-                                else if (nextChar === Char.WrappedString.reverseSolidus) { return flushChar('\\') }
-                                else if (nextChar === Char.WrappedString.solidus) { return flushChar('\/') }
-                                else if (nextChar === Char.WrappedString.b) {
+                                if (nextChar === WrappedString.quotationMark) { return flushChar('"') }
+                                else if (nextChar === WrappedString.apostrophe) { return flushChar('\'') } //deviation from the JSON standard
+                                else if (nextChar === WrappedString.apostrophe) { return flushChar('`') } //deviation from the JSON standard
+                                else if (nextChar === WrappedString.reverseSolidus) { return flushChar('\\') }
+                                else if (nextChar === WrappedString.solidus) { return flushChar('\/') }
+                                else if (nextChar === WrappedString.b) {
                                     return flushChar('\b')
                                 }
-                                else if (nextChar === Char.WrappedString.f) { return flushChar('\f') }
-                                else if (nextChar === Char.WrappedString.n) {
-                                    if ($.startCharacter === Char.WrappedString.backtick) {
+                                else if (nextChar === WrappedString.f) { return flushChar('\f') }
+                                else if (nextChar === WrappedString.n) {
+                                    if ($.startCharacter === WrappedString.backtick) {
                                         return snippet.ensureFlushed(() => {
                                             $.slashed = false
                                             return {
@@ -672,8 +724,8 @@ export function createPreTokenizer(
                                         return flushChar('\n')
                                     }
                                 }
-                                else if (nextChar === Char.WrappedString.r) {
-                                    if ($.startCharacter === Char.WrappedString.backtick) {
+                                else if (nextChar === WrappedString.r) {
+                                    if ($.startCharacter === WrappedString.backtick) {
                                         $.slashed = false
 
                                         return snippet.ensureFlushed(() => {
@@ -690,8 +742,8 @@ export function createPreTokenizer(
                                         return flushChar('\r')
                                     }
                                 }
-                                else if (nextChar === Char.WrappedString.t) { return flushChar('\t') }
-                                else if (nextChar === Char.WrappedString.u) {
+                                else if (nextChar === WrappedString.t) { return flushChar('\t') }
+                                else if (nextChar === WrappedString.u) {
                                     // \uxxxx
                                     $.slashed = false
                                     $.unicode = {
@@ -722,11 +774,11 @@ export function createPreTokenizer(
 
                             } else if ($.unicode !== null) {
                                 if (
-                                    (nextChar < Char.UnicodeChars["0"] && nextChar > Char.UnicodeChars["9"])
+                                    (nextChar < UnicodeChars["0"] && nextChar > UnicodeChars["9"])
                                     &&
-                                    (nextChar < Char.UnicodeChars.A && nextChar > Char.UnicodeChars.F)
+                                    (nextChar < UnicodeChars.A && nextChar > UnicodeChars.F)
                                     &&
-                                    (nextChar < Char.UnicodeChars.a && nextChar > Char.UnicodeChars.f)
+                                    (nextChar < UnicodeChars.a && nextChar > UnicodeChars.f)
                                 ) {
 
                                     onError({
@@ -760,7 +812,7 @@ export function createPreTokenizer(
                                 switch ($.foundNewlineCharacter.type) {
                                     case FoundNewlineCharacterType.CARRIAGE_RETURN: {
                                         /*
-                                        if nextChar === Char.Whitespace.lineFeed
+                                        if nextChar === Whitespace.lineFeed
                                             windows style newlines (\r\n)
                                         else
                                             old style Mac OS newlines (\r)
@@ -768,7 +820,7 @@ export function createPreTokenizer(
                                         const fnlc = $.foundNewlineCharacter
                                         $.foundNewlineCharacter = null
                                         return {
-                                            consumeCharacter: nextChar === Char.Whitespace.lineFeed,
+                                            consumeCharacter: nextChar === Whitespace.lineFeed,
                                             preToken: {
                                                 type: [PreTokenDataType.NewLine, {
                                                     range: createRangeFromLocations(fnlc.startLocation, locationState.getCurrentLocation()),
@@ -779,7 +831,7 @@ export function createPreTokenizer(
                                     }
                                     case FoundNewlineCharacterType.LINE_FEED: {
                                         /*
-                                        if nextChar === Char.Whitespace.carriageReturn
+                                        if nextChar === Whitespace.carriageReturn
                                             //strange style newline (\n\r)
                                         else
                                             //unix style newlines (\n)
@@ -788,7 +840,7 @@ export function createPreTokenizer(
                                         const fnlc = $.foundNewlineCharacter
                                         $.foundNewlineCharacter = null
                                         return {
-                                            consumeCharacter: nextChar === Char.Whitespace.carriageReturn,
+                                            consumeCharacter: nextChar === Whitespace.carriageReturn,
                                             preToken: {
                                                 type: [PreTokenDataType.NewLine, {
                                                     range: createRangeFromLocations(fnlc.startLocation, locationState.getCurrentLocation()),
@@ -801,7 +853,7 @@ export function createPreTokenizer(
                                 }
                             } else {
                                 //not slashed, not unicode, not newline
-                                if (nextChar === Char.WrappedString.reverseSolidus) {//backslash
+                                if (nextChar === WrappedString.reverseSolidus) {//backslash
                                     return snippet.ensureFlushed(() => {
                                         $.slashed = true
                                         return {
@@ -830,13 +882,13 @@ export function createPreTokenizer(
                                             ),
                                         }
                                     })
-                                } else if (nextChar === Char.Whitespace.carriageReturn || nextChar === Char.Whitespace.lineFeed) {
-                                    if ($.startCharacter === Char.WrappedString.backtick) { //multiline
+                                } else if (nextChar === Whitespace.carriageReturn || nextChar === Whitespace.lineFeed) {
+                                    if ($.startCharacter === WrappedString.backtick) { //multiline
 
                                         return snippet.ensureFlushed(() => {
 
                                             $.foundNewlineCharacter = {
-                                                type: nextChar === Char.Whitespace.carriageReturn ? FoundNewlineCharacterType.CARRIAGE_RETURN : FoundNewlineCharacterType.LINE_FEED,
+                                                type: nextChar === Whitespace.carriageReturn ? FoundNewlineCharacterType.CARRIAGE_RETURN : FoundNewlineCharacterType.LINE_FEED,
                                                 startLocation: locationState.getCurrentLocation(),
                                             }
                                             return {
@@ -887,27 +939,27 @@ export function createPreTokenizer(
                         currentChunk,
                         (char: number) => {
                             const isOtherCharacter = (false
-                                || char === Char.Whitespace.carriageReturn
-                                || char === Char.Whitespace.lineFeed
-                                || char === Char.Whitespace.space
-                                || char === Char.Whitespace.tab
+                                || char === Whitespace.carriageReturn
+                                || char === Whitespace.lineFeed
+                                || char === Whitespace.space
+                                || char === Whitespace.tab
 
-                                || char === Char.Structural.closeBrace
-                                || char === Char.Structural.closeParen
-                                || char === Char.Structural.colon
-                                || char === Char.Structural.comma
-                                || char === Char.Structural.openBrace
-                                || char === Char.Structural.openParen
-                                || char === Char.Structural.closeAngleBracket
-                                || char === Char.Structural.closeBracket
-                                || char === Char.Structural.openAngleBracket
-                                || char === Char.Structural.openBracket
-                                || char === Char.Structural.verticalLine
+                                || char === Structural.closeBrace
+                                || char === Structural.closeParen
+                                || char === Structural.colon
+                                || char === Structural.comma
+                                || char === Structural.openBrace
+                                || char === Structural.openParen
+                                || char === Structural.closeAngleBracket
+                                || char === Structural.closeBracket
+                                || char === Structural.openAngleBracket
+                                || char === Structural.openBracket
+                                || char === Structural.verticalLine
 
-                                || char === Char.CommentChar.solidus
+                                || char === CommentChar.solidus
 
-                                || char === Char.WrappedString.quotationMark
-                                || char === Char.WrappedString.apostrophe
+                                || char === WrappedString.quotationMark
+                                || char === WrappedString.apostrophe
                             )
                             return !isOtherCharacter
                         },
@@ -935,7 +987,7 @@ export function createPreTokenizer(
                         currentChunk,
                         (nextChar, snippet) => {
                             //first check if we are breaking out of an whitespace token. Can only be done by checking the character that comes directly after the whitespace token
-                            if (nextChar !== Char.Whitespace.space && nextChar !== Char.Whitespace.tab) {
+                            if (nextChar !== Whitespace.space && nextChar !== Whitespace.tab) {
                                 return snippet.ensureFlushed(() => {
                                     return {
                                         consumeCharacter: false,

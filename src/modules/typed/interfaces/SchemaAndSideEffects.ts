@@ -1,10 +1,10 @@
-import * as def from "./definitions"
-import * as h from "../../typed/interfaces/ITypedTreeHandler"
+import * as def from "../../schema/types/definitions"
 import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"
 
+import * as h from "./ITypedTreeHandler"
 
-export type SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation> = {
-    schema: def.Schema
+export interface SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation> {
+    getSchema: () => def.Schema
     createStreamingValidator: (
         onValidationError: (message: string, annotation: TokenAnnotation, severity: DiagnosticSeverity) => void,
     ) => h.ITypedTreeHandler<TokenAnnotation, NonTokenAnnotation>

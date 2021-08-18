@@ -1,4 +1,3 @@
-// import * as fs from "fs"
 import * as fs from "fs"
 import * as chai from "chai"
 import * as astn from "../src"
