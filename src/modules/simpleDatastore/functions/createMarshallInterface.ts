@@ -3,7 +3,7 @@ import { Value, Datastore } from "../types/Datastore"
 
 import * as serialize from "../../marshallDataset/interfaces/IMarshallableDataset"
 
-export function createSerializeInterface(
+export function createMarshallInterface(
     ds: Datastore
 ): serialize.IMarshallableDataset {
     function createValueSerializeInterface(value: Value): serialize.IMarshallableValue {

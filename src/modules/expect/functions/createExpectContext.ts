@@ -5,7 +5,7 @@ import * as i from "../../parser/interfaces/ITreeHandler"
 import * as expect from "../interfaces/IExpectContext"
 import * as ee from "../types/ExpectedValue"
 import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"
-import { ExpectErrorValueTypeX } from "../types/expectedError"
+import { ExpectError } from "../types/expectedError"
 import { ExpectIssueHandler } from "../interfaces/expectIssueHandler"
 import { ExpectSeverity } from "../types/expectSeverity"
 import { OnDuplicateEntry } from "../types/onDuplicateEntry"
@@ -106,14 +106,14 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
     onDuplicateEntry: OnDuplicateEntry,
 ): ICreateContext<TokenAnnotation, NonTokenAnnotation> {
 
-    function raiseWarning(issue: ExpectErrorValueTypeX, annotation: TokenAnnotation): void {
+    function raiseWarning(issue: ExpectError, annotation: TokenAnnotation): void {
         issueHandler({
             issue: issue,
             severity: DiagnosticSeverity.warning,
             annotation: annotation,
         })
     }
-    function raiseError(issue: ExpectErrorValueTypeX, annotation: TokenAnnotation): void {
+    function raiseError(issue: ExpectError, annotation: TokenAnnotation): void {
         issueHandler({
             issue: issue,
             severity: DiagnosticSeverity.error,
@@ -547,14 +547,14 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     onDuplicateEntry: OnDuplicateEntry,
 ): expect.IExpectContext<TokenAnnotation, NonTokenAnnotation> {
 
-    function raiseError(issue: ExpectErrorValueTypeX, annotation: TokenAnnotation): void {
+    function raiseError(issue: ExpectError, annotation: TokenAnnotation): void {
         issueHandler({
             issue: issue,
             severity: DiagnosticSeverity.error,
             annotation: annotation,
         })
     }
-    function raiseWarning(issue: ExpectErrorValueTypeX, annotation: TokenAnnotation): void {
+    function raiseWarning(issue: ExpectError, annotation: TokenAnnotation): void {
         issueHandler({
             issue: issue,
             severity: DiagnosticSeverity.warning,

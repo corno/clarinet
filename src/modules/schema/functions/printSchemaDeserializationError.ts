@@ -1,6 +1,6 @@
 import { SchemaDeserializationError } from "../types/SchemaDeserializationError"
 
-import { printExpectX } from "../../expect/functions/printExpectError"
+import { printExpectError } from "../../expect/functions/printExpectError"
 import { printTreeParserError } from "../../parser/functions/printTreeParserErrorError"
 
 function assertUnreachable<RT>(_x: never): RT {
@@ -11,7 +11,7 @@ export function printSchemaDeserializationError(error: SchemaDeserializationErro
     switch (error[0]) {
         case "expect": {
             const $$$ = error[1]
-            return printExpectX($$$)
+            return printExpectError($$$)
         }
         case "validation": {
             const $$$ = error[1]

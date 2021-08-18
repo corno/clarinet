@@ -1,11 +1,11 @@
-import { ExpectErrorValueTypeX } from "../types/expectedError"
+import { ExpectError } from "../types/expectedError"
 import { printExpectedValue, printExpectedValueType } from "./printExpectedValue"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
 
-export function printExpectX(issue: ExpectErrorValueTypeX): string {
+export function printExpectError(issue: ExpectError): string {
     switch (issue[0]) {
         case "array is not a list": {
             return `expected a list: [ ]`

@@ -12,7 +12,7 @@ export type ExpectedToken =
 | "open paren"
 
 
-export type ExpectErrorValueTypeX =
+export type ExpectError =
 | ["array is not a list", {
     //
 }]

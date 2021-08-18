@@ -170,7 +170,7 @@ export function directoryTests(): void {
                             simpleDS,
                             () => {
                                 astn.marshall(
-                                    astn.createSerializeInterface(simpleDS),
+                                    astn.createMarshallInterface(simpleDS),
                                     rs.schemaAndSideEffects.getSchema(),
                                     rs.specification,
                                     style,
