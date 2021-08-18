@@ -111,7 +111,7 @@ function createCodeCompletionForShorthandGroup(
 ): void {
     group.properties.forEach((prop, _propKey) => {
         createCodeCompletionForShorthandValue(
-            prop,
+            prop.value,
             sequence,
         )
     })
@@ -154,7 +154,7 @@ function createCodeCompletionForVerboseProperties(
             dirty = true
             const line = $.addLine()
             line.snippet(`'${propKey}':`)
-            createCodeCompletionForVerboseValue(prop, line)
+            createCodeCompletionForVerboseValue(prop.value, line)
         })
     })
     if (!dirty) {

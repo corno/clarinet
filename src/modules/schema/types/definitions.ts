@@ -1,59 +1,31 @@
-import { IReadonlyDictionary } from "../../../generics/interfaces/IReadonlyDictionary"
-import { IReference } from "../../../generics/interfaces/IReference"
 
+/*eslint
+    "camelcase": 0,
+*/
 
-export type TypeReferenceDefinition = {
-    readonly "type": IReference<TypeDefinition>
-}
+import * as gen from "./schema_generated"
+export type TypeReferenceDefinition = gen.__type_reference_T
 
-export type TypeDefinition = {
-    readonly "value": ValueDefinition
-}
+export type TypeDefinition = gen.__types_T
 
-export type DictionaryDefinition = {
-    readonly "key": SimpleStringDefinition
-    readonly "value": ValueDefinition
-}
+export type DictionaryDefinition = gen.__dictionary_T
 
-export type ListDefinition = {
-    readonly "value": ValueDefinition
-}
+export type ListDefinition = gen.__list_T
 
-export type GroupDefinition = {
-    readonly "properties": IReadonlyDictionary<ValueDefinition>
-}
+export type GroupDefinition = gen.__group_T
 
-export type ValueDefinition = {
-    readonly "type": ValueTypeDefinition
-}
+export type PropertyDefinition = gen.__properties_T
 
-export type ValueTypeDefinition =
-    | ["group", GroupDefinition]
-    | ["dictionary", DictionaryDefinition]
-    | ["list", ListDefinition]
-    | ["type reference", TypeReferenceDefinition]
-    | ["tagged union", TaggedUnionDefinition]
-    | ["simple string", SimpleStringDefinition]
-    | ["multiline string", MultiLineStringDefinition]
+export type ValueDefinition = gen.__value_T
 
-export type Schema = {
-    readonly "types": IReadonlyDictionary<TypeDefinition>
-    readonly "root type": IReference<TypeDefinition>
-}
+export type ValueTypeDefinition = gen.__type_TU
 
-export type OptionDefinition = {
-    readonly "value": ValueDefinition
-}
+export type Schema = gen.__root_T
 
-export type TaggedUnionDefinition = {
-    readonly "options": IReadonlyDictionary<OptionDefinition>
-    readonly "default option": IReference<OptionDefinition>
-}
+export type OptionDefinition = gen.__options_T
 
-export type SimpleStringDefinition = {
-    readonly "default value": string
-    readonly "quoted": boolean
-}
+export type TaggedUnionDefinition = gen.__tagged_union_T
 
-export type MultiLineStringDefinition = {
-}
+export type SimpleStringDefinition = gen.__simple_string_T
+
+export type MultiLineStringDefinition = gen.__multiline_string_T

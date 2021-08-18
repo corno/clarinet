@@ -110,7 +110,7 @@ function onValueIsNonDefault(
                     group.onProperty(key, value => {
                         onValueIsNonDefault(
                             value,
-                            p,
+                            p.value,
                             () => {
                                 foundNonDefault = true
                             }
@@ -274,7 +274,7 @@ function marshallValue(
                         group.onProperty(key, prop => {
                             marshallValue(
                                 prop,
-                                propDef,
+                                propDef.value,
                                 out,
                                 style,
                                 true,
@@ -306,7 +306,7 @@ function marshallValue(
                                                 }])
                                                 marshallValue(
                                                     prop,
-                                                    propDef,
+                                                    propDef.value,
                                                     out,
                                                     style,
                                                     false,
@@ -316,7 +316,7 @@ function marshallValue(
                                             if (expandedStyle.omitPropertiesWithDefaultValues) {
                                                 onValueIsNonDefault(
                                                     prop,
-                                                    propDef,
+                                                    propDef.value,
                                                     () => {
                                                         serializeProperty()
                                                     }
@@ -347,7 +347,7 @@ function marshallValue(
                                         group.onProperty(key, prop => {
                                             marshallValue(
                                                 prop,
-                                                propDef,
+                                                propDef.value,
                                                 out,
                                                 style,
                                                 true,

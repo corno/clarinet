@@ -143,11 +143,11 @@ export function defaultInitializeValue<TokenAnnotation, NonTokenAnnotation>(
             })
             $e.properties.forEach((propDef, key) => {
                 defaultInitializeValue(
-                    propDef,
+                    propDef.value,
                     groupHandler.onProperty({
                         key: key,
                         token: null,
-                        definition: propDef,
+                        definition: propDef.value,
                     }),
                     onError,
                 )
@@ -813,11 +813,11 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                         const propertyHandler = groupHandler.onProperty({
                                             key: $p.token.data.value,
                                             token: $p.token,
-                                            definition: propertyDefinition,
+                                            definition: propertyDefinition.value,
                                         })
                                         return wrap(
                                             createValueUnmarshaller(
-                                                propertyDefinition,
+                                                propertyDefinition.value,
                                                 propertyHandler,
                                                 onError,
                                                 () => {
@@ -827,7 +827,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                             ),
                                             () => {
                                                 defaultInitializeValue(
-                                                    propertyDefinition,
+                                                    propertyDefinition.value,
                                                     propertyHandler,
                                                     onError,
                                                 )
@@ -852,11 +852,11 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                     const pp = processedProperties[propKey]
                                     if (pp === undefined) {
                                         defaultInitializeValue(
-                                            propDefinition,
+                                            propDefinition.value,
                                             groupHandler.onProperty({
                                                 key: propKey,
                                                 token: null,
-                                                definition: propDefinition,
+                                                definition: propDefinition.value,
                                             }),
                                             onError,
                                         )

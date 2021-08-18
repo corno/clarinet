@@ -40,7 +40,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                         context.expectTaggedUnion({
                             options: {
                                 "group": () => {
-                                    const properties = createDictionaryBuilder<def.ValueDefinition>()
+                                    const properties = createDictionaryBuilder<def.PropertyDefinition>()
                                     return wrap(context.expectGroup({
                                         properties: {
                                             "properties": {
@@ -65,7 +65,9 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                                                 },
                                                             },
                                                             onTypeEnd: () => {
-                                                                properties.add(propertyData.token.data.value, targetValue)
+                                                                properties.add(propertyData.token.data.value, {
+                                                                    value: targetValue,
+                                                                })
                                                             },
                                                         }))
                                                     },
@@ -317,8 +319,8 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
                                             },
                                             onTypeEnd: () => {
                                                 targetValueType = ["simple string", {
-                                                    "quoted": quoted,
                                                     "default value": defaultValue,
+                                                    "quoted": quoted,
                                                 }]
                                             },
                                         }),

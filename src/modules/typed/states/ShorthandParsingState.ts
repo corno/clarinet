@@ -64,7 +64,7 @@ function createGroupContext<TokenAnnotation, NonTokenAnnotation>(
         expectedElements.push({
             name: propKey,
             handler: subHandler,
-            definition: propDefinition,
+            definition: propDefinition.value,
         })
     })
     return ["group", {

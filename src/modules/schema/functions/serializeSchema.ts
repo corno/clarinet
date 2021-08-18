@@ -160,7 +160,7 @@ export function serializeSchema(
                             serializeVerboseType({
                                 properties: () => {
                                     serializeDictionary($.properties, $ => {
-                                        serializeValueDefinition($)
+                                        serializeValueDefinition($.value)
                                     })
                                 },
                             })
