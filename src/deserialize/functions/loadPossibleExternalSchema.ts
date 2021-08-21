@@ -2,7 +2,7 @@
 import * as p from "pareto"
 import { RetrievalError } from "../types/RetrievalError"
 import { SchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
-import { SchemaSchemaBuilder } from "../../modules/typed/interfaces/SchemaSchemaBuilder"
+import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
 import { TokenizerAnnotationData } from "../../modules/tokenizer/types/TokenizerAnnotationData"
 import { ExternalSchemaResolvingError } from "../types/ContextSchemaError"
 import { loadExternalSchema } from "./loadExternalSchema"

@@ -4,9 +4,9 @@ import * as p from "pareto"
 import * as def from "../../modules/schema/types/definitions"
 import { DiagnosticSeverity } from "../../modules/diagnosticSeverity/types/DiagnosticSeverity"
 import { TokenizerAnnotationData } from "../../modules/tokenizer/types/TokenizerAnnotationData"
-import { SchemaSchemaBuilder } from "../../modules/typed/interfaces/SchemaSchemaBuilder"
-import { ResolvedSchema } from "../types/ResolvedSchema"
-import { DeserializeError } from "../types/DeserializeError"
+import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
+import { ResolvedSchema } from "../interfaces/ResolvedSchema"
+import { ASTNUnmarshallError } from "../types/ASTNUnmarshallError"
 import { RetrievalError } from "../types/RetrievalError"
 
 import * as th from "../../modules/parser/interfaces/ITreeHandler"
@@ -22,10 +22,10 @@ import { loadPossibleExternalSchema } from "./loadPossibleExternalSchema"
 
 type ResolveReferencedSchema = (id: string) => p.IUnsafeValue<p.IStream<string, null>, RetrievalError>
 
-export function createUnmarshaller($: {
+export function createASTNUnmarshaller($: {
     contextSchema: ContextSchema<TokenizerAnnotationData, null>
     resolveReferencedSchema: ResolveReferencedSchema
-    onError: (diagnostic: DeserializeError, annotation: TokenizerAnnotationData, severity: DiagnosticSeverity) => void
+    onError: (diagnostic: ASTNUnmarshallError, annotation: TokenizerAnnotationData, severity: DiagnosticSeverity) => void
 
     getSchemaSchemaBuilder: (
         name: string,

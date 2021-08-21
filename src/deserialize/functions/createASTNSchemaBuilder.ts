@@ -4,14 +4,14 @@
 
 import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
 
-import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSeverity"
-import { ExpectSeverity } from "../../expect/types/expectSeverity"
-import { OnDuplicateEntry } from "../../expect/types/onDuplicateEntry"
+import { DiagnosticSeverity } from "../../modules/diagnosticSeverity/types/DiagnosticSeverity"
+import { ExpectSeverity } from "../../modules/expect/types/expectSeverity"
+import { OnDuplicateEntry } from "../../modules/expect/types/onDuplicateEntry"
 
-import { createExpectContext } from "../../expect/functions/createExpectContext"
-import { createDummyValueHandler } from "../../parser/functions/dummyHandlers"
-import { createASTNSchemaDeserializer } from "../../schema/functions/createASTNSchemaDeserializer"
-import { createDummyTypedHandler } from "./createDummyTypedHandler"
+import { createExpectContext } from "../../modules/expect/functions/createExpectContext"
+import { createDummyValueHandler } from "../../modules/parser/functions/dummyHandlers"
+import { createASTNSchemaDeserializer } from "../../modules/schema/functions/createASTNSchemaDeserializer"
+import { createDummyTypedHandler } from "../../modules/typed/functions/createDummyTypedHandler"
 
 
 export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): SchemaSchemaBuilder<TokenAnnotation, NonTokenAnnotation> | null {

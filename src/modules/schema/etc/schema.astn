@@ -2,13 +2,15 @@
 < {
     "simple string": < {
         "default value": < 'value' "" 'text' >
-        "quoted": < 'value' "true" 'text' >
+        "quoted": < 'state group' "yes" {
+            "yes": < { } >
+            "no": < { } >
+        }>
     } >
     "value": < {
         "type": < 'state group' "simple string" {
             "simple string": < {
-                "default value": < 'value' "" 'text' >
-                "quoted": < 'value' "true" 'text' >
+                "definition": < 'component' "simple string" >
             } >
             "multiline string": < {  
             } >
@@ -42,6 +44,6 @@
             "name": < 'value' "" 'text' >
             "value": < 'component' "value" >
         } 'dictionary' "name" >
-        "root type": < 'value' "" 'text' >
+        "root value":  < 'component' "value" >
     } >
 } "root" >

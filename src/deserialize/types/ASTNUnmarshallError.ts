@@ -1,12 +1,12 @@
 
 import { StructureErrorType } from "../../modules/parser/types/StructureErrorType"
 import { TreeParserErrorType } from "../../modules/parser/types/TreeParserError"
-import { SchemaDeserializationError } from "../../modules/schema/types/SchemaDeserializationError"
+import { SchemaDeserializationError } from "./SchemaDeserializationError"
 import { TokenError } from "../../modules/tokenizer/types/TokenError"
 import { UnmarshallError } from "../../modules/typed/types/UnmarshallError"
 import { ExternalSchemaResolvingError } from "./ContextSchemaError"
 
-export type DeserializeError =
+export type ASTNUnmarshallError =
 | ["no valid schema"]
 | ["no schema"]
 | ["found both internal and context schema. ignoring internal schema"]

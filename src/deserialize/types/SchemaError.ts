@@ -1,7 +1,7 @@
 import { TokenError } from "../../modules/tokenizer/types/TokenError"
 import { StructureErrorType } from "../../modules/parser/types/StructureErrorType"
 import { TreeParserErrorType } from "../../modules/parser/types/TreeParserError"
-import { SchemaDeserializationError } from "../../modules/schema/types/SchemaDeserializationError"
+import { SchemaDeserializationError } from "./SchemaDeserializationError"
 
 export type SchemaError =
     | ["schema schema cannot be embedded"]

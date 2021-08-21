@@ -2,7 +2,7 @@
 import * as p from "pareto"
 import { SchemaError } from "../types/SchemaError"
 import { SchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
-import { SchemaSchemaBuilder } from "../../modules/typed/interfaces/SchemaSchemaBuilder"
+import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
 import { createStructureParser } from "../../modules/parser/functions/createStructureParser"
 import { createDummyTreeHandler } from "../../modules/parser/functions/dummyHandlers"
 import { IParser } from "../../modules/parser/interfaces/IParser"

@@ -3,14 +3,14 @@ import { Range } from "../../modules/tokenizer/types/range"
 import { ITypedTreeHandler } from "../../modules/typed/interfaces/ITypedTreeHandler"
 import { DiagnosticSeverity } from "../../modules/diagnosticSeverity/types/DiagnosticSeverity"
 import { TokenizerAnnotationData } from "../../modules/tokenizer/types/TokenizerAnnotationData"
-import { SchemaSchemaBuilder } from "../../modules/typed/interfaces/SchemaSchemaBuilder"
+import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
 import { RetrievalError } from "../types/RetrievalError"
-import { ResolvedSchema } from "../types/ResolvedSchema"
+import { ResolvedSchema } from "../interfaces/ResolvedSchema"
 import { loadContextSchema } from "./loadContextSchema"
 import { printContextSchemaError } from "./printContextSchemaError"
 import { createStreamPreTokenizer } from "../../modules/tokenizer/functions/createStreamPreTokenizer"
 import { createTokenizer } from "../../modules/tokenizer/functions/createTokenizer"
-import { createUnmarshaller } from "./createUnmarshaller"
+import { createASTNUnmarshaller } from "./createASTNUnmarshaller"
 import { printDeserializationDiagnostic } from "./printDeserializeDiagnostic"
 import { printTokenError } from "../../modules/tokenizer/functions/printTokenError"
 
@@ -45,7 +45,7 @@ export function createProcessorForASTNStreamWithContext(
     ).mapResult(contextSchema => {
         return p.value(createStreamPreTokenizer(
             createTokenizer(
-                createUnmarshaller({
+                createASTNUnmarshaller({
                     contextSchema: contextSchema,
                     resolveReferencedSchema: getReferencedSchema,
                     onError: (error, annotation, severity) => {

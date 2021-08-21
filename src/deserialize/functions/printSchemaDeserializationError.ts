@@ -1,7 +1,6 @@
 import { SchemaDeserializationError } from "../types/SchemaDeserializationError"
 
-import { printExpectError } from "../../expect/functions/printExpectError"
-import { printTreeParserError } from "../../parser/functions/printTreeParserErrorError"
+import { printExpectError } from "../../modules/expect/functions/printExpectError"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -17,11 +16,6 @@ export function printSchemaDeserializationError(error: SchemaDeserializationErro
             const $$$ = error[1]
 
             return $$$.message
-        }
-        case "stacked": {
-            const $$$ = error[1]
-
-            return printTreeParserError($$$)
         }
         default:
             return assertUnreachable(error[0])

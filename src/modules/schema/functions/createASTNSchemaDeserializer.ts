@@ -7,9 +7,11 @@
     "quote-props": 0
 */
 
+import { AnnotatedString } from "../../../generics/interfaces/IResolveRegistry"
+import { IReadonlyLookup } from "../../../generics/interfaces/IReadonlyLookup"
+
 import { createResolveRegistry } from "../../../generics/functions/createResolveRegistry"
 import { createDictionaryBuilder } from "../../../generics/functions/createDictionaryBuilder"
-import { AnnotatedString } from "../../../generics/interfaces/IResolveRegistry"
 import { createReference } from "../../../generics/functions/createReference"
 
 import {
@@ -31,7 +33,6 @@ import {
 
 import { RequiredValueHandler, TreeHandler, ValueHandler } from "../../parser/interfaces/ITreeHandler"
 import { IExpectContext } from "../../expect/interfaces/IExpectContext"
-import { IReadonlyLookup } from "../../../generics/interfaces/IReadonlyLookup"
 
 export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation>(
     context: IExpectContext<TokenAnnotation, NonTokenAnnotation>,

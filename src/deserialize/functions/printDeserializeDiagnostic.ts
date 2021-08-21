@@ -2,15 +2,15 @@
 import { printStructureError } from "../../modules/parser/functions/printStructureError"
 import { printUnmarshallError } from "../../modules/typed/functions/printUnmarshallError"
 import { printTokenError } from "../../modules/tokenizer/functions/printTokenError"
-import { printSchemaDeserializationError } from "../../modules/schema/functions/printSchemaDeserializationError"
+import { printSchemaDeserializationError } from "./printSchemaDeserializationError"
 import { printExternalSchemaResolvingError } from "./printExternalSchemaResolvingError"
-import { DeserializeError } from "../types/DeserializeError"
+import { ASTNUnmarshallError } from "../types/ASTNUnmarshallError"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
 }
 
-export function printDeserializationDiagnostic($: DeserializeError): string {
+export function printDeserializationDiagnostic($: ASTNUnmarshallError): string {
     switch ($[0]) {
         case "tree": {
             const $$ = $[1]

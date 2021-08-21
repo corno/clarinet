@@ -2,7 +2,7 @@ import { SchemaError } from "../types/SchemaError"
 import { printStructureError } from "../../modules/parser/functions/printStructureError"
 import { printTreeParserError } from "../../modules/parser/functions/printTreeParserErrorError"
 import { printTokenError } from "../../modules/tokenizer/functions/printTokenError"
-import { printSchemaDeserializationError } from "../../modules/schema/functions/printSchemaDeserializationError"
+import { printSchemaDeserializationError } from "./printSchemaDeserializationError"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")

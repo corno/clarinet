@@ -1,7 +1,7 @@
 
 import * as p from "pareto"
 import { SchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
-import { SchemaSchemaBuilder } from "../../modules/typed/interfaces/SchemaSchemaBuilder"
+import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
 import { TokenizerAnnotationData } from "../../modules/tokenizer/types/TokenizerAnnotationData"
 import { createStreamPreTokenizer } from "../../modules/tokenizer/functions/createStreamPreTokenizer"
 import { createTokenizer } from "../../modules/tokenizer/functions/createTokenizer"
