@@ -11,86 +11,19 @@ const Whitespace = {
     space: 0x20,             //
 }
 
-import { Location, Range } from "../types/range"
+import { Range } from "../types/range"
 import { TokenizerOptions } from "../types/TokenizerOptions"
 import { TokenError } from "../types/TokenError"
 
 
 import { IChunk } from "../interfaces/IChunk"
-import { IPreTokenizer } from "../interfaces/IPreTokenizer"
 import { IPreTokenStreamConsumer } from "../interfaces/IPreTokenStreamConsumer"
 import { ILocationState } from "../interfaces/ILocationState"
 
 import { createPreTokenizer } from "./createPreTokenizer"
-
-const DEBUG = false
-
-
-class LocationState implements ILocationState {
-    private readonly location = {
-        position: -1,
-        column: 0,
-        line: 1,
-    }
-    private readonly spacesPerTab: number
-    constructor(spacesPerTab: number) {
-        this.spacesPerTab = spacesPerTab
-    }
-    public getCurrentLocation(): Location {
-        return {
-            position: this.location.position + 1,
-            line: this.location.line,
-            column: this.location.column + 1,
-        }
-    }
-    public getNextLocation(): Location {
-        return {
-            position: this.location.position + 2,
-            line: this.location.line,
-            column: this.location.column + 2,
-        }
-    }
-    public increase(character: number): void {
-        this.location.position++
-        //set the position
-        switch (character) {
-            case Whitespace.lineFeed:
-                this.location.line++
-                this.location.column = 0
-                break
-            case Whitespace.carriageReturn:
-                break
-            case Whitespace.tab:
-                this.location.column += this.spacesPerTab
-                break
-            default:
-                this.location.column++
-        }
-    }
-}
-
-
-class Chunk implements IChunk {
-    private currentIndex: number
-    public readonly str: string
-    constructor(str: string) {
-        this.str = str
-        this.currentIndex = -1
-    }
-    lookahead(): number | null {
-        const char = this.str.charCodeAt(this.getIndexOfNextCharacter())
-        return isNaN(char) ? null : char
-    }
-    increaseIndex(): void {
-        this.currentIndex += 1
-    }
-    getIndexOfNextCharacter(): number {
-        return this.currentIndex + 1
-    }
-    getString(): string {
-        return this.str
-    }
-}
+import { ILoopState, TokenReturnType } from "../interfaces/IPreTokenizer"
+import { PreToken, PreTokenDataType } from "../types/PreToken"
+import { IStreamConsumer } from "../../../IStreamConsumer"
 
 /**
  *
@@ -105,74 +38,199 @@ export function createStreamPreTokenizer(
         range: Range
     }) => void,
     opt?: TokenizerOptions
-): p.IStreamConsumer<string, null, null> {
+): IStreamConsumer<string, null, null> {
 
-    class StreamPreTokenizer implements p.IStreamConsumer<string, null, null> {
+    const location = {
+        position: -1,
+        column: 0,
+        line: 1,
+    }
+    const spacesPerTab: number = opt === undefined
+        ? 4
+        : opt.spaces_per_tab === undefined
+            ? 4
+            : opt.spaces_per_tab
 
-        private readonly tokenizerState: IPreTokenizer
-        private readonly locationState: LocationState
-        private readonly tokenStreamConsumer: IPreTokenStreamConsumer
-        private aborted = false
-
-        constructor(
-        ) {
-            this.tokenStreamConsumer = tokenStreamConsumer
-            this.locationState = new LocationState(
-                opt === undefined
-                    ? 4
-                    : opt.spaces_per_tab === undefined
-                        ? 4
-                        : opt.spaces_per_tab
-            )
-            this.tokenizerState = createPreTokenizer(this.locationState, onError)
-        }
-        private loopUntilPromiseOrEnd(currentChunk: IChunk): p.IValue<boolean> {
-            if (this.aborted) {
-                //ignore this data
-                return p.value(true)
+    const locationState: ILocationState = {
+        getCurrentLocation: () => {
+            return {
+                position: location.position + 1,
+                line: location.line,
+                column: location.column + 1,
             }
-            while (true) {
-                const la = currentChunk.lookahead()
-                if (la === null) {
-                    return p.value(false)
-                }
+        },
+        getNextLocation: () => {
+            return {
+                position: location.position + 2,
+                line: location.line,
+                column: location.column + 2,
+            }
+        },
+        increase: (character) => {
+            location.position++
+            //set the position
+            switch (character) {
+                case Whitespace.lineFeed:
+                    location.line++
+                    location.column = 0
+                    break
+                case Whitespace.carriageReturn:
+                    break
+                case Whitespace.tab:
+                    location.column += spacesPerTab
+                    break
+                default:
+                    location.column++
+            }
+        },
+    }
+    const tokenizerState = createPreTokenizer(locationState, onError)
+    let aborted = false
 
-                const tokenData = this.tokenizerState.createNextToken(currentChunk)
+    function loopUntilPromiseOrEnd(currentChunk: IChunk): p.IValue<boolean> {
+        if (aborted) {
+            //ignore this data
+            return p.value(true)
+        }
+        while (true) {
+            const la = currentChunk.lookahead()
+            if (la === null) {
+                return p.value(false)
+            }
 
-                if (tokenData !== null) {
-                    const onDataResult = this.tokenStreamConsumer.onData(tokenData)
-                    return onDataResult.mapResult(abortRequested => {
 
-                        if (abortRequested) {
-                            this.aborted = true
-                            return p.value(true)
-                        } else {
-                            return this.loopUntilPromiseOrEnd(currentChunk)
+            function createLoopState(
+                chunk: IChunk,
+            ): ILoopState {
+                let startIndex: null | number = null
+
+                function ensureFlushed(callback: () => TokenReturnType): TokenReturnType {
+                    if (startIndex !== null) {
+                        return {
+                            startSnippet: false,
+                            consumeCharacter: false,
+                            preToken: {
+                                type: [PreTokenDataType.Snippet, {
+                                    chunk: chunk.getString(),
+                                    begin: startIndex,
+                                    end: chunk.getCurrentIndex(),
+                                }],
+                            },
                         }
-                    })
+                    }
+                    return callback()
+                }
+
+                return {
+                    /**
+                     * if not flushed, the callback is not called.
+                     * the current character position should not change so that the next round
+                     * the same call will be made, but now it is flushed, so the callback will be called
+                     */
+                    ensureFlushed: (callback: () => TokenReturnType) => {
+                        return ensureFlushed(callback)
+                    },
+                    whileLoop: (
+                        callback: (
+                            nextChar: number,
+                        ) => TokenReturnType
+                    ): PreToken | null => {
+                        function whileLoop<RT>(
+                            callback2: () => undefined | RT,
+                        ): RT {
+                            while (true) {
+                                const returnValue = callback2()
+                                if (returnValue !== undefined) {
+                                    return returnValue
+                                }
+                            }
+                        }
+                        return whileLoop(
+                            () => {
+                                const nextChar = chunk.lookahead()
+                                if (nextChar === null) {
+                                    return ensureFlushed(() => {
+                                        return {
+                                            startSnippet: false,
+                                            consumeCharacter: false,
+                                            preToken: null,
+                                        }
+                                    }).preToken
+                                }
+                                const result = callback(nextChar)
+                                if (result.startSnippet) {
+                                    if (startIndex === null) {
+                                        startIndex = chunk.getCurrentIndex()
+                                    }
+                                }
+                                if (result.consumeCharacter) {
+                                    const cc = chunk.lookahead()
+                                    if (cc === null) {
+                                        throw new Error("Unexpected consume")
+                                    }
+                                    locationState.increase(cc)
+                                    chunk.increaseIndex()
+                                }
+                                if (result.preToken !== null) {
+                                    return result.preToken
+                                }
+                                return undefined
+                            }
+                        )
+                    },
                 }
             }
-        }
-        public onData(chunk: string): p.IValue<boolean> {
-            if (DEBUG) console.log(`write -> [${JSON.stringify(chunk)}]`)
-            const currentChunk = new Chunk(chunk)
-            return this.loopUntilPromiseOrEnd(currentChunk)
-        }
+            const loopState = createLoopState(currentChunk)
 
-        public onEnd(aborted: boolean): p.IValue<null> {
-            const tokenData = this.tokenizerState.handleDanglingToken()
+            const tokenData = tokenizerState.createNextToken(loopState)
+
             if (tokenData !== null) {
-                const onDataReturnValue = this.tokenStreamConsumer.onData(tokenData)
-                return onDataReturnValue.mapResult(_abort => {
-                    //nothing to abort anymore
-                    return this.tokenStreamConsumer.onEnd(aborted, this.locationState.getCurrentLocation())
+                const onDataResult = tokenStreamConsumer.onData(tokenData)
+                return onDataResult.mapResult((abortRequested) => {
 
+                    if (abortRequested) {
+                        aborted = true
+                        return p.value(true)
+                    } else {
+                        return loopUntilPromiseOrEnd(currentChunk)
+                    }
                 })
-            } else {
-                return this.tokenStreamConsumer.onEnd(aborted, this.locationState.getCurrentLocation())
             }
         }
     }
+    return {
+        onData: (chunk: string): p.IValue<boolean> => {
+            let currentIndex = 0
+            const str = chunk
 
-    return new StreamPreTokenizer()
+            return loopUntilPromiseOrEnd({
+                lookahead: () => {
+                    const char = str.charCodeAt(currentIndex)
+                    return isNaN(char) ? null : char
+                },
+                increaseIndex: () => {
+                    currentIndex += 1
+                },
+                getCurrentIndex: () => {
+                    return currentIndex
+                },
+                getString: () => {
+                    return str
+                },
+            })
+        },
+        onEnd: (aborted2: boolean): p.IValue<null> => {
+            const tokenData = tokenizerState.handleDanglingToken()
+            if (tokenData !== null) {
+                const onDataReturnValue = tokenStreamConsumer.onData(tokenData)
+                return onDataReturnValue.mapResult((_abort) => {
+                    //nothing to abort anymore
+                    return tokenStreamConsumer.onEnd(aborted2, locationState.getCurrentLocation())
+                })
+            } else {
+                return tokenStreamConsumer.onEnd(aborted2, locationState.getCurrentLocation())
+            }
+        },
+    }
+
 }
