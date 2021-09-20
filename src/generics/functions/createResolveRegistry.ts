@@ -1,25 +1,19 @@
 import { IResolveRegistry, Resolve } from "../interfaces/IResolveRegistry"
-import { ResolveError } from "../types/ResolveError"
 
 
 export function createResolveRegistry<Annotation>(): IResolveRegistry<Annotation> {
-    class ResolveRegistry {
-        public readonly references: Resolve<Annotation>[] = []
-        public getRegistrater() {
+    const references: Resolve<Annotation>[] = []
+    return {
+        getRegistrater: () => {
             return {
-                register: (reference: Resolve<Annotation>) => {
-                    this.references.push(reference)
+                register: (reference) => {
+                    references.push(reference)
                 },
             }
-        }
-        public register(reference: Resolve<Annotation>): void {
-            this.references.push(reference)
-        }
-        public resolve(
-            onError: (error: ResolveError<Annotation>) => void,
-        ): boolean {
+        },
+        resolve: (onError) => {
             let foundErrors = false
-            this.references.forEach(r => {
+            references.forEach((r) => {
                 const result = r()
                 if (result !== null) {
                     onError(result)
@@ -27,7 +21,6 @@ export function createResolveRegistry<Annotation>(): IResolveRegistry<Annotation
                 }
             })
             return !foundErrors
-        }
+        },
     }
-    return new ResolveRegistry()
 }

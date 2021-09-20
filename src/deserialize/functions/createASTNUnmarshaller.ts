@@ -42,7 +42,7 @@ export function createASTNUnmarshaller($: {
     let internalSchema: ResolvedSchema<TokenizerAnnotationData, null> | null = null
 
     return createStructureParser({
-        onEmbeddedSchema: $$ => {
+        onEmbeddedSchema: ($$) => {
             headerAnnotation = $$.headerAnnotation
 
             const schemaSchemaBuilder = $.getSchemaSchemaBuilder($$.schemaSchemaReferenceToken.data.value)
@@ -55,7 +55,7 @@ export function createASTNUnmarshaller($: {
                     $.onError(["embedded schema error", error], annotation, DiagnosticSeverity.error)
                     foundSchemaErrors = true
                 },
-                schemaAndSideEffects => {
+                (schemaAndSideEffects) => {
                     internalSchema = {
                         schemaAndSideEffects: schemaAndSideEffects,
                         specification: ["embedded"],
@@ -63,13 +63,13 @@ export function createASTNUnmarshaller($: {
                 }
             )
         },
-        onSchemaReference: $$ => {
+        onSchemaReference: ($$) => {
             headerAnnotation = $$.token.annotation
 
             return loadPossibleExternalSchema(
                 $.resolveReferencedSchema($$.token.data.value),
                 $.getSchemaSchemaBuilder,
-                error => {
+                (error) => {
                     foundSchemaErrors = true
                     $.onError(
                         ["schema reference resolving", error],
@@ -77,7 +77,7 @@ export function createASTNUnmarshaller($: {
                         DiagnosticSeverity.error,
                     )
                 },
-            ).mapResult<boolean>(schemaAndSideEffects => {
+            ).mapResult<boolean>((schemaAndSideEffects) => {
                 internalSchema = {
                     schemaAndSideEffects: schemaAndSideEffects,
                     specification: ["reference", { name: $$.token.data.value }],
@@ -87,7 +87,7 @@ export function createASTNUnmarshaller($: {
                 return p.value(false)
             })
         },
-        onBody: firstBodyTokenAnnotation => {
+        onBody: (firstBodyTokenAnnotation) => {
             function createRealTreeHandler(
                 schema: def.Schema,
                 schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
@@ -149,10 +149,10 @@ export function createASTNUnmarshaller($: {
             }
         },
         errors: {
-            onTreeError: $$ => {
+            onTreeError: ($$) => {
                 $.onError(["tree", $$.error], $$.annotation, DiagnosticSeverity.error)
             },
-            onStructureError: $$ => {
+            onStructureError: ($$) => {
                 $.onError(["structure", $$.error], $$.annotation, DiagnosticSeverity.error)
             },
         },

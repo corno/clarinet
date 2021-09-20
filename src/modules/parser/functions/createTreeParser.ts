@@ -227,7 +227,7 @@ export function createTreeParser<TokenAnnotation>(
         }
     }
     return {
-        forceEnd: endAnnotation => {
+        forceEnd: (endAnnotation) => {
             unwindLoop: while (true) {
                 if (currentContext === null) {
 
@@ -290,7 +290,7 @@ export function createTreeParser<TokenAnnotation>(
                 }
             }
         },
-        taggedUnion: $ => {
+        taggedUnion: ($) => {
             push(["taggedunion", {
                 handler: getValueHandler($.annotation).taggedUnion({
                     token: $,
@@ -299,7 +299,7 @@ export function createTreeParser<TokenAnnotation>(
                 }],
             }])
         },
-        multilineString: $ => {
+        multilineString: ($) => {
             getValueHandler($.annotation).multilineString({
                 token: $,
             })
@@ -307,7 +307,7 @@ export function createTreeParser<TokenAnnotation>(
                 $.annotation,
             )
         },
-        simpleString: $ => {
+        simpleString: ($) => {
             function onStringValue(
             ): void {
                 getValueHandler($.annotation).simpleString({
@@ -360,7 +360,7 @@ export function createTreeParser<TokenAnnotation>(
                 }
             }
         },
-        openObject: $ => {
+        openObject: ($) => {
             push(["object", {
                 type: $.data.type[0] === "verbose group" ? ["verbose group"] : ["dictionary"],
                 objectHandler: getValueHandler($.annotation).object({
@@ -369,7 +369,7 @@ export function createTreeParser<TokenAnnotation>(
                 propertyHandler: null,
             }])
         },
-        openArray: $ => {
+        openArray: ($) => {
             push(["array", {
                 foundElements: false,
                 type: $.data.type[0] === "shorthand group" ? ["shorthand group"] : ["list"],
@@ -378,7 +378,7 @@ export function createTreeParser<TokenAnnotation>(
                 }),
             }])
         },
-        closeObject: $$ => {
+        closeObject: ($$) => {
             unwindLoop: while (true) {
                 if (currentContext === null) {
                     break unwindLoop
@@ -431,7 +431,7 @@ export function createTreeParser<TokenAnnotation>(
                 )
             }
         },
-        closeArray: $ => {
+        closeArray: ($) => {
             unwindLoop: while (true) {
                 if (currentContext === null) {
                     break unwindLoop

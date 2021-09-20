@@ -210,7 +210,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
         case "dictionary": {
             const $d = definition.type[1]
             return {
-                array: $e => {
+                array: ($e) => {
                     defInitializeValue()
                     return createUnexpectedArrayHandler(
                         ["expected a dictionary"],
@@ -218,7 +218,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                object: $e => {
+                object: ($e) => {
                     const foundKeys: string[] = []
                     if ($e.token.data.type[0] !== "dictionary") {
                         onError(["object is not a dictionary"], $e.token.annotation, DiagnosticSeverity.warning)
@@ -232,7 +232,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         definition: $d,
                     })
                     return {
-                        property: $p => {
+                        property: ($p) => {
                             if ($p.token.data.wrapping[0] !== "quote") {
                                 onError(["entry key does not have quotes", {}], $p.token.annotation, DiagnosticSeverity.warning)
                             }
@@ -267,7 +267,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                 }
                             )
                         },
-                        objectEnd: $ee => {
+                        objectEnd: ($ee) => {
                             dictHandler.onClose({
                                 token: {
                                     data: {},
@@ -278,7 +278,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         },
                     }
                 },
-                taggedUnion: $e => {
+                taggedUnion: ($e) => {
                     defInitializeValue()
                     return createUnexpectedTaggedUnionHandler(
                         ["expected a dictionary"],
@@ -286,7 +286,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                simpleString: $e => {
+                simpleString: ($e) => {
                     defInitializeValue()
                     return createUnexpectedStringHandler(
                         ["expected a dictionary"],
@@ -294,7 +294,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                multilineString: $e => {
+                multilineString: ($e) => {
                     defInitializeValue()
                     return createUnexpectedStringHandler(
                         ["expected a dictionary"],
@@ -308,7 +308,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
         case "list": {
             const $d = definition.type[1]
             return {
-                array: $e => {
+                array: ($e) => {
                     if ($e.token.data.type[0] !== "list") {
                         onError(["array is not a list"], $e.token.annotation, DiagnosticSeverity.error)
                     }
@@ -320,7 +320,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         definition: $d,
                     })
                     return {
-                        element: $ => {
+                        element: ($) => {
                             flagNonDefaultPropertiesFound()
                             // const entry = collBuilder.createEntry(_errorMessage => {
                             //     //onError(errorMessage, svData)
@@ -338,7 +338,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                 null,
                             )
                         },
-                        arrayEnd: $ => {
+                        arrayEnd: ($) => {
                             listHandler.onClose({
                                 token: {
                                     data: {},
@@ -348,7 +348,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         },
                     }
                 },
-                object: $e => {
+                object: ($e) => {
                     defInitializeValue()
                     return createUnexpectedObjectHandler(
                         ["expected a list"],
@@ -356,7 +356,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                taggedUnion: $e => {
+                taggedUnion: ($e) => {
                     defInitializeValue()
                     return createUnexpectedTaggedUnionHandler(
                         ["expected a list"],
@@ -364,7 +364,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                simpleString: $e => {
+                simpleString: ($e) => {
                     defInitializeValue()
                     return createUnexpectedStringHandler(
                         ["expected a list"],
@@ -372,7 +372,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                multilineString: $e => {
+                multilineString: ($e) => {
                     defInitializeValue()
                     return createUnexpectedStringHandler(
                         ["expected a list"],
@@ -406,7 +406,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                 return find(
                     definition.options,
                     optionToken.data.value,
-                    optionDefinition => {
+                    (optionDefinition) => {
                         if (optionDefinition !== definition["default option"].get()) {
                             flagNonDefaultPropertiesFound()
                         }
@@ -419,7 +419,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                             })
                         )
                     },
-                    keys => {
+                    (keys) => {
                         onError(
                             ["unknown option", {
                                 "known options": keys,
@@ -442,7 +442,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                 )
             }
             return {
-                array: $e => {
+                array: ($e) => {
                     defInitializeValue()
                     return createUnexpectedArrayHandler(
                         ["expected a tagged union"],
@@ -450,7 +450,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                object: $e => {
+                object: ($e) => {
                     defInitializeValue()
                     return createUnexpectedObjectHandler(
                         ["expected a tagged union"],
@@ -458,13 +458,13 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                taggedUnion: $tu => {
+                taggedUnion: ($tu) => {
                     const tuHandler = handler.onTaggedUnion({
                         definition: $d,
                         token: $tu.token,
                     })
                     return {
-                        option: $e => {
+                        option: ($e) => {
                             return doOption(
                                 $e.token,
                                 $d,
@@ -502,14 +502,14 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                 onError,
                             )
                         },
-                        end: $ => {
+                        end: ($) => {
                             tuHandler.onEnd({
                                 annotation: $.annotation,
                             })
                         },
                     }
                 },
-                simpleString: $e => {
+                simpleString: ($e) => {
                     if (mixedIn !== null) {
                         if ($e.token.data.wrapping[0] === "apostrophe") {
                             const tuHandler = handler.onTaggedUnion({
@@ -548,7 +548,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         )
                     }
                 },
-                multilineString: $e => {
+                multilineString: ($e) => {
                     defInitializeValue()
                     return createUnexpectedStringHandler(
                         ["expected a tagged union"],
@@ -564,7 +564,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                 ? ["expected an unquoted string"]
                 : ["expected a quoted string"]
             return {
-                array: $e => {
+                array: ($e) => {
                     defInitializeValue()
                     return createUnexpectedArrayHandler(
                         error,
@@ -572,7 +572,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                object: $e => {
+                object: ($e) => {
                     defInitializeValue()
                     return createUnexpectedObjectHandler(
                         error,
@@ -580,7 +580,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                taggedUnion: $e => {
+                taggedUnion: ($e) => {
                     defInitializeValue()
                     return createUnexpectedTaggedUnionHandler(
                         error,
@@ -588,7 +588,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                multilineString: $e => {
+                multilineString: ($e) => {
                     defInitializeValue()
                     return createUnexpectedStringHandler(
                         error,
@@ -596,7 +596,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                simpleString: $e => {
+                simpleString: ($e) => {
                     const value = $e.token.data.value
                     if (value !== $d["default value"]) {
                         flagNonDefaultPropertiesFound()
@@ -638,7 +638,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
             const $d = definition.type[1]
 
             return {
-                array: $e => {
+                array: ($e) => {
                     defInitializeValue()
                     return createUnexpectedArrayHandler(
                         ["expected a multiline string"],
@@ -646,7 +646,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                object: $e => {
+                object: ($e) => {
                     defInitializeValue()
                     return createUnexpectedObjectHandler(
                         ["expected a multiline string"],
@@ -654,7 +654,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                taggedUnion: $e => {
+                taggedUnion: ($e) => {
                     defInitializeValue()
                     return createUnexpectedTaggedUnionHandler(
                         ["expected a multiline string"],
@@ -662,7 +662,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         onError,
                     )
                 },
-                multilineString: $e => {
+                multilineString: ($e) => {
                     if ($e.token.data.lines.length > 1) {
                         flagNonDefaultPropertiesFound()
                     } else {
@@ -678,7 +678,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         definition: $d,
                     })
                 },
-                simpleString: $e => {
+                simpleString: ($e) => {
                     defInitializeValue()
                     return createUnexpectedStringHandler(
                         ["expected a multiline string"],
@@ -691,7 +691,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
         case "group": {
             const $d = definition.type[1]
             return {
-                array: $e => {
+                array: ($e) => {
                     if ($e.token.data.type[0] !== "shorthand group") {
                         if (mixedIn === null) {
                             onError(["expected a group"], $e.token.annotation, DiagnosticSeverity.error)
@@ -718,22 +718,22 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                             const nextValue = state.findNextValue()
                             if (nextValue === null) {
                                 return {
-                                    array: $ => {
+                                    array: ($) => {
                                         onError(["superfluous element"], $.token.annotation, DiagnosticSeverity.error)
                                         return createDummyArrayHandler()
                                     },
-                                    object: $ => {
+                                    object: ($) => {
                                         onError(["superfluous element"], $.token.annotation, DiagnosticSeverity.error)
                                         return createDummyObjectHandler()
                                     },
-                                    taggedUnion: $ => {
+                                    taggedUnion: ($) => {
                                         onError(["superfluous element"], $.token.annotation, DiagnosticSeverity.error)
                                         return createDummyTaggedUnionHandler()
                                     },
-                                    simpleString: $ => {
+                                    simpleString: ($) => {
                                         onError(["superfluous element"], $.token.annotation, DiagnosticSeverity.error)
                                     },
-                                    multilineString: $ => {
+                                    multilineString: ($) => {
                                         onError(["superfluous element"], $.token.annotation, DiagnosticSeverity.error)
                                     },
                                 }
@@ -760,7 +760,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                             element: () => {
                                 return createUnmarshallerForNextValue()
                             },
-                            arrayEnd: $e => {
+                            arrayEnd: ($e) => {
                                 state.wrapup(
                                     $e.token.annotation,
                                     onError,
@@ -769,7 +769,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         }
                     }
                 },
-                object: $e => {
+                object: ($e) => {
                     if ($e.token.data.type[0] !== "verbose group") {
                         if (mixedIn === null) {
                             onError(["expected a group"], $e.token.annotation, DiagnosticSeverity.error)
@@ -795,7 +795,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                             }
                         } = {}
                         return {
-                            property: $p => {
+                            property: ($p) => {
                                 const key = $p.token.data.value
                                 if ($p.token.data.wrapping[0] !== "apostrophe") {
                                     onError(["property key does not have apostrophes", {}], $p.token.annotation, DiagnosticSeverity.warning)
@@ -803,7 +803,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                 return find(
                                     $d.properties,
                                     key,
-                                    propertyDefinition => {
+                                    (propertyDefinition) => {
                                         const pp = {
                                             annotation: $p.token.annotation,
                                             isNonDefault: false,
@@ -834,7 +834,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                             }
                                         )
                                     },
-                                    keys => {
+                                    (keys) => {
                                         onError(["unknown property", { "known properties": keys }], $p.token.annotation, DiagnosticSeverity.error)
                                         groupHandler.onUnexpectedProperty({
                                             token: $p.token,
@@ -845,7 +845,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                                     }
                                 )
                             },
-                            objectEnd: $$ => {
+                            objectEnd: ($$) => {
                                 let hadNonDefaultProperties = false
 
                                 $d.properties.forEach((propDefinition, propKey) => {
@@ -881,7 +881,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         }
                     }
                 },
-                taggedUnion: $e => {
+                taggedUnion: ($e) => {
                     if (mixedIn === null) {
                         onError(["expected a group"], $e.token.annotation, DiagnosticSeverity.error)
                         defInitializeValue()
@@ -890,7 +890,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         return mixedIn.pushGroup($d, handler).taggedUnion($e)
                     }
                 },
-                simpleString: $e => {
+                simpleString: ($e) => {
                     if (mixedIn === null) {
                         onError(["expected a group"], $e.token.annotation, DiagnosticSeverity.error)
                         defInitializeValue()
@@ -898,7 +898,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                         return mixedIn.pushGroup($d, handler).simpleString($e)
                     }
                 },
-                multilineString: $e => {
+                multilineString: ($e) => {
                     if (mixedIn === null) {
                         onError(["expected a group"], $e.token.annotation, DiagnosticSeverity.error)
                         defInitializeValue()

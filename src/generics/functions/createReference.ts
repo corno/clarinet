@@ -18,13 +18,13 @@ export function createReference<T, Annotation>(
     registrater.register(() => {
         return lookup.with(
             name,
-            entry => {
+            (entry) => {
                 t = entry
                 return null
             },
-            keys => {
+            (keys) => {
                 return {
-                    message: `${propertyName} '${name}' not found, choose from ${keys.map(x => `'${x}'`).join(", ")}`,
+                    message: `${propertyName} '${name}' not found, choose from ${keys.map((x) => `'${x}'`).join(", ")}`,
                     annotation: annotatedName !== null
                         ? annotatedName.annotation
                         : contextAnnotation,

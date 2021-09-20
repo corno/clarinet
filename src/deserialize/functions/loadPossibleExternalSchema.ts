@@ -22,7 +22,7 @@ export function loadPossibleExternalSchema(
     ) => void,
 ): p.IUnsafeValue<SchemaAndSideEffects<TokenizerAnnotationData, null>, null> {
 
-    return possibleStream.mapError(error => {
+    return possibleStream.mapError((error) => {
         switch (error[0]) {
             case "not found": {
                 onError(["loading", {
@@ -41,7 +41,7 @@ export function loadPossibleExternalSchema(
                 return assertUnreachable(error[0])
         }
     }).try(
-        stream => {
+        (stream) => {
             return loadExternalSchema(
                 stream,
                 getSchemaSchemaBuilder,

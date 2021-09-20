@@ -91,7 +91,7 @@ function createCodeCompletionForShorthandValue(
     createCodeCompletionForValue(
         definition,
         sequence,
-        $ => {
+        ($) => {
             const step = sequence.addTaggedUnionStep()
             $.options.forEach((option, optionName) => {
                 const seq = step.addOption()
@@ -99,7 +99,7 @@ function createCodeCompletionForShorthandValue(
                 createCodeCompletionForShorthandValue(option.value, seq)
             })
         },
-        $ => {
+        ($) => {
             createCodeCompletionForShorthandGroup($, sequence)
         },
     )
@@ -132,11 +132,11 @@ function createCodeCompletionForVerboseValue(prop: ValueDefinition, sequence: Li
     createCodeCompletionForValue(
         prop,
         sequence,
-        $ => {
+        ($) => {
             sequence.snippet(` | '${$["default option"].name}'`)
             createCodeCompletionForVerboseValue($["default option"].get().value, sequence)
         },
-        $ => {
+        ($) => {
             sequence.snippet(` (`)
             createCodeCompletionForVerboseProperties($, sequence)
             sequence.snippet(`)`)
@@ -149,7 +149,7 @@ function createCodeCompletionForVerboseProperties(
     sequence: Line,
 ): void {
     let dirty = false
-    sequence.indent($ => {
+    sequence.indent(($) => {
         group.properties.forEach((prop, propKey) => {
             dirty = true
             const line = $.addLine()
@@ -199,7 +199,7 @@ function createAlternativesRoot(): AlternativesRoot {
 
     function createSequence(imp: ASequence): Line {
         return {
-            indent: callback => {
+            indent: (callback) => {
                 const block: ABlock = {
                     lines: [],
                 }
@@ -245,33 +245,33 @@ function createAlternativesRoot(): AlternativesRoot {
                     const step = s[i]
                     switch (step[0]) {
                         case "block":
-                            cc(step[1], step2 => {
+                            cc(step[1], (step2) => {
                                 indentationLevel += 1
-                                step2.block.lines.forEach(l => {
+                                step2.block.lines.forEach((l) => {
                                     const temp: string[] = []
-                                    ser(out.map(str => `${str}\n${createIndentation()}`), l, str => temp.push(str))
+                                    ser(out.map((str) => `${str}\n${createIndentation()}`), l, (str) => temp.push(str))
                                     out = temp
                                 })
                                 indentationLevel -= 1
                                 if (step2.block.lines.length !== 0) {
-                                    out = out.map(str => `${str}\n${createIndentation()}`)
+                                    out = out.map((str) => `${str}\n${createIndentation()}`)
                                 }
                                 //
                             })
                             break
                         case "snippet":
-                            cc(step[1], step2 => {
-                                out = out.map(str => {
+                            cc(step[1], (step2) => {
+                                out = out.map((str) => {
                                     return str + step2.value
                                 })
                             })
                             break
                         case "tagged union":
-                            cc(step[1], step2 => {
+                            cc(step[1], (step2) => {
                                 const temp: string[] = []
                                 for (let j = 0; j !== step2.alts.length; j += 1) {
                                     const alt = step2.alts[j]
-                                    ser(out, alt, str => temp.push(str))
+                                    ser(out, alt, (str) => temp.push(str))
                                 }
                                 out = temp
                             })
@@ -281,12 +281,12 @@ function createAlternativesRoot(): AlternativesRoot {
                     }
                 }
 
-                out.forEach(str => {
+                out.forEach((str) => {
                     add(str)
                 })
             }
             const res: string[] = []
-            ser([""], rootSequence, str => res.push(str))
+            ser([""], rootSequence, (str) => res.push(str))
             return res
         },
     }
@@ -299,14 +299,14 @@ function createCodeCompletionsForValue(
     createCodeCompletionForValue(
         definition,
         line,
-        $ => {
+        ($) => {
             line.snippet(` |`)
             createCodeCompletionsForTaggedUnion(
                 $,
                 line,
             )
         },
-        $ => {
+        ($) => {
             const tus = line.addTaggedUnionStep()
             const verbose = tus.addOption()
             verbose.snippet(` (`)
@@ -371,7 +371,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
 
             }
             return {
-                onProperty: $ => {
+                onProperty: ($) => {
                     ifToken(
                         $.token,
                         null,
@@ -386,7 +386,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                     )
                     return createValueHandler()
                 },
-                onUnexpectedProperty: $ => {
+                onUnexpectedProperty: ($) => {
                     onToken(
                         $.token.annotation,
                         () => {
@@ -395,7 +395,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                         null,
                     )
                 },
-                onClose: $$ => {
+                onClose: ($$) => {
                     ifToken(
                         $$.token,
                         () => {
@@ -408,13 +408,13 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
         }
 
         return {
-            onDictionary: $ => {
+            onDictionary: ($) => {
                 addDummyOnToken($.token)
                 return {
-                    onClose: $ => {
+                    onClose: ($) => {
                         addDummyOnToken($.token)
                     },
-                    onEntry: $$ => {
+                    onEntry: ($$) => {
                         ifToken(
                             $$.token,
                             null,
@@ -431,10 +431,10 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                     },
                 }
             },
-            onList: $ => {
+            onList: ($) => {
                 addDummyOnToken($.token)
                 return {
-                    onClose: $ => {
+                    onClose: ($) => {
                         addDummyOnToken($.token)
                     },
                     onElement: () => {
@@ -442,7 +442,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                     },
                 }
             },
-            onTaggedUnion: $ => {
+            onTaggedUnion: ($) => {
                 ifToken(
                     $.token,
                     null,
@@ -456,7 +456,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                     }
                 )
                 return {
-                    onUnexpectedOption: $$ => {
+                    onUnexpectedOption: ($$) => {
                         onToken(
                             $$.token.annotation,
                             () => {
@@ -466,7 +466,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                         )
                         return createValueHandler()
                     },
-                    onOption: $$ => {
+                    onOption: ($$) => {
                         addDummyOnToken($$.token)
                         return createValueHandler()
                     },
@@ -475,7 +475,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                     },
                 }
             },
-            onSimpleString: $ => {
+            onSimpleString: ($) => {
                 ifToken(
                     $.token,
                     () => {
@@ -494,13 +494,13 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                     null,
                 )
             },
-            onMultilineString: $ => {
+            onMultilineString: ($) => {
                 addDummyOnToken($.token)
             },
             onTypeReference: () => {
                 return createValueHandler()
             },
-            onGroup: $ => {
+            onGroup: ($) => {
                 const definition = $.definition
                 switch ($.type[0]) {
                     case "mixin":
@@ -514,7 +514,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                             [],
                         )
                     case "shorthand":
-                        return cc($.type[1], $ => {
+                        return cc($.type[1], ($) => {
                             const alternatives = createAlternativesRoot()
                             createCodeCompletionForShorthandGroup(
                                 definition,
@@ -526,7 +526,7 @@ export function createCodeCompletionsGenerator<TokenAnnotation, NonTokenAnnotati
                             )
                         })
                     case "verbose":
-                        return cc($.type[1], $ => {
+                        return cc($.type[1], ($) => {
                             const alternatives = createAlternativesRoot()
                             createCodeCompletionForVerboseProperties(definition, alternatives.root)
                             return doGroup(

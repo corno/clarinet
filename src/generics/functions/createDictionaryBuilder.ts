@@ -9,7 +9,7 @@ export function createDictionaryBuilder<T>(): IDictionaryBuilder<T> {
         toDictionary: () => {
             return {
                 forEach: (callback: (entry: T, key: string) => void): void => {
-                    Object.keys(imp).sort().forEach(key => callback(imp[key], key))
+                    Object.keys(imp).sort().forEach((key) => callback(imp[key], key))
                 },
                 getLookup: () => {
                     return {

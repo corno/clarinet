@@ -17,40 +17,40 @@ export function createLoggingHandler<TokenAnnotation, NonTokenAnnotation>(
     function createLoggingValueHandler(
     ): ValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
-            array: $ => {
+            array: ($) => {
                 onEvent(["open array", $.token.data], $.token.annotation)
                 return {
                     element: () => {
                         return createLoggingValueHandler()
                     },
-                    arrayEnd: $ => {
+                    arrayEnd: ($) => {
                         onEvent(["close array", $.token.data], $.token.annotation)
                     },
                 }
             },
-            object: $ => {
+            object: ($) => {
                 onEvent(["open object", $.token.data], $.token.annotation)
 
                 return {
-                    property: $ => {
+                    property: ($) => {
                         onEvent(["simple string", $.token.data], $.token.annotation)
                         return createLoggingRequiredValueHandler()
                     },
-                    objectEnd: $ => {
+                    objectEnd: ($) => {
                         onEvent(["close object", $.token.data], $.token.annotation)
                     },
                 }
             },
-            simpleString: $ => {
+            simpleString: ($) => {
                 onEvent(["simple string", $.token.data], $.token.annotation)
             },
-            multilineString: $ => {
+            multilineString: ($) => {
                 onEvent(["multiline string", $.token.data], $.token.annotation)
             },
-            taggedUnion: $ => {
+            taggedUnion: ($) => {
                 onEvent(["tagged union", $.token.data], $.token.annotation)
                 return {
-                    option: $ => {
+                    option: ($) => {
                         onEvent(["simple string", $.token.data], $.token.annotation)
                         return createLoggingRequiredValueHandler()
                     },

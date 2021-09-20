@@ -134,7 +134,7 @@ export function createShorthandParsingState<TokenAnnotation, NonTokenAnnotation>
                         const missing = $.elements.length - $.index
                         if (missing > 0) {
                             onError(
-                                ["missing elements", { elements: $.elements.slice($.index).map(ee => ee.name) }],
+                                ["missing elements", { elements: $.elements.slice($.index).map((ee) => ee.name) }],
                                 annotation,
                                 DiagnosticSeverity.error
                             )

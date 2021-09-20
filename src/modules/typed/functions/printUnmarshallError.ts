@@ -12,7 +12,7 @@ export function printUnmarshallError(error: UnmarshallError): string {
     switch (error[0]) {
         case "missing elements":
             const $ = error[1]
-            return `missing elements: ${$.elements.map(k => `'${k}'`).join(", ")}`
+            return `missing elements: ${$.elements.map((k) => `'${k}'`).join(", ")}`
 
         case "object is not a dictionary": {
             return "object is not a dictionary: { }"
@@ -34,11 +34,11 @@ export function printUnmarshallError(error: UnmarshallError): string {
         }
         case "unknown option": {
             const $ = error[1]
-            return `unknown option, choose from: ${$["known options"].map(k => `'${k}'`).join(", ")}`
+            return `unknown option, choose from: ${$["known options"].map((k) => `'${k}'`).join(", ")}`
         }
         case "unknown property": {
             const $ = error[1]
-            return `unknown property, choose from: ${$["known properties"].map(k => `'${k}'`).join(", ")}`
+            return `unknown property, choose from: ${$["known properties"].map((k) => `'${k}'`).join(", ")}`
         }
         case "value should have quotes": {
             return "value should have quotes: \"...\""
@@ -84,7 +84,7 @@ export function printUnmarshallError(error: UnmarshallError): string {
         }
         case "missing elements": {
             const $ = error[1]
-            return `${$.elements.length} missing element(s): ${$.elements.map(e => `'${e}'`).join(", ")}`
+            return `${$.elements.length} missing element(s): ${$.elements.map((e) => `'${e}'`).join(", ")}`
         }
         case "this is interpreted as an option, expected apostrophes": {
             return "this is interpreted as an option, expected apostrophes"

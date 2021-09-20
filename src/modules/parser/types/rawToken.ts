@@ -34,29 +34,19 @@ export type StructuralTokenData = {
     type: StructuralTokenType
 }
 
-
-export const Punctuation = {
-    exclamationMark: 0x21,   // !
-    verticalLine: 0x7C,      // |
-    comma: 0x2C,             // ,
-    colon: 0x3A,             // :
-    openBrace: 0x7B,         // {
-    closeBrace: 0x7D,        // }
-    openParen: 0x28,         // )
-    closeParen: 0x29,        // )
-    openBracket: 0x5B,       // [
-    closeBracket: 0x5D,      // ]
-    openAngleBracket: 0x3C,  // <
-    closeAngleBracket: 0x3E, // >
-}
-
 export enum TokenType {
     Structural,
     SimpleString,
     MultilineString,
 }
 
+export type Comments = {
+    before: string[]
+    after: string | null
+}
+
 export type Token2<Annotation> = {
+    comments: Comments
     annotation: Annotation
     type:
     | [TokenType.Structural, StructuralTokenData]

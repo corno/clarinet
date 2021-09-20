@@ -10,62 +10,62 @@ export function combineTypedHandlers<TokenAnnotation, NonTokenAnnotation>(
         handlers: ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>[]
     ): ITypedValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
-            onDictionary: $ => {
-                const dictHandlers = handlers.map(h => h.onDictionary($))
+            onDictionary: ($) => {
+                const dictHandlers = handlers.map((h) => h.onDictionary($))
                 return {
-                    onClose: $ => {
-                        dictHandlers.forEach(dh => dh.onClose($))
+                    onClose: ($) => {
+                        dictHandlers.forEach((dh) => dh.onClose($))
                     },
-                    onEntry: $ => {
-                        return combineTypedValueHandler(dictHandlers.map(dh => dh.onEntry($)))
+                    onEntry: ($) => {
+                        return combineTypedValueHandler(dictHandlers.map((dh) => dh.onEntry($)))
                     },
                 }
             },
-            onList: $ => {
-                const listHandlers = handlers.map(h => h.onList($))
+            onList: ($) => {
+                const listHandlers = handlers.map((h) => h.onList($))
                 return {
-                    onClose: $ => {
-                        listHandlers.forEach(dh => dh.onClose($))
+                    onClose: ($) => {
+                        listHandlers.forEach((dh) => dh.onClose($))
                     },
-                    onElement: $ => {
-                        return combineTypedValueHandler(listHandlers.map(dh => dh.onElement($)))
+                    onElement: ($) => {
+                        return combineTypedValueHandler(listHandlers.map((dh) => dh.onElement($)))
                     },
                 }
             },
-            onTaggedUnion: $ => {
-                const taggedUnionHandlers = handlers.map(h => h.onTaggedUnion($))
+            onTaggedUnion: ($) => {
+                const taggedUnionHandlers = handlers.map((h) => h.onTaggedUnion($))
                 return {
-                    onUnexpectedOption: $ => {
-                        return combineTypedValueHandler(taggedUnionHandlers.map(tuh => tuh.onUnexpectedOption($)))
+                    onUnexpectedOption: ($) => {
+                        return combineTypedValueHandler(taggedUnionHandlers.map((tuh) => tuh.onUnexpectedOption($)))
                     },
-                    onOption: $ => {
-                        return combineTypedValueHandler(taggedUnionHandlers.map(tuh => tuh.onOption($)))
+                    onOption: ($) => {
+                        return combineTypedValueHandler(taggedUnionHandlers.map((tuh) => tuh.onOption($)))
                     },
-                    onEnd: $ => {
-                        taggedUnionHandlers.forEach(tuh => tuh.onEnd($))
+                    onEnd: ($) => {
+                        taggedUnionHandlers.forEach((tuh) => tuh.onEnd($))
                     },
                 }
             },
-            onSimpleString: $ => {
-                handlers.forEach(h => h.onSimpleString($))
+            onSimpleString: ($) => {
+                handlers.forEach((h) => h.onSimpleString($))
             },
-            onMultilineString: $ => {
-                handlers.forEach(h => h.onMultilineString($))
+            onMultilineString: ($) => {
+                handlers.forEach((h) => h.onMultilineString($))
             },
-            onTypeReference: $ => {
-                return combineTypedValueHandler(handlers.map(h => h.onTypeReference($)))
+            onTypeReference: ($) => {
+                return combineTypedValueHandler(handlers.map((h) => h.onTypeReference($)))
             },
-            onGroup: $ => {
-                const shorthandHandlers = handlers.map(h => h.onGroup($))
+            onGroup: ($) => {
+                const shorthandHandlers = handlers.map((h) => h.onGroup($))
                 return {
-                    onUnexpectedProperty: $ => {
-                        shorthandHandlers.forEach(vth => vth.onUnexpectedProperty($))
+                    onUnexpectedProperty: ($) => {
+                        shorthandHandlers.forEach((vth) => vth.onUnexpectedProperty($))
                     },
-                    onProperty: $ => {
-                        return combineTypedValueHandler(shorthandHandlers.map(shh => shh.onProperty($)))
+                    onProperty: ($) => {
+                        return combineTypedValueHandler(shorthandHandlers.map((shh) => shh.onProperty($)))
                     },
-                    onClose: $ => {
-                        shorthandHandlers.forEach(shh => shh.onClose($))
+                    onClose: ($) => {
+                        shorthandHandlers.forEach((shh) => shh.onClose($))
                     },
 
                 }
@@ -74,9 +74,9 @@ export function combineTypedHandlers<TokenAnnotation, NonTokenAnnotation>(
 
     }
     return {
-        root: combineTypedValueHandler(treeHandlers.map(rh => rh.root)),
-        onEnd: $ => {
-            return p20.createArray(treeHandlers.map(rh => rh.onEnd($))).mergeSafeValues(() => p.value(null)).mapResult(() => p.value(null))
+        root: combineTypedValueHandler(treeHandlers.map((rh) => rh.root)),
+        onEnd: ($) => {
+            return p20.createArray(treeHandlers.map((rh) => rh.onEnd($))).mergeSafeValues(() => p.value(null)).mapResult(() => p.value(null))
         },
     }
 }

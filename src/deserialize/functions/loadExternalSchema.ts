@@ -25,19 +25,22 @@ export function loadExternalSchema(
             createTokenizer(
                 createSchemaParser(
                     getSchemaSchemaBuilder,
-                    _error => {
+                    (_error) => {
                         foundErrors = true
                         //console.error("SCHEMA ERROR", error)
                     },
-                    $ => {
+                    ($) => {
                         schema = $
                         return p.value(null)
                     }
-                )
+                ),
+                (_error) => {
+                    foundErrors = true
+                },
             ),
-            _error => {
+            (_error) => {
                 foundErrors = true
-            }
+            },
         ),
     ).try(
         () => {

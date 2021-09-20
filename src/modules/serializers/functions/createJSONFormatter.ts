@@ -23,7 +23,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
         return indentation
     }
     return {
-        objectBegin: $ => {
+        objectBegin: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -33,7 +33,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        property: $ => {
+        property: ($) => {
             writer.token(
                 {
                     stringBefore: `${$.isFirst ? "" : ","}${newline}${createIndentation($.stackContext)}`,
@@ -43,7 +43,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.propertyToken.annotation
             )
         },
-        objectEnd: $ => {
+        objectEnd: ($) => {
             writer.token(
                 {
                     stringBefore: $.isEmpty ? ` ` : `${newline}${createIndentation($.stackContext)}`,
@@ -54,7 +54,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
             )
         },
 
-        arrayBegin: $ => {
+        arrayBegin: ($) => {
             writer.token({
                 stringBefore: ``,
                 token: `[`,
@@ -63,7 +63,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        element: $ => {
+        element: ($) => {
             writer.nonToken(
                 {
                     string: `${$.isFirst ? "" : ","} `,
@@ -71,7 +71,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.annotation
             )
         },
-        arrayEnd: $ => {
+        arrayEnd: ($) => {
             writer.token(
                 {
                     stringBefore: ` `,
@@ -81,7 +81,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        simpleStringValue: $ => {
+        simpleStringValue: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -114,7 +114,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        multilineStringValue: $ => {
+        multilineStringValue: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -126,7 +126,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        taggedUnionBegin: $ => {
+        taggedUnionBegin: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -136,7 +136,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        option: $ => {
+        option: ($) => {
             writer.token(
                 {
                     stringBefore: ` `,
@@ -146,7 +146,7 @@ export function createJSONFormatter<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        taggedUnionEnd: $ => {
+        taggedUnionEnd: ($) => {
             writer.nonToken(
                 {
                     string: ` ]`,

@@ -15,7 +15,7 @@ export function createJSONSerializer<TokenAnnotation>(
     errorHandler: StructureErrorHandler<TokenAnnotation>,
 ): IParser<TokenAnnotation> {
     return createStructureParser({
-        onEmbeddedSchema: _range => {
+        onEmbeddedSchema: (_range) => {
             return createDummyTreeHandler()
         },
         onSchemaReference: () => {
@@ -25,13 +25,13 @@ export function createJSONSerializer<TokenAnnotation>(
             indentationString,
             newline,
             {
-                token: instruction => {
+                token: (instruction) => {
                     write(instruction.stringBefore)
                     write(instruction.token)
                     write(instruction.stringAfter)
 
                 },
-                nonToken: instruction => {
+                nonToken: (instruction) => {
                     write(instruction.string)
                 },
             }

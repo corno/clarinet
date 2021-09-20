@@ -56,7 +56,7 @@
     "update2latest": "ncu -u --packageFile package.json && nsi && tsc",
     "update2latestAndPublishMinor": "npm run validatePublishReadiness && npm run update2latest && npm run test && git commit -am \"u2l\" && npm run pubMin",
     "update2latestAndPublishPath": "npm run validatePublishReadiness && npm run update2latest && npm run test && git commit -am \"u2l\" && npm run pubPatch",
-    "generateASTNSchema": "astn-expand ./src/schema/schema.astn > ./src/schema/astnschema@0.1"
+    "generateASTNSchema": "astn-expand ./src/modules/schema/etc/schema.astn | astn-generate > ./src/modules/schema/astnschema@0.1"
   },
   "engines": {
     "node": ">=8.0.0",

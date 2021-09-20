@@ -1,6 +1,6 @@
-import * as core from "../src"
-import { formatCLI } from "./formatCLI";
+import { toJSON } from "../src/toJSON"
+import { runProgram } from "../src/runProgram"
 
-formatCLI(
-    core.createJSONSerializer,
+runProgram(
+    toJSON
 )

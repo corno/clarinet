@@ -35,7 +35,7 @@ export function serializeSchema(
         sendEvent(["open object", {
             type: ["verbose group"],
         }])
-        Object.keys(properties).sort().forEach(key => {
+        Object.keys(properties).sort().forEach((key) => {
             sendEvent(["simple string", {
                 value: key,
                 wrapping: ["apostrophe", {}],
@@ -126,7 +126,7 @@ export function serializeSchema(
                                 "options": () => {
                                     serializeDictionary(
                                         $.options,
-                                        state => {
+                                        (state) => {
                                             serializeVerboseType({
                                                 node: () => serializeValueDefinition(state.value),
                                             })
@@ -159,7 +159,7 @@ export function serializeSchema(
                             const $ = valueDefinition.type[1]
                             serializeVerboseType({
                                 properties: () => {
-                                    serializeDictionary($.properties, $ => {
+                                    serializeDictionary($.properties, ($) => {
                                         serializeValueDefinition($.value)
                                     })
                                 },
@@ -177,7 +177,7 @@ export function serializeSchema(
         "component types": () => {
             serializeDictionary(
                 schema.types,
-                entry => {
+                (entry) => {
                     serializeVerboseType({
                         node: () => serializeValueDefinition(entry.value),
                     })

@@ -26,7 +26,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
         return indentation
     }
     return {
-        objectBegin: $ => {
+        objectBegin: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -36,7 +36,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        property: $ => {
+        property: ($) => {
             writer.token(
                 {
                     stringBefore: `${createIndentation($.stackContext)}`,
@@ -57,7 +57,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 $.propertyToken.annotation,
             )
         },
-        objectEnd: $ => {
+        objectEnd: ($) => {
             writer.token(
                 {
                     stringBefore: $.isEmpty ? ` ` : `${createIndentation($.stackContext)}`,
@@ -68,7 +68,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
             )
         },
 
-        arrayBegin: $ => {
+        arrayBegin: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -78,7 +78,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        element: $ => {
+        element: ($) => {
             writer.nonToken(
                 {
                     string: $.arrayToken.data.type[0] === "shorthand group"
@@ -88,7 +88,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 $.annotation,
             )
         },
-        arrayEnd: $ => {
+        arrayEnd: ($) => {
             writer.token(
                 {
                     stringBefore: $.openToken.data.type[0] === "shorthand group"
@@ -103,7 +103,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
             )
         },
 
-        simpleStringValue: $ => {
+        simpleStringValue: ($) => {
             function serializeSimpleString(
                 $: SimpleString,
             ): string {
@@ -132,7 +132,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        multilineStringValue: $ => {
+        multilineStringValue: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -146,7 +146,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
             )
         },
 
-        taggedUnionBegin: $ => {
+        taggedUnionBegin: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -156,7 +156,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        option: $ => {
+        option: ($) => {
             writer.token(
                 {
                     stringBefore: ``,
@@ -166,7 +166,7 @@ export function createASTNNormalizer<TokenAnnotation, NonTokenAnnotation>(
                 $.token.annotation,
             )
         },
-        taggedUnionEnd: $ => {
+        taggedUnionEnd: ($) => {
             writer.nonToken(
                 {
                     string: ``,

@@ -19,7 +19,7 @@ export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): 
         let foundErrors = false
         return createASTNSchemaDeserializer(
             createExpectContext(
-                $ => {
+                ($) => {
                     if ($.severity === DiagnosticSeverity.error) {
                         onError2(["expect", $.issue], $.annotation)
                     }
@@ -33,7 +33,7 @@ export function createASTNSchemaBuilder<TokenAnnotation, NonTokenAnnotation>(): 
                 foundErrors = true
                 onError2(["validation", { message: message }], annotation)
             },
-            schema => {
+            (schema) => {
                 if (schema === null) {
                     if (foundErrors === false) {
                         throw new Error("no schema, no errors")

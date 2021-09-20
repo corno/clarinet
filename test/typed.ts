@@ -30,7 +30,7 @@ describe('typed', () => {
                     },
                     onBody: () => {
                         const expect = astn.createExpectContext<astn.TokenizerAnnotationData, null>(
-                            $ => {
+                            ($) => {
                                 if ($.severity === astn.DiagnosticSeverity.error) {
                                     foundErrors.push(["expect error", `${astn.printExpectError($.issue)} ${astn.printRange($.annotation.range)}`])
                                 } else {
@@ -43,20 +43,20 @@ describe('typed', () => {
                             astn.OnDuplicateEntry.ignore,
                         )
                         return {
-                            onEnd: () => {},
+                            onEnd: () => { },
                             root: callback(
                                 expect,
-                                errorLine => {
+                                (errorLine) => {
                                     foundErrors.push(errorLine)
                                 }
                             ),
                         }
                     },
                     errors: {
-                        onStructureError: $ => {
+                        onStructureError: ($) => {
                             foundErrors.push(["parser error", `${astn.printStructureError($.error)} @ ${astn.printRange($.annotation.range)}`])
                         },
-                        onTreeError: $ => {
+                        onTreeError: ($) => {
                             foundErrors.push(["parser error", `${astn.printTreeParserError($.error)} @ ${astn.printRange($.annotation.range)}`])
                         },
                     },
@@ -67,8 +67,13 @@ describe('typed', () => {
                 return tryToConsumeString(
                     data,
                     astn.createStreamPreTokenizer(
-                        astn.createTokenizer(structureParser),
-                        $ => {
+                        astn.createTokenizer(
+                            structureParser,
+                            (error, range) => {
+                                foundErrors.push(["parser error", `${astn.printTokenizerError(error)} @ ${astn.printRange(range)}`])
+                            },
+                        ),
+                        ($) => {
                             foundErrors.push(["parser error", `${astn.printTokenError($.error)} @ ${astn.printRange($.range)}`])
                         },
                     ),
@@ -81,7 +86,7 @@ describe('typed', () => {
         doTest(
             'duplicate entry',
             `{ "a": (), "a": () }`,
-            expect => {
+            (expect) => {
                 return {
                     exists: expect.expectDictionary({
                         onBegin: () => {
@@ -111,7 +116,7 @@ describe('typed', () => {
         doTest(
             'duplicate property',
             `( "a": 42, "a": 42 )`,
-            expect => astn.createRequiredValueHandler(
+            (expect) => astn.createRequiredValueHandler(
                 expect,
                 ["verbose group", {
                     properties: {
@@ -230,7 +235,7 @@ describe('typed', () => {
         doTest(
             'tagged union',
             `( "a": | "foo" () )`,
-            expect => {
+            (expect) => {
                 return {
                     missing: () => {
                         //

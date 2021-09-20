@@ -132,7 +132,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
 
     return {
         createDictionaryHandler: (onEntry, onBegin, onEnd) => {
-            return data => {
+            return (data) => {
 
                 if (data.token.data.type[0] !== "dictionary") {
                     raiseWarning(["object is not a dictionary", {}], data.token.annotation)
@@ -142,7 +142,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                 }
                 const foundEntries: string[] = []
                 return {
-                    property: propertyData => {
+                    property: (propertyData) => {
                         const process = (): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
                             if (foundEntries.includes(propertyData.token.data.value)) {
                                 switch (duplicateEntrySeverity) {
@@ -174,7 +174,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                         foundEntries.push(propertyData.token.data.value)
                         return vh
                     },
-                    objectEnd: endData => {
+                    objectEnd: (endData) => {
                         if (onEnd) {
                             onEnd(endData.token)
                         }
@@ -184,7 +184,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
         },
         createVerboseGroupHandler: (expectedProperties, onBegin, onEnd, onUnexpectedProperty) => {
             const properties = expectedProperties ? expectedProperties : {}
-            return data => {
+            return (data) => {
 
                 if (data.token.data.type[0] !== "verbose group") {
                     raiseWarning(["object is not a verbose group", {}], data.token.annotation)
@@ -195,7 +195,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                 const foundProperies: string[] = []
                 let hasErrors = false
                 return {
-                    property: $$ => {
+                    property: ($$) => {
                         const onProperty = (): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
                             const expected = properties[$$.token.data.value]
                             if (expected === undefined) {
@@ -250,8 +250,8 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                         foundProperies.push($$.token.data.value)
                         return vh
                     },
-                    objectEnd: endData => {
-                        Object.keys(properties).forEach(epName => {
+                    objectEnd: (endData) => {
+                        Object.keys(properties).forEach((epName) => {
                             if (!foundProperies.includes(epName)) {
                                 const ep = properties[epName]
                                 if (ep.onNotExists === null) {
@@ -282,7 +282,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
             onEnd,
         ) => {
             const elements = expectedElements ? expectedElements : []
-            return typeData => {
+            return (typeData) => {
                 if (onBegin) {
                     onBegin(typeData)
                 }
@@ -297,23 +297,23 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                         if (ee2 === undefined) {
                             const dvh = createDummyValueHandler()
                             return {
-                                object: data => {
+                                object: (data) => {
                                     raiseError(["superfluous element", {}], data.token.annotation)
                                     return dvh.object(data)
                                 },
-                                array: data => {
+                                array: (data) => {
                                     raiseError(["superfluous element", {}], data.token.annotation)
                                     return dvh.array(data)
                                 },
-                                simpleString: data => {
+                                simpleString: (data) => {
                                     raiseError(["superfluous element", {}], data.token.annotation)
                                     return dvh.simpleString(data)
                                 },
-                                multilineString: data => {
+                                multilineString: (data) => {
                                     raiseError(["superfluous element", {}], data.token.annotation)
                                     return dvh.multilineString(data)
                                 },
-                                taggedUnion: data => {
+                                taggedUnion: (data) => {
                                     raiseError(["superfluous element", {}], data.token.annotation)
                                     return dvh.taggedUnion(data)
                                 },
@@ -322,11 +322,11 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                             return ee2.getHandler().exists
                         }
                     },
-                    arrayEnd: $$ => {
+                    arrayEnd: ($$) => {
                         const missing = elements.length - index
                         if (missing > 0) {
                             raiseError(['elements missing', {
-                                names: elements.map(ee2 => {
+                                names: elements.map((ee2) => {
                                     return ee2.name
                                 }),
                             }], $$.token.annotation)
@@ -348,7 +348,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
             onBegin,
             onEnd,
         ) => {
-            return data => {
+            return (data) => {
                 if (data.token.data.type[0] !== "list") {
                     raiseWarning(["array is not a list", {}], data.token.annotation)
                 }
@@ -357,7 +357,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                 }
                 return {
                     element: () => onElement(),
-                    arrayEnd: endData => {
+                    arrayEnd: (endData) => {
                         if (onEnd) {
                             onEnd(endData.token)
                         }
@@ -371,9 +371,9 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
             onUnexpectedOption,
             onMissingOption,
         ) => {
-            return tuData => {
+            return (tuData) => {
                 return {
-                    option: optionData => {
+                    option: (optionData) => {
 
                         const optionHandler = options ? options[optionData.token.data.value] : undefined
                         if (optionHandler === undefined) {
@@ -406,7 +406,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
             onInvalidType,
             onNull,
         ) => {
-            return svData => {
+            return (svData) => {
                 if (onNull !== undefined && svData.token.data.wrapping[0] === "none" && svData.token.data.value === "null") {
                     onNull(svData)
                 } else {
@@ -428,7 +428,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
             expected,
             onInvalidType,
         ) => {
-            return svData => {
+            return (svData) => {
                 if (onInvalidType !== undefined && onInvalidType !== null) {
                     onInvalidType({
                         annotation: svData.token.annotation,
@@ -446,7 +446,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
             expected,
             onInvalidType,
         ) => {
-            return svData => {
+            return (svData) => {
                 if (onInvalidType !== undefined && onInvalidType !== null) {
                     onInvalidType({
                         annotation: svData.token.annotation,
@@ -462,7 +462,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
         ) => {
             return () => {
                 return {
-                    option: $ => {
+                    option: ($) => {
                         if (onInvalidType !== undefined && onInvalidType !== null) {
                             onInvalidType({
                                 annotation: $.token.annotation,
@@ -484,7 +484,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
             expected,
             onInvalidType,
         ) => {
-            return $ => {
+            return ($) => {
                 if (onInvalidType !== undefined && onInvalidType !== null) {
                     onInvalidType({
                         annotation: $.token.annotation,
@@ -496,7 +496,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                     )
                 }
                 return {
-                    property: propertyData => {
+                    property: (propertyData) => {
                         return {
                             exists: createDummyPropertyHandler({
                                 key: propertyData.token,
@@ -506,7 +506,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                             },
                         }
                     },
-                    objectEnd: _endData => {
+                    objectEnd: (_endData) => {
                     },
                 }
             }
@@ -515,7 +515,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
             expected,
             onInvalidType,
         ) => {
-            return $ => {
+            return ($) => {
                 if (onInvalidType !== undefined && onInvalidType !== null) {
                     onInvalidType({
                         annotation: $.token.annotation,
@@ -530,7 +530,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                     element: () => {
                         return createDummyValueHandler()
                     },
-                    arrayEnd: _endData => {
+                    arrayEnd: (_endData) => {
 
                     },
                 }
@@ -587,7 +587,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     }
 
     return {
-        expectSimpleString: $ => {
+        expectSimpleString: ($) => {
 
             const expectValue: ee.ExpectedValue = {
                 "type": "string",
@@ -595,14 +595,14 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
             }
             return expectSimpleStringImp(expectValue, $.callback, $.onInvalidType)
         },
-        expectQuotedString: $ => {
+        expectQuotedString: ($) => {
             const expectValue: ee.ExpectedValue = {
                 "type": "quoted string",
                 "null allowed": $.onNull !== undefined,
             }
             return expectSimpleStringImp(
                 expectValue,
-                $$ => {
+                ($$) => {
                     if ($$.token.data.wrapping[0] !== "quote") {
                         if ($.warningOnly) {
                             raiseWarning(["string is not quoted", {}], $$.token.annotation)
@@ -627,14 +627,14 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                 $.onInvalidType
             )
         },
-        expectNonWrappedString: $ => {
+        expectNonWrappedString: ($) => {
             const expectValue: ee.ExpectedValue = {
                 "type": "nonwrapped string",
                 "null allowed": $.onNull !== undefined,
             }
             return expectSimpleStringImp(
                 expectValue,
-                $$ => {
+                ($$) => {
                     if ($$.token.data.wrapping[0] !== "none") {
                         if ($.warningOnly) {
                             raiseWarning(["string should not have quotes or apostrophes", {}], $$.token.annotation)
@@ -659,7 +659,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                 $.onInvalidType
             )
         },
-        expectDictionary: $ => {
+        expectDictionary: ($) => {
 
             const expectValue: ee.ExpectedValue = {
                 "type": "dictionary",
@@ -673,7 +673,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                 taggedUnion: createContext.createUnexpectedTaggedUnionHandler(expectValue, $.onInvalidType),
             }
         },
-        expectVerboseGroup: $ => {
+        expectVerboseGroup: ($) => {
 
             const expectValue: ee.ExpectedValue = {
                 "type": "verbose group",
@@ -692,7 +692,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                 taggedUnion: createContext.createUnexpectedTaggedUnionHandler(expectValue, $.onInvalidType),
             }
         },
-        expectList: $ => {
+        expectList: ($) => {
 
             const expectValue: ee.ExpectedValue = {
                 "type": "list",
@@ -706,7 +706,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                 taggedUnion: createContext.createUnexpectedTaggedUnionHandler(expectValue, $.onInvalidType),
             }
         },
-        expectShorthandGroup: $ => {
+        expectShorthandGroup: ($) => {
 
             const expectValue: ee.ExpectedValue = {
                 "type": "shorthand group",
@@ -721,7 +721,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
             }
         },
 
-        expectGroup: $ => {
+        expectGroup: ($) => {
 
             const expectValue: ee.ExpectedValue = {
                 "type": "type or shorthand group",
@@ -740,7 +740,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
                 taggedUnion: createContext.createUnexpectedTaggedUnionHandler(expectValue, $.onInvalidType),
             }
         },
-        expectTaggedUnion: $ => {
+        expectTaggedUnion: ($) => {
 
             const expectValue: ee.ExpectedValue = {
                 "type": "tagged union",

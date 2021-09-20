@@ -7,8 +7,7 @@ import { Location, Range, RangeSize } from "../types/range";
 import { TokenError } from "../types/TokenError"
 import { PreToken, PreTokenDataType } from "../types/PreToken";
 
-import { IChunk } from "../interfaces/IChunk";
-import { IPreTokenizer } from "../interfaces/IPreTokenizer";
+import { ILoopState, IPreTokenizer, TokenReturnType } from "../interfaces/IPreTokenizer";
 import { ILocationState } from "../interfaces/ILocationState";
 import { StructuralTokenType } from "../../parser/types/rawToken";
 
@@ -139,44 +138,6 @@ type StringContext = {
     foundNewlineCharacter: FoundNewlineCharacter | null
 }
 
-type TokenReturnType = {
-    consumeCharacter: boolean
-    preToken: null | PreToken
-}
-
-class Snippet {
-    private readonly chunk: IChunk
-    private startIndex: null | number = null
-    constructor(chunk: IChunk) {
-        this.chunk = chunk
-    }
-    public start() {
-        if (this.startIndex === null) {
-            this.startIndex = this.chunk.getIndexOfNextCharacter()
-        }
-    }
-    /**
-     * if not flushed, the callback is not called.
-     * the current character position should not change so that the next round
-     * the same call will be made, but now it is flushed, so the callback will be called
-     */
-    public ensureFlushed(callback: () => TokenReturnType): TokenReturnType {
-        if (this.startIndex !== null) {
-            return {
-                consumeCharacter: false,
-                preToken: {
-                    type: [PreTokenDataType.Snippet, {
-                        chunk: this.chunk.getString(),
-                        begin: this.startIndex,
-                        end: this.chunk.getIndexOfNextCharacter(),
-                    }],
-                },
-            }
-        }
-        return callback()
-    }
-}
-
 function getCurrentCharacterRange(ls: ILocationState): Range {
     return createRangeFromLocations(ls.getCurrentLocation(), ls.getNextLocation())
 }
@@ -187,94 +148,186 @@ type OnError = ($: {
 }) => void
 
 
+//const loopState = createLoopState(currentChunk, locationState)
+
+// function createLoopState(
+//     chunk: IChunk,
+//     locationState: ILocationState,
+// ): ILoopState {
+//     let startIndex: null | number = null
+
+//     function ensureFlushed(callback: () => TokenReturnType): TokenReturnType {
+//         if (startIndex !== null) {
+//             return {
+//                 startSnippet: false,
+//                 consumeCharacter: false,
+//                 preToken: {
+//                     type: [PreTokenDataType.Snippet, {
+//                         chunk: chunk.getString(),
+//                         begin: startIndex,
+//                         end: chunk.getCurrentIndex(),
+//                     }],
+//                 },
+//             }
+//         }
+//         return callback()
+//     }
+
+//     return {
+//         /**
+//          * if not flushed, the callback is not called.
+//          * the current character position should not change so that the next round
+//          * the same call will be made, but now it is flushed, so the callback will be called
+//          */
+//         ensureFlushed: (callback: () => TokenReturnType) => {
+//             return ensureFlushed(callback)
+//         },
+//         whileLoop: (
+//             callback: (
+//                 nextChar: number,
+//             ) => TokenReturnType
+//         ): PreToken | null => {
+//             while (true) {
+
+//                 const nextChar = chunk.lookahead()
+
+//                 if (nextChar === null) {
+//                     return ensureFlushed(() => {
+//                         return {
+//                             startSnippet: false,
+//                             consumeCharacter: false,
+//                             preToken: null,
+//                         }
+//                     }).preToken
+//                 }
+//                 const result = callback(nextChar)
+//                 if (result.startSnippet) {
+//                     if (startIndex === null) {
+//                         startIndex = chunk.getCurrentIndex()
+//                     }
+//                 }
+//                 if (result.consumeCharacter) {
+//                     const cc = chunk.lookahead()
+//                     if (cc === null) {
+//                         throw new Error("Unexpected consume")
+//                     }
+//                     locationState.increase(cc)
+//                     chunk.increaseIndex()
+//                 }
+//                 if (result.preToken !== null) {
+//                     return result.preToken
+//                 }
+//             }
+//         },
+//     }
+// }
+
 export function createPreTokenizer(
     locationState: ILocationState,
     onError: OnError,
 ): IPreTokenizer {
 
-    let currentTokenType: CurrentToken = [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }]
+    let currentToken: CurrentToken = [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }]
 
 
-    function changeCurrentTokenType(tokenType: CurrentToken, tokenData: PreToken): PreToken {
-        currentTokenType = tokenType
+    function changeCurrentTokenType(ct: CurrentToken, tokenData: PreToken): PreToken {
+        currentToken = ct
         return tokenData
     }
-    class PreTokenizer {
 
-        private flushString(
-            str: string,
-        ): PreToken {
-            return {
-                type: [PreTokenDataType.Snippet, {
-                    chunk: str,
-                    begin: 0,
-                    end: str.length,
-                }],
+
+    function handleNewlineCharacter(
+        fnlc: FoundNewlineCharacter,
+        nextChar: number,
+    ): TokenReturnType {
+        switch (fnlc.type) {
+            case FoundNewlineCharacterType.CARRIAGE_RETURN: {
+                /*
+                if nextChar === Whitespace.lineFeed
+                    windows style newlines (\r\n)
+                else
+                    old style Mac OS newlines (\r)
+                */
+                return {
+                    startSnippet: false,
+                    consumeCharacter: nextChar === Whitespace.lineFeed,
+                    preToken: changeCurrentTokenType(
+                        [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
+                        {
+                            type: [PreTokenDataType.NewLine, {
+                                range: createRangeFromLocations(fnlc.startLocation, locationState.getCurrentLocation()),
+                            }],
+                        }
+                    ),
+                }
+
             }
-        }
-        private processUntilFirstNotIncludedCharacter(
-            currentChunk: IChunk,
-            isIncludedCharacter: (char: number) => boolean,
-            onEndOfToken: () => TokenReturnType,
-        ): null | PreToken {
-            return this.whileLoop(
-                currentChunk,
-                (nextChar, snippet) => {
-
-                    //first check if we are breaking out of an nonwrapped string. Can only be done by checking the character that comes directly after the nonwrapped string
-                    if (!isIncludedCharacter(nextChar)) {
-
-                        return snippet.ensureFlushed(onEndOfToken)
-
-                        //this character does not belong to the keyword so don't go to the next character by breaking
-                    } else {
-                        //normal character
-                        //don't flush
-                        snippet.start()
-                        return {
-                            consumeCharacter: true,
-                            preToken: null,
+            case FoundNewlineCharacterType.LINE_FEED: {
+                /*
+                if nextChar === Whitespace.carriageReturn
+                    //strange style newline (\n\r)
+                else
+                    //unix style newlines (\n)
+                    //don't consume character
+                */
+                return {
+                    startSnippet: false,
+                    consumeCharacter: nextChar === Whitespace.carriageReturn,
+                    preToken: changeCurrentTokenType(
+                        [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
+                        {
+                            type: [PreTokenDataType.NewLine, {
+                                range: createRangeFromLocations(fnlc.startLocation, locationState.getCurrentLocation()),
+                            }],
                         }
-                    }
-                }
-            )
-        }
-        private whileLoop(
-            currentChunk: IChunk,
-            callback: (
-                nextChar: number,
-                snippet: Snippet,
-            ) => TokenReturnType
-        ): PreToken | null {
-            const snippet = new Snippet(currentChunk)
-            while (true) {
-
-                const nextChar = currentChunk.lookahead()
-
-                if (nextChar === null) {
-                    return snippet.ensureFlushed(() => {
-                        return {
-                            consumeCharacter: false,
-                            preToken: null,
-                        }
-                    }).preToken
-                }
-                const result = callback(nextChar, snippet)
-                if (result.consumeCharacter) {
-                    const cc = currentChunk.lookahead()
-                    if (cc === null) {
-                        throw new Error("Unexpected consume")
-                    }
-                    locationState.increase(cc)
-                    currentChunk.increaseIndex()
-                }
-                if (result.preToken !== null) {
-                    return result.preToken
+                    ),
                 }
             }
+            default:
+                return assertUnreachable(fnlc.type)
         }
-        public handleDanglingToken(): PreToken | null {
-            const ct = currentTokenType
+    }
+    function flushString(
+        str: string,
+    ): PreToken {
+        return {
+            type: [PreTokenDataType.Snippet, {
+                chunk: str,
+                begin: 0,
+                end: str.length,
+            }],
+        }
+    }
+    function processUntilFirstNotIncludedCharacter(
+        loopState: ILoopState,
+        isIncludedCharacter: (char: number) => boolean,
+        onEndOfToken: () => TokenReturnType,
+    ): null | PreToken {
+
+        return loopState.whileLoop(
+            (nextChar) => {
+
+                //first check if we are breaking out of an nonwrapped string. Can only be done by checking the character that comes directly after the nonwrapped string
+                if (!isIncludedCharacter(nextChar)) {
+
+                    return loopState.ensureFlushed(onEndOfToken)
+
+                    //this character does not belong to the keyword so don't go to the next character by breaking
+                } else {
+                    //normal character
+                    //don't flush
+                    return {
+                        startSnippet: true,
+                        consumeCharacter: true,
+                        preToken: null,
+                    }
+                }
+            }
+        )
+    }
+    return {
+        handleDanglingToken: () => {
+            const ct = currentToken
             switch (ct[0]) {
                 case TokenType.BLOCK_COMMENT: {
                     onError({
@@ -344,68 +397,20 @@ export function createPreTokenizer(
                 default:
                     return assertUnreachable(ct[0])
             }
-        }
-        private handleNewlineCharacter(
-            fnlc: FoundNewlineCharacter,
-            nextChar: number,
-        ): TokenReturnType {
-            switch (fnlc.type) {
-                case FoundNewlineCharacterType.CARRIAGE_RETURN: {
-                    /*
-                    if nextChar === Whitespace.lineFeed
-                        windows style newlines (\r\n)
-                    else
-                        old style Mac OS newlines (\r)
-                    */
-                    return {
-                        consumeCharacter: nextChar === Whitespace.lineFeed,
-                        preToken: changeCurrentTokenType(
-                            [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
-                            {
-                                type: [PreTokenDataType.NewLine, {
-                                    range: createRangeFromLocations(fnlc.startLocation, locationState.getCurrentLocation()),
-                                }],
-                            }
-                        ),
-                    }
+        },
+        createNextToken: (loopState) => {
 
-                }
-                case FoundNewlineCharacterType.LINE_FEED: {
-                    /*
-                    if nextChar === Whitespace.carriageReturn
-                        //strange style newline (\n\r)
-                    else
-                        //unix style newlines (\n)
-                        //don't consume character
-                    */
-                    return {
-                        consumeCharacter: nextChar === Whitespace.carriageReturn,
-                        preToken: changeCurrentTokenType(
-                            [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
-                            {
-                                type: [PreTokenDataType.NewLine, {
-                                    range: createRangeFromLocations(fnlc.startLocation, locationState.getCurrentLocation()),
-                                }],
-                            }
-                        ),
-                    }
-                }
-                default:
-                    return assertUnreachable(fnlc.type)
-            }
-        }
-        public createNextToken(currentChunk: IChunk): null | PreToken {
-            const currentTokenType2 = currentTokenType
-            switch (currentTokenType2[0]) {
+            switch (currentToken[0]) {
                 case TokenType.BLOCK_COMMENT: {
-                    const $$ = currentTokenType2[1]
-                    return this.whileLoop(
-                        currentChunk,
-                        (nextChar, snippet) => {
+                    const $$ = currentToken[1]
+
+                    return loopState.whileLoop(
+                        (nextChar) => {
                             if ($$.locationOfFoundAsterisk !== null) {
                                 if (nextChar === CommentChar.solidus) {
                                     //end of block comment
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: true,
                                         preToken: changeCurrentTokenType(
                                             [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
@@ -421,22 +426,27 @@ export function createPreTokenizer(
 
                                     //don't consume next token yet
                                     $$.locationOfFoundAsterisk = null
-                                    return { consumeCharacter: false, preToken: this.flushString("*") }
+                                    return {
+                                        startSnippet: false,
+                                        consumeCharacter: false,
+                                        preToken: flushString("*"),
+                                    }
                                 }
                             } else {
 
                                 if (nextChar === CommentChar.asterisk) {
-                                    return snippet.ensureFlushed(() => {
+                                    return loopState.ensureFlushed(() => {
                                         $$.locationOfFoundAsterisk = locationState.getCurrentLocation()
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: null,
                                         }
                                     })
 
                                 } else {
-                                    snippet.start()
                                     return {
+                                        startSnippet: true,
                                         consumeCharacter: true,
                                         preToken: null,
                                     }
@@ -447,14 +457,16 @@ export function createPreTokenizer(
                     )
                 }
                 case TokenType.LINE_COMMENT: {
-                    return this.processUntilFirstNotIncludedCharacter(
-                        currentChunk,
-                        char => {
+
+                    return processUntilFirstNotIncludedCharacter(
+                        loopState,
+                        (char) => {
                             return char !== Whitespace.lineFeed &&
                                 char !== Whitespace.carriageReturn
                         },
                         () => {
                             return {
+                                startSnippet: false,
                                 consumeCharacter: false,
                                 preToken: changeCurrentTokenType(
                                     [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
@@ -469,17 +481,17 @@ export function createPreTokenizer(
                     )
                 }
                 case TokenType.NONE: {
-                    return this.whileLoop(
-                        currentChunk,
-                        nextChar => {
+                    const $ = currentToken[1]
+                    return loopState.whileLoop(
+                        (nextChar) => {
 
-                            const $ = currentTokenType2[1]
                             if ($.foundNewlineCharacter !== null) {
-                                return this.handleNewlineCharacter($.foundNewlineCharacter, nextChar)
+                                return handleNewlineCharacter($.foundNewlineCharacter, nextChar)
                             } else if ($.foundSolidus !== null) {
 
                                 if (nextChar === CommentChar.solidus) {
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: true,
                                         preToken: changeCurrentTokenType(
                                             [TokenType.LINE_COMMENT],
@@ -494,6 +506,7 @@ export function createPreTokenizer(
                                 } else if (nextChar === CommentChar.asterisk) {
 
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: true,
                                         preToken: changeCurrentTokenType(
                                             [TokenType.BLOCK_COMMENT, { locationOfFoundAsterisk: null }],
@@ -512,6 +525,7 @@ export function createPreTokenizer(
                                     })
                                     $.foundSolidus = null
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: false,
                                         preToken: null,
                                     }
@@ -527,6 +541,7 @@ export function createPreTokenizer(
                                             startLocation: locationState.getCurrentLocation(),
                                         }
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: null,
                                         }
@@ -538,12 +553,14 @@ export function createPreTokenizer(
                                             startLocation: locationState.getCurrentLocation(),
                                         }
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: null,
                                         }
                                     }
                                     case Whitespace.space: {
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: false,
                                             preToken: changeCurrentTokenType(
                                                 [TokenType.WHITESPACE],
@@ -558,12 +575,14 @@ export function createPreTokenizer(
                                     case CommentChar.solidus: {
                                         $.foundSolidus = locationState.getCurrentLocation()
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: null,
                                         }
                                     }
                                     case Whitespace.tab: {
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: false,
                                             preToken: changeCurrentTokenType(
                                                 [TokenType.WHITESPACE],
@@ -577,6 +596,7 @@ export function createPreTokenizer(
                                     }
                                     case WrappedString.apostrophe: {
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: changeCurrentTokenType(
                                                 [TokenType.WRAPPED_STRING, {
@@ -596,6 +616,7 @@ export function createPreTokenizer(
                                     }
                                     case WrappedString.backtick: {
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: changeCurrentTokenType(
                                                 [TokenType.WRAPPED_STRING, {
@@ -617,6 +638,7 @@ export function createPreTokenizer(
                                     }
                                     case WrappedString.quotationMark: {
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: changeCurrentTokenType(
                                                 [TokenType.WRAPPED_STRING, {
@@ -637,6 +659,7 @@ export function createPreTokenizer(
                                     default: {
                                         function createStructuralToken(type: StructuralTokenType): TokenReturnType {
                                             return {
+                                                startSnippet: false,
                                                 consumeCharacter: true,
                                                 preToken: {
                                                     type: [PreTokenDataType.Structural, {
@@ -651,8 +674,16 @@ export function createPreTokenizer(
                                             case Structural.closeBrace: return createStructuralToken(["close dictionary"])
                                             case Structural.closeBracket: return createStructuralToken(["close list"])
                                             case Structural.closeParen: return createStructuralToken(["close verbose group"])
-                                            case Structural.colon: return { consumeCharacter: true, preToken: null }
-                                            case Structural.comma: return { consumeCharacter: true, preToken: null }
+                                            case Structural.colon: return {
+                                                startSnippet: false,
+                                                consumeCharacter: true,
+                                                preToken: null,
+                                            }
+                                            case Structural.comma: return {
+                                                startSnippet: false,
+                                                consumeCharacter: true,
+                                                preToken: null,
+                                            }
                                             case Structural.exclamationMark: return createStructuralToken(["header start"])
                                             case Structural.openAngleBracket: return createStructuralToken(["open shorthand group"])
                                             case Structural.openBrace: return createStructuralToken(["open dictionary"])
@@ -661,6 +692,7 @@ export function createPreTokenizer(
                                             case Structural.verticalLine: return createStructuralToken(["tagged union start"])
                                             default:
                                                 return {
+                                                    startSnippet: false,
                                                     consumeCharacter: false,
                                                     preToken: changeCurrentTokenType(
                                                         [TokenType.NONWRAPPED_STRING],
@@ -683,18 +715,18 @@ export function createPreTokenizer(
                     /**
                      * QUOTED STRING PROCESSING
                      */
-                    const $ = currentTokenType2[1]
+                    const $ = currentToken[1]
 
-                    return this.whileLoop(
-                        currentChunk,
-                        (nextChar, snippet): TokenReturnType => {
+                    return loopState.whileLoop(
+                        (nextChar) => {
 
                             if ($.slashed) {
                                 const flushChar = (str: string): TokenReturnType => {
                                     $.slashed = false
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: true,
-                                        preToken: this.flushString(str),
+                                        preToken: flushString(str),
                                     }
                                 }
 
@@ -709,9 +741,10 @@ export function createPreTokenizer(
                                 else if (nextChar === WrappedString.f) { return flushChar('\f') }
                                 else if (nextChar === WrappedString.n) {
                                     if ($.startCharacter === WrappedString.backtick) {
-                                        return snippet.ensureFlushed(() => {
+                                        return loopState.ensureFlushed(() => {
                                             $.slashed = false
                                             return {
+                                                startSnippet: false,
                                                 consumeCharacter: true,
                                                 preToken: {
                                                     type: [PreTokenDataType.NewLine, {
@@ -728,8 +761,9 @@ export function createPreTokenizer(
                                     if ($.startCharacter === WrappedString.backtick) {
                                         $.slashed = false
 
-                                        return snippet.ensureFlushed(() => {
+                                        return loopState.ensureFlushed(() => {
                                             return {
+                                                startSnippet: false,
                                                 consumeCharacter: true,
                                                 preToken: {
                                                     type: [PreTokenDataType.NewLine, {
@@ -751,6 +785,7 @@ export function createPreTokenizer(
                                         foundCharacters: "",
                                     }
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: true,
                                         preToken: null,
                                     }
@@ -767,6 +802,7 @@ export function createPreTokenizer(
                                         range: getCurrentCharacterRange(locationState),
                                     })
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: true,
                                         preToken: null,
                                     }
@@ -798,11 +834,13 @@ export function createPreTokenizer(
                                     const textNode = String.fromCharCode(parseInt($.unicode.foundCharacters, 16))
                                     $.unicode = null
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: true,
-                                        preToken: this.flushString(textNode),
+                                        preToken: flushString(textNode),
                                     }
                                 } else {
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: true,
                                         preToken: null,
                                     }
@@ -820,6 +858,7 @@ export function createPreTokenizer(
                                         const fnlc = $.foundNewlineCharacter
                                         $.foundNewlineCharacter = null
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: nextChar === Whitespace.lineFeed,
                                             preToken: {
                                                 type: [PreTokenDataType.NewLine, {
@@ -840,6 +879,7 @@ export function createPreTokenizer(
                                         const fnlc = $.foundNewlineCharacter
                                         $.foundNewlineCharacter = null
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: nextChar === Whitespace.carriageReturn,
                                             preToken: {
                                                 type: [PreTokenDataType.NewLine, {
@@ -854,9 +894,10 @@ export function createPreTokenizer(
                             } else {
                                 //not slashed, not unicode, not newline
                                 if (nextChar === WrappedString.reverseSolidus) {//backslash
-                                    return snippet.ensureFlushed(() => {
+                                    return loopState.ensureFlushed(() => {
                                         $.slashed = true
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: null,
                                         }
@@ -866,10 +907,11 @@ export function createPreTokenizer(
                                      * THE QUOTED STRING IS FINISHED
                                      */
 
-                                    return snippet.ensureFlushed(() => {
+                                    return loopState.ensureFlushed(() => {
                                         const rangeInfo = getCurrentCharacterRange(locationState)
 
                                         return {
+                                            startSnippet: false,
                                             consumeCharacter: true,
                                             preToken: changeCurrentTokenType(
                                                 [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
@@ -885,19 +927,20 @@ export function createPreTokenizer(
                                 } else if (nextChar === Whitespace.carriageReturn || nextChar === Whitespace.lineFeed) {
                                     if ($.startCharacter === WrappedString.backtick) { //multiline
 
-                                        return snippet.ensureFlushed(() => {
+                                        return loopState.ensureFlushed(() => {
 
                                             $.foundNewlineCharacter = {
                                                 type: nextChar === Whitespace.carriageReturn ? FoundNewlineCharacterType.CARRIAGE_RETURN : FoundNewlineCharacterType.LINE_FEED,
                                                 startLocation: locationState.getCurrentLocation(),
                                             }
                                             return {
+                                                startSnippet: false,
                                                 consumeCharacter: true,
                                                 preToken: null,
                                             }
                                         })
                                     } else {
-                                        return snippet.ensureFlushed(() => {
+                                        return loopState.ensureFlushed(() => {
                                             const rangeInfo = getCurrentCharacterRange(locationState)
                                             onError({
                                                 error: { type: ["unterminated string"] },
@@ -905,7 +948,9 @@ export function createPreTokenizer(
                                             })
 
                                             return {
-                                                consumeCharacter: true, preToken: changeCurrentTokenType(
+                                                startSnippet: false,
+                                                consumeCharacter: true,
+                                                preToken: changeCurrentTokenType(
                                                     [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
                                                     {
                                                         type: [PreTokenDataType.WrappedStringEnd, {
@@ -920,8 +965,8 @@ export function createPreTokenizer(
                                 } else {
                                     //normal character
                                     //don't flush
-                                    snippet.start()
                                     return {
+                                        startSnippet: true,
                                         consumeCharacter: true,
                                         preToken: null,
                                     }
@@ -935,8 +980,9 @@ export function createPreTokenizer(
                     /**
                      * nonwrapped string PROCESSING (null, true, false)
                      */
-                    return this.processUntilFirstNotIncludedCharacter(
-                        currentChunk,
+
+                    return processUntilFirstNotIncludedCharacter(
+                        loopState,
                         (char: number) => {
                             const isOtherCharacter = (false
                                 || char === Whitespace.carriageReturn
@@ -965,6 +1011,7 @@ export function createPreTokenizer(
                         },
                         () => {
                             return {
+                                startSnippet: false,
                                 consumeCharacter: false,
                                 preToken: changeCurrentTokenType(
                                     [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
@@ -982,14 +1029,13 @@ export function createPreTokenizer(
                     /**
                      * nonwrapped string PROCESSING (null, true, false)
                      */
-
-                    return this.whileLoop(
-                        currentChunk,
-                        (nextChar, snippet) => {
+                    return loopState.whileLoop(
+                        (nextChar) => {
                             //first check if we are breaking out of an whitespace token. Can only be done by checking the character that comes directly after the whitespace token
                             if (nextChar !== Whitespace.space && nextChar !== Whitespace.tab) {
-                                return snippet.ensureFlushed(() => {
+                                return loopState.ensureFlushed(() => {
                                     return {
+                                        startSnippet: false,
                                         consumeCharacter: false,
                                         preToken: changeCurrentTokenType(
                                             [TokenType.NONE, { foundNewlineCharacter: null, foundSolidus: null }],
@@ -1003,20 +1049,18 @@ export function createPreTokenizer(
                                 })
                             } else {
                                 //whitespace character
-                                snippet.start()
                                 return {
+                                    startSnippet: true,
                                     consumeCharacter: true,
                                     preToken: null,
                                 }
                             }
                         }
                     )
-
                 }
                 default:
-                    return assertUnreachable(currentTokenType2[0])
+                    return assertUnreachable(currentToken[0])
             }
-        }
+        },
     }
-    return new PreTokenizer()
 }

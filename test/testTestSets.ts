@@ -95,30 +95,30 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
 
         }
         const structureParser = astn.createStructureParser<astn.TokenizerAnnotationData>({
-            onEmbeddedSchema: _schemaSchemaName => {
+            onEmbeddedSchema: (_schemaSchemaName) => {
                 actualEvents.push(["token", "schema data start"])
                 return createLogger()
             },
-            onSchemaReference: $$ => {
+            onSchemaReference: ($$) => {
                 actualEvents.push(["token", "schema data start"])
                 actualEvents.push(["token", "simple string", $$.token.data.value, getRange(test.testForLocation, $$.token.annotation.range)])
                 return p.value(false)
             },
-            onBody: _annotation => {
+            onBody: (_annotation) => {
                 if (test.testHeaders) {
                     actualEvents.push(["instance data start"])
                 }
                 return createLogger()
             },
             errors: {
-                onStructureError: $ => {
+                onStructureError: ($) => {
                     actualEvents.push(["parsingerror", astn.printStructureError($.error)])
                 },
-                onTreeError: $ => {
+                onTreeError: ($) => {
                     actualEvents.push(["parsingerror", astn.printTreeParserError($.error)])
                 },
             },
-            onEnd: _annotation => {
+            onEnd: (_annotation) => {
                 actualEvents.push(["end", getLocation(test.testForLocation, astn.getEndLocationFromRange(_annotation.range))])
                 return p.value(null)
             },
@@ -127,8 +127,13 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
         return p20.createArray(chunks).streamify().consume(
             null,
             astn.createStreamPreTokenizer(
-                astn.createTokenizer(structureParser),
-                $ => {
+                astn.createTokenizer(
+                    structureParser,
+                    (error) => {
+                        actualEvents.push(["parsingerror", astn.printTokenizerError(error)])
+                    },
+                ),
+                ($) => {
                     actualEvents.push(["parsingerror", astn.printTokenError($.error)])
                 },
             ),
@@ -162,14 +167,14 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
 
 describe('astn', () => {
     describe('#strictJSON', () => {
-        selectedOwnJSONTests.forEach(key => {
+        selectedOwnJSONTests.forEach((key) => {
             const test = ownJSONTests[key]
             it('[' + key + '] should be able to parse -> one chunk', createTestFunction([test.text], test, true));
             it('[' + key + '] should be able to parse -> every character is a chunck', createTestFunction(test.text.split(''), test, true));
         })
     })
     describe('#extensions', () => {
-        selectedExtensionTests.forEach(key => {
+        selectedExtensionTests.forEach((key) => {
             const test = extensionTests[key]
             it('[' + key + '] should be able to parse -> one chunk', createTestFunction([test.text], test, false));
             it('[' + key + '] should be able to parse -> every character is a chunck', createTestFunction(test.text.split(''), test, false));
@@ -177,7 +182,7 @@ describe('astn', () => {
     });
 
     describe('#pre-chunked', () => {
-        selectedOwnJSONTests.forEach(key => {
+        selectedOwnJSONTests.forEach((key) => {
             const test = ownJSONTests[key]
             if (!test.chunks) return;
             it('[' + key + '] should be able to parse pre-chunked', createTestFunction(test.chunks, test, true));

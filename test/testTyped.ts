@@ -100,7 +100,7 @@ function deepEqualJSON(
 export function directoryTests(): void {
 
     describe("'tests' directory", () => {
-        fs.readdirSync(testsDir).forEach(dir => {
+        fs.readdirSync(testsDir).forEach((dir) => {
             const testDirPath = path.join(testsDir, dir)
             const serializedDatasetPath = path.join(testDirPath, "data.astn.test")
             //const expectedOutputPath = path.join(testDirPath, "expected.astn.test")
@@ -115,19 +115,19 @@ export function directoryTests(): void {
                 return astn.createProcessorForASTNStreamWithContext(
                     path.basename(serializedDatasetPath),
                     path.dirname(serializedDatasetPath),
-                    name => {
+                    (name) => {
                         if (name !== "astn/schema@0.1") {
                             return null
                         }
                         return astn.createASTNSchemaBuilder()
                     },
                     readFileFromFileSystem,
-                    schemaID => {
+                    (schemaID) => {
                         return readFileFromFileSystem(__dirname + "../../../test/schema", schemaID)
                     },
                     getRootHandler,
                     onError,
-                ).mapResult(sp => {
+                ).mapResult((sp) => {
 
                     return p20.createArray(
                         [serializedDataset]
@@ -144,7 +144,7 @@ export function directoryTests(): void {
                         (error, severity, range) => {
                             actualIssues.push([error + (range === null ? "" : ` @ ${astn.printRange(range)}`), null, severity === astn.DiagnosticSeverity.warning ? "warning" : "error"])
                         },
-                        schema => schema.schemaAndSideEffects.createStreamingValidator(
+                        (schema) => schema.schemaAndSideEffects.createStreamingValidator(
                             (error, annotation, severity) => {
                                 actualIssues.push([error, astn.printRange(annotation.range), severity === astn.DiagnosticSeverity.warning ? "warning" : "error"])
                             }
@@ -183,21 +183,21 @@ export function directoryTests(): void {
                         () => {
 
                         },
-                        rs => createTypedSerializer(
+                        (rs) => createTypedSerializer(
                             rs,
-                            str => {
+                            (str) => {
                                 out += str
                             }
                         ),
                     ).mapResult(() => {
                         return p.value(out)
                     }).convertToNativePromise(
-                    ).then(serialized => {
+                    ).then((serialized) => {
                         deepEqual(
                             testDirPath,
                             "output",
                             file,
-                            str => str,
+                            (str) => str,
                             serialized,
                             serialized,
                         )

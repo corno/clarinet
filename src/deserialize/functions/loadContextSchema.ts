@@ -35,7 +35,7 @@ export function loadContextSchema(
     return data.getContextSchema(
         data.dirname,
         schemaFileName,
-    ).mapError<ContextSchema<TokenizerAnnotationData, null>>(error => {
+    ).mapError<ContextSchema<TokenizerAnnotationData, null>>((error) => {
         switch (error[0]) {
             case "not found": {
                 //this is okay, the context schema is optional
@@ -52,23 +52,23 @@ export function loadContextSchema(
                 return assertUnreachable(error[0])
         }
     }).mapResult<ContextSchema<TokenizerAnnotationData, null>>(
-        stream => {
+        (stream) => {
             return loadExternalSchema(
                 stream,
                 getSchemaSchemaBuilder,
-                error => {
+                (error) => {
                     onError(["external schema resolving", error], DiagnosticSeverity.error)
                 },
             ).reworkAndCatch<ContextSchema<TokenizerAnnotationData, null>>(
-                _error => {
+                (_error) => {
                     return p.value(["has errors"])
                 },
-                schema => {
+                (schema) => {
                     return p.value(["available", schema])
                 }
             )
         }
-    ).catch(error => {
+    ).catch((error) => {
         return p.value(error)
     })
 }

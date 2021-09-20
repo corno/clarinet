@@ -36,10 +36,10 @@ export function createHoverTextsGenerator<TokenAnnotation, NonTokenAnnotation>(
             }
         }
         return {
-            onDictionary: $ => {
+            onDictionary: ($) => {
                 addOnToken($.token)
                 return {
-                    onClose: $ => {
+                    onClose: ($) => {
                         addOnToken($.token)
                     },
                     onEntry: () => {
@@ -47,10 +47,10 @@ export function createHoverTextsGenerator<TokenAnnotation, NonTokenAnnotation>(
                     },
                 }
             },
-            onList: $ => {
+            onList: ($) => {
                 addOnToken($.token)
                 return {
-                    onClose: $ => {
+                    onClose: ($) => {
                         addOnToken($.token)
                     },
                     onElement: () => {
@@ -58,13 +58,13 @@ export function createHoverTextsGenerator<TokenAnnotation, NonTokenAnnotation>(
                     },
                 }
             },
-            onTaggedUnion: $ => {
+            onTaggedUnion: ($) => {
                 addOnToken($.token)
                 return {
                     onUnexpectedOption: () => {
                         return createValueHoverTextGenerator(null)
                     },
-                    onOption: $ => {
+                    onOption: ($) => {
                         addOnToken($.token)
                         return createValueHoverTextGenerator(null)
                     },
@@ -72,28 +72,28 @@ export function createHoverTextsGenerator<TokenAnnotation, NonTokenAnnotation>(
                     },
                 }
             },
-            onSimpleString: $ => {
+            onSimpleString: ($) => {
                 addOnToken($.token)
             },
-            onMultilineString: $ => {
+            onMultilineString: ($) => {
                 addOnToken($.token)
             },
             onTypeReference: () => {
                 return createValueHoverTextGenerator(name)
             },
-            onGroup: $ => {
+            onGroup: ($) => {
                 switch ($.type[0]) {
                     case "mixin":
                         break
                     case "omitted":
                         break
                     case "verbose":
-                        cc($.type[1], $ => {
+                        cc($.type[1], ($) => {
                             addOnToken($)
                         })
                         break
                     case "shorthand":
-                        cc($.type[1], $ => {
+                        cc($.type[1], ($) => {
                             addOnToken($)
                         })
                         break
@@ -104,10 +104,10 @@ export function createHoverTextsGenerator<TokenAnnotation, NonTokenAnnotation>(
                     onUnexpectedProperty: () => {
                         //
                     },
-                    onProperty: $ => {
+                    onProperty: ($) => {
                         return createValueHoverTextGenerator($.key)
                     },
-                    onClose: $ => {
+                    onClose: ($) => {
                         addOnToken($.token)
                     },
                 }

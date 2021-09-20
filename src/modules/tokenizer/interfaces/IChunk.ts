@@ -1,7 +1,7 @@
 
 export interface IChunk {
     lookahead(): number | null
-    getIndexOfNextCharacter(): number
+    getCurrentIndex(): number
     getString(): string
     increaseIndex(): void
 }

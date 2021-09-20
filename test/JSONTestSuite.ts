@@ -28,7 +28,8 @@ function tokenizeStrings(
                         return p.value(null)
                     },
 
-                })
+                }),
+                onError,
             ),
             onError,
         )
@@ -37,7 +38,7 @@ function tokenizeStrings(
 
 const parsingDir = path.join(__dirname, "/../../test/data/JSONTestSuite/test_parsing")
 describe('parsing', () => {
-    fs.readdirSync(parsingDir).forEach(file => {
+    fs.readdirSync(parsingDir).forEach((file) => {
         it(file, () => {
             const expected = file[0]
             switch (expected) {
@@ -95,7 +96,7 @@ describe('parsing', () => {
 
 const transformDir = path.join(__dirname, "/../../test/data/JSONTestSuite/test_transform")
 describe('transform', () => {
-    fs.readdirSync(transformDir).forEach(file => {
+    fs.readdirSync(transformDir).forEach((file) => {
         it(file, () => {
             try {
                 const data = fs.readFileSync(path.join(transformDir, file), { encoding: "utf-8" })

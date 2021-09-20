@@ -38,7 +38,7 @@ export function createCodeCompletionFinder(
         if (gs !== null) {
             const codeCompletions = gs()
             //console.log(codeCompletions)
-            codeCompletions.forEach(codeCompletion => {
+            codeCompletions.forEach((codeCompletion) => {
                 //console.log("codeCompletion", codeCompletion)
                 callback(codeCompletion)
             })

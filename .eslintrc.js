@@ -72,7 +72,7 @@ module.exports = {
         "@typescript-eslint/unified-signatures": "error",
         "arrow-parens": [
             "error",
-            "as-needed"
+            "always"
         ],
         "camelcase": "error",
         "comma-dangle": [

@@ -8,15 +8,15 @@ export function createMarshallInterface(
 ): serialize.IMarshallableDataset {
     function createValueSerializeInterface(value: Value): serialize.IMarshallableValue {
         return {
-            toDictionary: callback => {
+            toDictionary: (callback) => {
                 if (value.type === null || value.type[0] !== "dictionary") {
                     throw new Error("Unexpected: missing or invalid dictionary")
                 }
                 const dict = value.type[1]
                 callback({
                     entries: {
-                        forEach: callback2 => {
-                            Object.keys(dict).forEach(key => {
+                        forEach: (callback2) => {
+                            Object.keys(dict).forEach((key) => {
                                 callback2(createValueSerializeInterface(dict[key]), key)
                             })
                         },
@@ -24,7 +24,7 @@ export function createMarshallInterface(
                     },
                 })
             },
-            toGroup: callback => {
+            toGroup: (callback) => {
                 if (value.type === null || value.type[0] !== "group") {
                     throw new Error("Unexpected: missing or invalid group")
                 }
@@ -39,15 +39,15 @@ export function createMarshallInterface(
                     },
                 })
             },
-            toList: callback => {
+            toList: (callback) => {
                 if (value.type === null || value.type[0] !== "list") {
                     throw new Error("Unexpected: missing or invalid list")
                 }
                 const list = value.type[1]
                 callback({
                     elements: {
-                        forEach: callback2 => {
-                            list.forEach(e => {
+                        forEach: (callback2) => {
+                            list.forEach((e) => {
                                 callback2(createValueSerializeInterface(e))
                             })
                         },
@@ -56,19 +56,19 @@ export function createMarshallInterface(
                     },
                 })
             },
-            toMultilineString: callback => {
+            toMultilineString: (callback) => {
                 if (value.type === null || value.type[0] !== "multiline string") {
                     throw new Error("Unexpected: missing or invalid multiline string")
                 }
                 callback(value.type[1])
             },
-            toSimpleString: callback => {
+            toSimpleString: (callback) => {
                 if (value.type === null || value.type[0] !== "simple string") {
                     throw new Error("Unexpected: missing or invalid simple string")
                 }
                 callback(value.type[1])
             },
-            toTaggedUnion: callback => {
+            toTaggedUnion: (callback) => {
                 if (value.type === null || value.type[0] !== "tagged union") {
                     throw new Error("Unexpected: missing or invalid tagged union")
                 }

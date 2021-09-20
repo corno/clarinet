@@ -37,7 +37,7 @@ export function printExpectError(issue: ExpectError): string {
         }
         case "unexpected property": {
             const $ = issue[1]
-            return `unexpected property: '${$["found key"]}'. Choose from ${$["valid keys"].map($ => `'${$}'`).join(", ")}`
+            return `unexpected property: '${$["found key"]}'. Choose from ${$["valid keys"].map(($) => `'${$}'`).join(", ")}`
         }
         case "duplicate entry": {
             const $ = issue[1]
@@ -95,11 +95,11 @@ export function printExpectError(issue: ExpectError): string {
         }
         case "elements missing": {
             const $ = issue[1]
-            return `${$.names.length} missing element(s): ${$.names.map($ => `'${$}'`).join(", ")}`
+            return `${$.names.length} missing element(s): ${$.names.map(($) => `'${$}'`).join(", ")}`
         }
         case "unknown option": {
             const $ = issue[1]
-            return `unknown option '${$.found}', choose from ${$["valid options"].map($ => `'${$}'`).join(", ")} `
+            return `unknown option '${$.found}', choose from ${$["valid options"].map(($) => `'${$}'`).join(", ")} `
         }
         default:
             return assertUnreachable(issue[0])

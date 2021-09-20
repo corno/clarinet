@@ -1,6 +1,6 @@
-import * as core from "../src"
-import { formatCLI } from "./formatCLI";
+import { normalize } from "../src/normalizeText"
+import { runProgram } from "../src/runProgram"
 
-formatCLI(
-    core.createASTNSerializer,
+runProgram(
+    normalize
 )

@@ -1,16 +1,16 @@
 /* eslint
+    complexity: off
 */
 import * as p from "pareto"
 
 import * as rng from "../types/range"
-import { TokenType } from "../../parser/types/rawToken"
+import { Comments, TokenType } from "../../parser/types/rawToken"
 import { TokenizerAnnotationData } from "../types/TokenizerAnnotationData"
 
 import { IParser } from "../../parser/interfaces/IParser"
-import { IPreTokenStreamConsumer} from "../interfaces/IPreTokenStreamConsumer"
+import { IPreTokenStreamConsumer } from "../interfaces/IPreTokenStreamConsumer"
 
 import { getEndLocationFromRange } from "./getEndLocationFromRange"
-import { printRange } from "./printRange"
 import { PreToken, PreTokenDataType, WrappedStringType } from "../types/PreToken"
 
 function createRangeFromLocations(start: rng.Location, end: rng.Location): rng.Range {
@@ -82,68 +82,60 @@ type CurrentToken =
     | [CurrentTokenType.QUOTED_STRING, WrappedStringContext]
     | [CurrentTokenType.WHITESPACE, WhitespaceContext]
 
+export type TokenizerError =
+    | ["unexpected start of token"]
+    | ["unexpected, parser is already in 'none' mode"]
+    | ["Unexpected block comment end"]
+    | ["Unexpected line comment end"]
+    | ["Unexpected nonwrapped string end"]
+    | ["Unexpected whitespace end"]
 
-export class RangeError extends Error {
-    public readonly range: rng.Range
-    /**
-     * as a RangeError extends a regular Error, it will have a message. In this message there will be range information
-     * If you need a message without the range information, use this property
-     */
-    public readonly rangeLessMessage: string
-    constructor(message: string, range: rng.Range) {
-        super(`${message} @ ${printRange(range)}`)
-        this.rangeLessMessage = message
-        this.range = range
-    }
-}
-
-class TokenizerStackPanicError extends RangeError {
-    constructor(message: string, range: rng.Range) {
-        super(`stack panic: ${message}`, range)
-    }
+export function printTokenizerError(error: TokenizerError): string {
+    return error[0]
 }
 
 export function createTokenizer(
     parser: IParser<TokenizerAnnotationData>,
+    onError: (msg: TokenizerError, range: rng.Range) => void,
 ): IPreTokenStreamConsumer {
 
-    class IndentationState {
-        private indentation = ""
-        private lineIsDirty = false
-        setLineDirty() {
-            this.lineIsDirty = true
-        }
-        onWhitespace(value: string) {
-            if (!this.lineIsDirty) {
-                this.indentation = value
-            }
-        }
-        onNewline() {
-            this.indentation = ""
-            this.lineIsDirty = false
-        }
-        getIndentation() {
-            return this.indentation
-        }
-    }
 
-    const indentationState = new IndentationState()
+    const indentationState = (() => {
+        let indentation = ""
+        let lineIsDirty = false
+        return {
+            setLineDirty: () => {
+                lineIsDirty = true
+            },
+            onWhitespace: (value: string) => {
+                if (!lineIsDirty) {
+                    indentation = value
+                }
+            },
+            onNewline: () => {
+                indentation = ""
+                lineIsDirty = false
+            },
+            getIndentation: () => {
+                return indentation
+            },
+        }
+    })()
 
     function createAnnotation(
         range: rng.Range,
-        //tokenString: string | null,
     ): TokenizerAnnotationData {
         return {
-            //tokenString: tokenString,
             range: range,
             indentation: indentationState.getIndentation(),
-            // contextData: {
-            //     before: {
-            //         comments: [],
-            //     },
-            //     lineCommentAfter: null,
-            // },
-
+        }
+    }
+    function createComments(
+    ): Comments {
+        //console.log("COMMENTS")
+        return {
+            before: [],
+            after: null,
         }
     }
     let currentToken: CurrentToken = [CurrentTokenType.NONE]
@@ -151,13 +143,13 @@ export function createTokenizer(
 
     function setCurrentToken(contextType: CurrentToken, range: rng.Range) {
         if (currentToken[0] !== CurrentTokenType.NONE) {
-            throw new TokenizerStackPanicError(`unexpected start of token`, range)
+            onError(["unexpected start of token"], range)
         }
         currentToken = contextType
     }
     function unsetCurrentToken(range: rng.Range) {
         if (currentToken[0] === CurrentTokenType.NONE) {
-            throw new TokenizerStackPanicError(`unexpected, parser is already in 'none' mode`, range)
+            onError(["unexpected, parser is already in 'none' mode"], range)
         }
         currentToken = [CurrentTokenType.NONE]
     }
@@ -181,7 +173,7 @@ export function createTokenizer(
                     const $ = data.type[1]
 
                     if (currentToken[0] !== CurrentTokenType.BLOCK_COMMENT) {
-                        throw new TokenizerStackPanicError(`Unexpected block comment end`, $.range)
+                        onError(["Unexpected block comment end"], $.range)
                     }
                     //const $ = currentToken[1]
                     //const endOfStart = getEndLocationFromRange($.start)
@@ -234,7 +226,7 @@ export function createTokenizer(
                     function onLineCommentEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.LINE_COMMENT) {
-                            throw new TokenizerStackPanicError(`Unexpected line comment end`, createRangeFromSingleLocation(location))
+                            onError(["Unexpected line comment end"], createRangeFromSingleLocation(location))
                         }
 
                         //const $ = currentToken[1]
@@ -318,6 +310,7 @@ export function createTokenizer(
                     const $ = data.type[1]
                     indentationState.setLineDirty()
                     return parser.onToken({
+                        comments: createComments(),
                         annotation: createAnnotation(
                             $.range,
                         ),
@@ -328,44 +321,40 @@ export function createTokenizer(
                     })
                 }
                 case PreTokenDataType.Snippet: {
-                    const $ = data.type[1]
-                    function onSnippet(chunk: string, begin: number, end: number): p.IValue<boolean> {
-
-                        switch (currentToken[0]) {
-                            case CurrentTokenType.LINE_COMMENT: {
-                                const $ = currentToken[1]
-                                $.commentNode += chunk.substring(begin, end)
-                                break
-                            }
-                            case CurrentTokenType.BLOCK_COMMENT: {
-                                const $ = currentToken[1]
-                                $.commentNode += chunk.substring(begin, end)
-                                break
-                            }
-                            case CurrentTokenType.NONE: {
-                                throw new Error(`unexpected snippet`)
-                            }
-                            case CurrentTokenType.QUOTED_STRING: {
-                                const $ = currentToken[1]
-                                $.wrappedStringNode += chunk.substring(begin, end)
-                                break
-                            }
-                            case CurrentTokenType.NONWRAPPED_STRING: {
-                                const $ = currentToken[1]
-                                $.nonwrappedStringNode += chunk.substring(begin, end)
-                                break
-                            }
-                            case CurrentTokenType.WHITESPACE: {
-                                const $ = currentToken[1]
-                                $.whitespaceNode += chunk.substring(begin, end)
-                                break
-                            }
-                            default:
-                                assertUnreachable(currentToken[0])
+                    const $$ = data.type[1]
+                    switch (currentToken[0]) {
+                        case CurrentTokenType.LINE_COMMENT: {
+                            const $ = currentToken[1]
+                            $.commentNode += $$.chunk.substring($$.begin, $$.end)
+                            break
                         }
-                        return p.value(false)
+                        case CurrentTokenType.BLOCK_COMMENT: {
+                            const $ = currentToken[1]
+                            $.commentNode += $$.chunk.substring($$.begin, $$.end)
+                            break
+                        }
+                        case CurrentTokenType.NONE: {
+                            throw new Error(`unexpected snippet`)
+                        }
+                        case CurrentTokenType.QUOTED_STRING: {
+                            const $ = currentToken[1]
+                            $.wrappedStringNode += $$.chunk.substring($$.begin, $$.end)
+                            break
+                        }
+                        case CurrentTokenType.NONWRAPPED_STRING: {
+                            const $ = currentToken[1]
+                            $.nonwrappedStringNode += $$.chunk.substring($$.begin, $$.end)
+                            break
+                        }
+                        case CurrentTokenType.WHITESPACE: {
+                            const $ = currentToken[1]
+                            $.whitespaceNode += $$.chunk.substring($$.begin, $$.end)
+                            break
+                        }
+                        default:
+                            assertUnreachable(currentToken[0])
                     }
-                    return onSnippet($.chunk, $.begin, $.end)
+                    return p.value(false)
                 }
                 case PreTokenDataType.WrappedStringBegin: {
                     const $ = data.type[1]
@@ -388,67 +377,72 @@ export function createTokenizer(
                     const $ = data.type[1]
                     function onWrappedStringEnd(end: rng.Range, wrapper: string | null): p.IValue<boolean> {
                         if (currentToken[0] !== CurrentTokenType.QUOTED_STRING) {
-                            throw new TokenizerStackPanicError(`Unexpected nonwrapped string end`, end)
-                        }
-                        const $tok = currentToken[1]
-                        const $ = currentToken[1]
+                            onError(["Unexpected nonwrapped string end"], end)
+                            return p.value(false)
+                        } else {
+                            const $tok = currentToken[1]
+                            const $ = currentToken[1]
 
-                        const range = createRangeFromLocations($tok.start.start, getEndLocationFromRange(end))
+                            const range = createRangeFromLocations($tok.start.start, getEndLocationFromRange(end))
 
-                        unsetCurrentToken(end)
+                            unsetCurrentToken(end)
 
-                        switch ($.type[0]) {
-                            case "apostrophe": {
-                                return parser.onToken({
-                                    annotation: createAnnotation(
-                                        range,
-                                    ),
-                                    type: [TokenType.SimpleString, {
-                                        value: $.wrappedStringNode,
-                                        wrapping: ["apostrophe", {
-                                            terminated: wrapper !== null,
+                            switch ($.type[0]) {
+                                case "apostrophe": {
+                                    return parser.onToken({
+                                        comments: createComments(),
+                                        annotation: createAnnotation(
+                                            range,
+                                        ),
+                                        type: [TokenType.SimpleString, {
+                                            value: $.wrappedStringNode,
+                                            wrapping: ["apostrophe", {
+                                                terminated: wrapper !== null,
+                                            }],
                                         }],
-                                    }],
-                                })
-                            }
-                            case "multiline": {
-                                const $$ = $.type[1]
-                                function trimStringLines(lines: string[], indentation: string) {
-                                    return lines.map((line, index) => {
-                                        if (index === 0) { //the first line needs no trimming
-                                            return line
-                                        }
-                                        if (line.startsWith(indentation)) {
-                                            return line.substr(indentation.length)
-                                        }
-                                        return line
                                     })
                                 }
-                                return parser.onToken({
-                                    annotation: createAnnotation(
-                                        range,
-                                    ),
-                                    type: [TokenType.MultilineString, {
-                                        lines: trimStringLines($$.previousLines.concat([$.wrappedStringNode]), $.indentation),
-                                        terminated: wrapper !== null,
-                                    }],
-                                })
-                            }
-                            case "quote": {
-                                return parser.onToken({
-                                    annotation: createAnnotation(
-                                        range,
-                                    ),
-                                    type: [TokenType.SimpleString, {
-                                        value: $.wrappedStringNode,
-                                        wrapping: ["quote", {
+                                case "multiline": {
+                                    const $$ = $.type[1]
+                                    function trimStringLines(lines: string[], indentation: string) {
+                                        return lines.map((line, index) => {
+                                            if (index === 0) { //the first line needs no trimming
+                                                return line
+                                            }
+                                            if (line.startsWith(indentation)) {
+                                                return line.substr(indentation.length)
+                                            }
+                                            return line
+                                        })
+                                    }
+                                    return parser.onToken({
+                                        comments: createComments(),
+                                        annotation: createAnnotation(
+                                            range,
+                                        ),
+                                        type: [TokenType.MultilineString, {
+                                            lines: trimStringLines($$.previousLines.concat([$.wrappedStringNode]), $.indentation),
                                             terminated: wrapper !== null,
                                         }],
-                                    }],
-                                })
+                                    })
+                                }
+                                case "quote": {
+                                    return parser.onToken({
+                                        comments: createComments(),
+                                        annotation: createAnnotation(
+                                            range,
+                                        ),
+                                        type: [TokenType.SimpleString, {
+                                            value: $.wrappedStringNode,
+                                            wrapping: ["quote", {
+                                                terminated: wrapper !== null,
+                                            }],
+                                        }],
+                                    })
+                                }
+                                default:
+                                    return assertUnreachable($.type[0])
                             }
-                            default:
-                                return assertUnreachable($.type[0])
                         }
                     }
                     return onWrappedStringEnd($.range, $.wrapper)
@@ -469,7 +463,8 @@ export function createTokenizer(
                     function onNonWrappedStringEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.NONWRAPPED_STRING) {
-                            throw new TokenizerStackPanicError(`Unexpected nonwrapped string end`, createRangeFromSingleLocation(location))
+                            onError(["Unexpected nonwrapped string end"], createRangeFromSingleLocation(location))
+                            return p.value(false)
                         }
                         const $ = currentToken[1]
 
@@ -478,6 +473,7 @@ export function createTokenizer(
                         const range = createRangeFromLocations($.start, location)
                         unsetCurrentToken(createRangeFromSingleLocation(location))
                         return parser.onToken({
+                            comments: createComments(),
                             annotation: createAnnotation(
                                 range,
                             ),
@@ -509,7 +505,8 @@ export function createTokenizer(
                     function onWhitespaceEnd(location: rng.Location): p.IValue<boolean> {
 
                         if (currentToken[0] !== CurrentTokenType.WHITESPACE) {
-                            throw new TokenizerStackPanicError(`Unexpected whitespace end`, createRangeFromSingleLocation(location))
+                            onError(["Unexpected whitespace end"], createRangeFromSingleLocation(location))
+                            return p.value(false)
                         }
                         const $ = currentToken[1]
                         //const range = createRangeFromLocations($.start, location)

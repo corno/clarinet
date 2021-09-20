@@ -15,19 +15,19 @@ export function createASTNSerializer<TokenAnnotation>(
     errorHandler: StructureErrorHandler<TokenAnnotation>,
 ): IParser<TokenAnnotation> {
     const writer: IFormatInstructionWriter<TokenAnnotation, null> = {
-        token: instruction => {
+        token: (instruction) => {
             write(instruction.stringBefore)
             write(instruction.token)
             write(instruction.stringAfter)
 
         },
-        nonToken: instruction => {
+        nonToken: (instruction) => {
             write(instruction.string)
         },
     }
     let foundHeader = false
     return createStructureParser({
-        onEmbeddedSchema: _range => {
+        onEmbeddedSchema: (_range) => {
             foundHeader = true
             write(`! `)
             return flatten(createASTNNormalizer(
@@ -36,7 +36,7 @@ export function createASTNSerializer<TokenAnnotation>(
                 writer
             ))
         },
-        onSchemaReference: $$ => {
+        onSchemaReference: ($$) => {
             foundHeader = true
             write(`! ${$$.token.data.value}\n`)
             return p.value(false)

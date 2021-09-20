@@ -24,11 +24,11 @@ export function createSchemaParser<TokenAnnotation>(
     }
 
     return createStructureParser({
-        onEmbeddedSchema: $$ => {
+        onEmbeddedSchema: ($$) => {
             onSchemaError(["schema schema cannot be embedded"], $$.embeddedSchemaAnnotation)
             return createDummyTreeHandler()
         },
-        onSchemaReference: $$ => {
+        onSchemaReference: ($$) => {
             schemaDefinitionFound = true
             schemaSchemaBuilder = getSchemaSchemaBuilder($$.token.data.value)
             if (schemaSchemaBuilder === null) {
@@ -37,7 +37,7 @@ export function createSchemaParser<TokenAnnotation>(
             }
             return p.value(false)
         },
-        onBody: annotation => {
+        onBody: (annotation) => {
             if (!schemaDefinitionFound) {
                 //console.error("missing schema schema types")
                 onSchemaError(["missing schema schema definition"], annotation)
@@ -53,7 +53,7 @@ export function createSchemaParser<TokenAnnotation>(
                         (error, annotation2) => {
                             onError(["schema processing", error], annotation2)
                         },
-                        schemaAndSideEffects => {
+                        (schemaAndSideEffects) => {
                             onSchema(schemaAndSideEffects)
                         }
                     )
@@ -64,10 +64,10 @@ export function createSchemaParser<TokenAnnotation>(
             return p.value(null)
         },
         errors: {
-            onTreeError: $ => {
+            onTreeError: ($) => {
                 onSchemaError(["tree", $.error], $.annotation)
             },
-            onStructureError: $ => {
+            onStructureError: ($) => {
                 onSchemaError(["structure", $.error], $.annotation)
             },
 

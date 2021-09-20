@@ -13,6 +13,8 @@ import { createTokenizer } from "../../modules/tokenizer/functions/createTokeniz
 import { createASTNUnmarshaller } from "./createASTNUnmarshaller"
 import { printDeserializationDiagnostic } from "./printDeserializeDiagnostic"
 import { printTokenError } from "../../modules/tokenizer/functions/printTokenError"
+import { printTokenizerError } from "../../modules/tokenizer/functions/createTokenizer"
+import { IStreamConsumer } from "../../IStreamConsumer"
 
 export function createProcessorForASTNStreamWithContext(
     serializedDatasetBaseName: string,
@@ -31,7 +33,7 @@ export function createProcessorForASTNStreamWithContext(
         schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>
     ) => ITypedTreeHandler<TokenizerAnnotationData, null>,
     onError: (error: string, severity: DiagnosticSeverity, range: Range | null) => void,
-): p.IValue<p.IStreamConsumer<string, null, null>> {
+): p.IValue<IStreamConsumer<string, null, null>> {
     return loadContextSchema(
         {
             basename: serializedDatasetBaseName,
@@ -42,7 +44,7 @@ export function createProcessorForASTNStreamWithContext(
         (error, severity) => {
             onError(printContextSchemaError(error), severity, null)
         },
-    ).mapResult(contextSchema => {
+    ).mapResult((contextSchema) => {
         return p.value(createStreamPreTokenizer(
             createTokenizer(
                 createASTNUnmarshaller({
@@ -56,10 +58,12 @@ export function createProcessorForASTNStreamWithContext(
                     onEnd: () => {
                         return p.value(null)
                     },
-                })
-
+                }),
+                (error, range) => {
+                    onError(printTokenizerError(error), DiagnosticSeverity.error, range)
+                },
             ),
-            $ => {
+            ($) => {
                 onError(printTokenError($.error), DiagnosticSeverity.error, $.range)
             }
         ))

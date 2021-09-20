@@ -28,7 +28,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
     function createDecoratedValue(
     ): ValueHandler<InTokenAnnotation, InNonTokenAnnotation> {
         return {
-            object: $ => {
+            object: ($) => {
                 switch ($.token.data.type[0]) {
                     case "dictionary": {
                         dictionaryDepth += 1
@@ -47,7 +47,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
                 })
                 let foundProperties = false
                 return {
-                    property: $$ => {
+                    property: ($$) => {
                         const wasFirst = !foundProperties
                         foundProperties = true
                         handler.property({
@@ -58,7 +58,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
                         })
                         return createDecoratedRequiredValue()
                     },
-                    objectEnd: $$ => {
+                    objectEnd: ($$) => {
                         switch ($.token.data.type[0]) {
                             case "dictionary": {
                                 dictionaryDepth -= 1
@@ -80,7 +80,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
                     },
                 }
             },
-            array: $ => {
+            array: ($) => {
                 switch ($.token.data.type[0]) {
                     case "list": {
                         listDepth += 1
@@ -98,7 +98,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
                 })
                 let foundElements = false
                 return {
-                    element: $$ => {
+                    element: ($$) => {
                         const wasFirst = !foundElements
                         foundElements = true
                         handler.element({
@@ -109,7 +109,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
                         })
                         return createDecoratedValue()
                     },
-                    arrayEnd: $$ => {
+                    arrayEnd: ($$) => {
                         switch ($.token.data.type[0]) {
                             case "list": {
                                 listDepth -= 1
@@ -131,26 +131,26 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
                     },
                 }
             },
-            simpleString: $ => {
+            simpleString: ($) => {
                 handler.simpleStringValue({
                 token: $.token,
                 stackContext: createStackContext(),
             })
             },
-            multilineString: $ => {
+            multilineString: ($) => {
                 handler.multilineStringValue({
                     token: $.token,
                     stackContext: createStackContext(),
                 })
             },
-            taggedUnion: $ => {
+            taggedUnion: ($) => {
                 taggedUnionDepth += 1
                 handler.taggedUnionBegin({
                     token: $.token,
                     stackContext: createStackContext(),
                 })
                 return {
-                    option: $$ => {
+                    option: ($$) => {
                         handler.option({
                             token: $$.token,
                             stackContext: createStackContext(),
@@ -159,7 +159,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
                     },
                     missingOption: () => {
                     },
-                    end: $$ => {
+                    end: ($$) => {
                         taggedUnionDepth -= 1
                         handler.taggedUnionEnd({
                             annotation: $$.annotation,
@@ -180,7 +180,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
     }
     return {
         root: createDecoratedRequiredValue(),
-        onEnd: annotation => {
+        onEnd: (annotation) => {
             handler.end(annotation)
         },
     }

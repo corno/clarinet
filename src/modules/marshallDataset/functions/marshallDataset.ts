@@ -51,7 +51,7 @@ function onValueIsNonDefault(
             break
         }
         case "dictionary": {
-            value.toDictionary(dict => {
+            value.toDictionary((dict) => {
                 if (!dict.entries.isEmpty()) {
                     callback()
 
@@ -60,7 +60,7 @@ function onValueIsNonDefault(
             break
         }
         case "list": {
-            value.toList(list => {
+            value.toList((list) => {
                 if (!list.elements.isEmpty()) {
                     callback()
                 }
@@ -69,7 +69,7 @@ function onValueIsNonDefault(
         }
         case "tagged union": {
             const $ = definition.type[1]
-            value.toTaggedUnion(tu => {
+            value.toTaggedUnion((tu) => {
                 if (tu.option !== $["default option"].name) {
                     callback()
                 } else {
@@ -84,7 +84,7 @@ function onValueIsNonDefault(
         }
         case "simple string": {
             const $ = definition.type[1]
-            value.toSimpleString(str => {
+            value.toSimpleString((str) => {
                 if (str !== $["default value"]) {
                     callback()
                 }
@@ -92,7 +92,7 @@ function onValueIsNonDefault(
             break
         }
         case "multiline string": {
-            value.toMultilineString(lines => {
+            value.toMultilineString((lines) => {
                 if (lines.length > 1) {
                     callback()
                 }
@@ -104,10 +104,10 @@ function onValueIsNonDefault(
         }
         case "group": {
             const $ = definition.type[1]
-            value.toGroup(group => {
+            value.toGroup((group) => {
                 let foundNonDefault = false
                 $.properties.forEach((p, key) => {
-                    group.onProperty(key, value => {
+                    group.onProperty(key, (value) => {
                         onValueIsNonDefault(
                             value,
                             p.value,
@@ -153,7 +153,7 @@ function marshallValue(
     switch (definition.type[0]) {
         case "dictionary": {
             const $ = definition.type[1]
-            value.toDictionary(dict => {
+            value.toDictionary((dict) => {
                 out.sendBlock(
                     {
                         open: ["open object", {
@@ -164,7 +164,7 @@ function marshallValue(
                                 //
                             }],
                     },
-                    out => {
+                    (out) => {
                         dict.entries.forEach((entry, key) => {
                             out.sendEvent(["simple string", {
                                 value: key,
@@ -185,7 +185,7 @@ function marshallValue(
         }
         case "list": {
             const $$ = definition.type[1]
-            value.toList(list => {
+            value.toList((list) => {
                 out.sendBlock(
                     {
                         open: ["open array", {
@@ -196,8 +196,8 @@ function marshallValue(
                                 //
                             }],
                     },
-                    out => {
-                        list.elements.forEach(e => {
+                    (out) => {
+                        list.elements.forEach((e) => {
                             marshallValue(
                                 e,
                                 $$.value,
@@ -224,7 +224,7 @@ function marshallValue(
         }
         case "tagged union": {
             const $ = definition.type[1]
-            value.toTaggedUnion(taggedUnion => {
+            value.toTaggedUnion((taggedUnion) => {
                 if (!inMixinMode) {
                     out.sendEvent(["tagged union", {}])
                 }
@@ -246,7 +246,7 @@ function marshallValue(
         }
         case "simple string": {
             const $ = definition.type[1]
-            value.toSimpleString(str => {
+            value.toSimpleString((str) => {
                 out.sendEvent(["simple string", {
                     value: str,
                     wrapping: $.quoted
@@ -259,7 +259,7 @@ function marshallValue(
             break
         }
         case "multiline string": {
-            value.toMultilineString(lines => {
+            value.toMultilineString((lines) => {
                 out.sendEvent(["multiline string", {
                     lines: lines,
                 }])
@@ -268,10 +268,10 @@ function marshallValue(
         }
         case "group": {
             const $ = definition.type[1]
-            value.toGroup(group => {
+            value.toGroup((group) => {
                 if (inMixinMode) {
                     $.properties.forEach((propDef, key) => {
-                        group.onProperty(key, prop => {
+                        group.onProperty(key, (prop) => {
                             marshallValue(
                                 prop,
                                 propDef.value,
@@ -296,9 +296,9 @@ function marshallValue(
                                             //
                                         }],
                                 },
-                                out => {
+                                (out) => {
                                     $.properties.forEach((propDef, key) => {
-                                        group.onProperty(key, prop => {
+                                        group.onProperty(key, (prop) => {
                                             function serializeProperty() {
                                                 out.sendEvent(["simple string", {
                                                     value: key,
@@ -342,9 +342,9 @@ function marshallValue(
                                             //
                                         }],
                                 },
-                                out => {
+                                (out) => {
                                     $.properties.forEach((propDef, key) => {
-                                        group.onProperty(key, prop => {
+                                        group.onProperty(key, (prop) => {
                                             marshallValue(
                                                 prop,
                                                 propDef.value,

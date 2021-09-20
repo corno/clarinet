@@ -17,7 +17,7 @@ export function createBuilder<TokenAnnotation, NonTokenAnnotation>(
                     onClose: () => {
                         //
                     },
-                    onEntry: $ => {
+                    onEntry: ($) => {
                         const entry: Value = { type: null }
                         dict[$.token.data.value] = entry
                         return buildValue(
@@ -42,7 +42,7 @@ export function createBuilder<TokenAnnotation, NonTokenAnnotation>(
                     },
                 }
             },
-            onTaggedUnion: $ => {
+            onTaggedUnion: ($) => {
                 const taggedUnion: DSTaggedUnion = {
                     option: null,
                     value: { type: null },
@@ -55,7 +55,7 @@ export function createBuilder<TokenAnnotation, NonTokenAnnotation>(
                             taggedUnion.value,
                         )
                     },
-                    onOption: $$ => {
+                    onOption: ($$) => {
                         taggedUnion.option = $$.name
                         return buildValue(
                             taggedUnion.value,
@@ -66,10 +66,10 @@ export function createBuilder<TokenAnnotation, NonTokenAnnotation>(
                     },
                 }
             },
-            onSimpleString: $ => {
+            onSimpleString: ($) => {
                 value.type = ["simple string", $.value]
             },
-            onMultilineString: $ => {
+            onMultilineString: ($) => {
                 value.type = ["multiline string", $.token === null ? [] : $.token.data.lines]
             },
             onTypeReference: () => {
@@ -84,7 +84,7 @@ export function createBuilder<TokenAnnotation, NonTokenAnnotation>(
                     onUnexpectedProperty: () => {
                         //
                     },
-                    onProperty: $ => {
+                    onProperty: ($) => {
                         const property: Value = { type: null }
                         group[$.key] = property
                         return buildValue(

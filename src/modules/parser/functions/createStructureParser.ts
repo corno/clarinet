@@ -73,7 +73,7 @@ export function createStructureParser<Annotation>($: {
     const rootContext: RootContext = { state: [StructureState.EXPECTING_HEADER_OR_BODY] }
 
     return {
-        onEnd: annotation => {
+        onEnd: (annotation) => {
             function raiseError(error: StructureErrorType) {
                 $.errors.onStructureError({
                     error: error,
@@ -123,7 +123,7 @@ export function createStructureParser<Annotation>($: {
             }
             $.onEnd(annotation)
         },
-        onToken: data => {
+        onToken: (data) => {
             function raiseError(error: StructureErrorType) {
                 $.errors.onStructureError({
                     error: error,
@@ -157,7 +157,7 @@ export function createStructureParser<Annotation>($: {
                 parser: ITreeParser<Annotation>,
             ) {
                 return handleToken(
-                    punctuation => {
+                    (punctuation) => {
                         function createToken<Data>(dta: Data): Token<Data, Annotation> {
                             return {
                                 data: dta,
@@ -218,7 +218,7 @@ export function createStructureParser<Annotation>($: {
                         }
                         return p.value(false)
                     },
-                    string => {
+                    (string) => {
                         parser.simpleString(
                             {
                                 annotation: data.annotation,
@@ -230,7 +230,7 @@ export function createStructureParser<Annotation>($: {
                         )
                         return p.value(false)
                     },
-                    string => {
+                    (string) => {
                         parser.multilineString(
                             {
                                 annotation: data.annotation,
@@ -266,7 +266,7 @@ export function createStructureParser<Annotation>($: {
             switch (rootContext.state[0]) {
                 case StructureState.EXPECTING_HEADER_OR_BODY: {
                     return handleToken(
-                        punctuation => {
+                        (punctuation) => {
                             switch (punctuation.type[0]) {
                                 case "header start":
                                     rootContext.state = [StructureState.EXPECTING_SCHEMA_REFERENCE_OR_EMBEDDED_SCHEMA, {
@@ -278,11 +278,11 @@ export function createStructureParser<Annotation>($: {
                             }
                             return p.value(false)
                         },
-                        _string => {
+                        (_string) => {
                             startBody()
                             return p.value(false)
                         },
-                        _string => {
+                        (_string) => {
                             startBody()
                             return p.value(false)
                         }
@@ -291,7 +291,7 @@ export function createStructureParser<Annotation>($: {
                 case StructureState.EXPECTING_SCHEMA_REFERENCE_OR_EMBEDDED_SCHEMA: {
                     const headerAnnotation = rootContext.state[1].headerAnnotation
                     return handleToken(
-                        structuralToken => {
+                        (structuralToken) => {
                             if (structuralToken.type[0] !== "header start") {
                                 raiseError(["expected a schema reference or an embedded schema"])
                                 return p.value(false)
@@ -302,7 +302,7 @@ export function createStructureParser<Annotation>($: {
                             }]
                             return p.value(false)
                         },
-                        stringData => {
+                        (stringData) => {
                             rootContext.state = [StructureState.EXPECTING_BODY, {
                             }]
                             return $.onSchemaReference({
@@ -378,18 +378,18 @@ export function createStructureParser<Annotation>($: {
                 }
                 case StructureState.EXPECTING_END: {
                     return handleToken(
-                        _punctuation => {
+                        (_punctuation) => {
                             raiseError([`unexpected data after end`, {
                             }])
                             return p.value(false)
                         },
-                        string => {
+                        (string) => {
                             raiseError([`unexpected data after end`, {
                                 data: string.value,
                             }])
                             return p.value(false)
                         },
-                        string => {
+                        (string) => {
                             raiseError([`unexpected data after end`, {
                                 data: string.lines.join("\n"),
                             }])

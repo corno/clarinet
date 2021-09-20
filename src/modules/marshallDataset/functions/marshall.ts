@@ -33,13 +33,13 @@ export function marshall(
 
 
     const writer2: IFormatInstructionWriter<null, null> = {
-        token: instruction => {
+        token: (instruction) => {
             writer(instruction.stringBefore)
             writer(instruction.token)
             writer(instruction.stringAfter)
 
         },
-        nonToken: instruction => {
+        nonToken: (instruction) => {
             writer(instruction.string)
         },
     }
@@ -54,7 +54,7 @@ export function marshall(
             writer(`! ! "astn/schema@0.1" `)
             const embeddedSchemaParser = createTreeParser(
                 flatten(normalizer),
-                $ => {
+                ($) => {
                     throw new Error(`unexpected error in schema: ${printTreeParserError($.error)}`)
                 },
                 () => {
@@ -66,7 +66,7 @@ export function marshall(
             )
             serializeSchema(
                 schema,
-                event => {
+                (event) => {
                     handleEvent(event, null, embeddedSchemaParser)
                 },
             )
@@ -87,7 +87,7 @@ export function marshall(
 
     const bodyParser = createTreeParser(
         flatten(normalizer),
-        $ => {
+        ($) => {
             throw new Error(`unexpected error in schema: ${printTreeParserError($.error)}`)
         },
         () => {
@@ -108,7 +108,7 @@ export function marshall(
                 callback(createOut())
                 he(eventpair.close)
             },
-            sendEvent: event => {
+            sendEvent: (event) => {
                 he(event)
             },
         }
