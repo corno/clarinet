@@ -27,7 +27,7 @@
   ],
   "types": "dist/src/index.d.ts",
   "devDependencies": {
-    "@types/chai": "^4.2.21",
+    "@types/chai": "^4.2.22",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.9.4",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
@@ -53,7 +53,7 @@
     "testTyped": "node ./node_modules/mocha/bin/mocha dist/test/testTyped.js",
     "testTyped2": "node ./node_modules/mocha/bin/mocha dist/test/typed.js",
     "testJSONTestSuite": "node ./node_modules/mocha/bin/mocha dist/test/JSONTestSuite.js",
-    "update2latest": "ncu -u --packageFile package.json && nsi && tsc",
+    "update2latest": "ncu -u --packageFile package.json --timeout 60000 && nsi && tsc",
     "update2latestAndPublishMinor": "npm run validatePublishReadiness && npm run update2latest && npm run test && git commit -am \"u2l\" && npm run pubMin",
     "update2latestAndPublishPath": "npm run validatePublishReadiness && npm run update2latest && npm run test && git commit -am \"u2l\" && npm run pubPatch",
     "generateASTNSchema": "astn-expand ./src/modules/schema/etc/schema.astn | astn-generate > ./src/modules/schema/astnschema@0.1"
