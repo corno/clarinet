@@ -1,12 +1,12 @@
 import { TreeParserEvent } from "../types/TreeParserEvent"
 
-import { RequiredValueHandler, TreeHandler, ValueHandler } from "../interfaces/ITreeHandler"
+import { IRequiredValueHandler, ITreeHandler, IValueHandler } from "../interfaces/ITreeHandler"
 
 export function createLoggingHandler<TokenAnnotation, NonTokenAnnotation>(
     onEvent: (event: TreeParserEvent, annotation: TokenAnnotation) => void,
-): TreeHandler<TokenAnnotation, NonTokenAnnotation> {
+): ITreeHandler<TokenAnnotation, NonTokenAnnotation> {
     function createLoggingRequiredValueHandler(
-    ): RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    ): IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             exists: createLoggingValueHandler(),
             missing: () => {
@@ -15,7 +15,7 @@ export function createLoggingHandler<TokenAnnotation, NonTokenAnnotation>(
     }
 
     function createLoggingValueHandler(
-    ): ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    ): IValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             array: ($) => {
                 onEvent(["open array", $.token.data], $.token.annotation)

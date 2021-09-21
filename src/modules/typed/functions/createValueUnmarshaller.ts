@@ -18,9 +18,9 @@ function assertUnreachable<RT>(_x: never): RT {
 type OnError<TokenAnnotation> = (message: UnmarshallError, annotation: TokenAnnotation, severity: DiagnosticSeverity) => void
 
 function wrap<TokenAnnotation, NonTokenAnnotation>(
-    handler: h.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
+    handler: h.IValueHandler<TokenAnnotation, NonTokenAnnotation>,
     onMissing: () => void,
-): h.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         exists: handler,
         missing: (): void => {
@@ -33,7 +33,7 @@ function createUnexpectedArrayHandler<TokenAnnotation, NonTokenAnnotation>(
     message: UnmarshallError,
     annotation: TokenAnnotation,
     onError: OnError<TokenAnnotation>,
-): h.ArrayHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.IArrayHandler<TokenAnnotation, NonTokenAnnotation> {
     onError(message, annotation, DiagnosticSeverity.error)
     return createDummyArrayHandler()
 }
@@ -51,7 +51,7 @@ function createUnexpectedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
     message: UnmarshallError,
     annotation: TokenAnnotation,
     onError: OnError<TokenAnnotation>,
-): h.TaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.ITaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
     onError(message, annotation, DiagnosticSeverity.error)
     return createDummyTaggedUnionHandler()
 }
@@ -184,7 +184,7 @@ type MixidIn<TokenAnnotation, NonTokenAnnotation> = {
     pushGroup: (
         definition: GroupDefinition,
         groupContainerHandler: ITypedValueHandler<TokenAnnotation, NonTokenAnnotation>
-    ) => h.ValueHandler<TokenAnnotation, NonTokenAnnotation>
+    ) => h.IValueHandler<TokenAnnotation, NonTokenAnnotation>
     pushTaggedUnion: (
         definition: OptionDefinition,
         taggedUnionHandler: ITypedTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>,
@@ -198,7 +198,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
     onError: OnError<TokenAnnotation>,
     flagNonDefaultPropertiesFound: () => void,
     mixedIn: null | MixidIn<TokenAnnotation, NonTokenAnnotation>,
-): h.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.IValueHandler<TokenAnnotation, NonTokenAnnotation> {
     function defInitializeValue() {
         defaultInitializeValue(
             definition,
@@ -714,7 +714,7 @@ export function createValueUnmarshaller<TokenAnnotation, NonTokenAnnotation>(
                             }),
                         )
 
-                        function createUnmarshallerForNextValue(): h.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+                        function createUnmarshallerForNextValue(): h.IValueHandler<TokenAnnotation, NonTokenAnnotation> {
                             const nextValue = state.findNextValue()
                             if (nextValue === null) {
                                 return {

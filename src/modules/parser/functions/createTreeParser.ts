@@ -11,12 +11,12 @@ function assertUnreachable<RT>(_x: never): RT {
 }
 
 export function createTreeParser<TokenAnnotation>(
-    treeHandler: i.TreeHandler<TokenAnnotation, null>,
+    treeHandler: i.ITreeHandler<TokenAnnotation, null>,
     onError: ($: {
         error: TreeParserErrorType
         annotation: TokenAnnotation
     }) => void,
-    createUnexpectedValueHandler: () => i.ValueHandler<TokenAnnotation, null>,
+    createUnexpectedValueHandler: () => i.IValueHandler<TokenAnnotation, null>,
     onEnd: (annotation: TokenAnnotation) => void,
 ): ITreeParser<TokenAnnotation> {
     function raiseError(error: TreeParserErrorType, annotation: TokenAnnotation) {
@@ -28,14 +28,14 @@ export function createTreeParser<TokenAnnotation>(
     type TaggedUnionState =
         | ["expecting option", {
         }]
-        | ["expecting value", i.RequiredValueHandler<TokenAnnotation, null>]
+        | ["expecting value", i.IRequiredValueHandler<TokenAnnotation, null>]
 
     type ObjectContext = {
         type:
         | ["dictionary"]
         | ["verbose group"]
         readonly objectHandler: i.IObjectHandler<TokenAnnotation, null>
-        propertyHandler: null | i.RequiredValueHandler<TokenAnnotation, null>
+        propertyHandler: null | i.IRequiredValueHandler<TokenAnnotation, null>
     }
 
     type ArrayContext = {
@@ -43,11 +43,11 @@ export function createTreeParser<TokenAnnotation>(
         | ["list"]
         | ["shorthand group"]
         foundElements: boolean
-        readonly arrayHandler: i.ArrayHandler<TokenAnnotation, null>
+        readonly arrayHandler: i.IArrayHandler<TokenAnnotation, null>
     }
 
     type TaggedUnionContext = {
-        readonly handler: i.TaggedUnionHandler<TokenAnnotation, null>
+        readonly handler: i.ITaggedUnionHandler<TokenAnnotation, null>
         state: TaggedUnionState
     }
 
@@ -55,7 +55,7 @@ export function createTreeParser<TokenAnnotation>(
         | ["object", ObjectContext]
         | ["array", ArrayContext]
         | ["taggedunion", TaggedUnionContext]
-    let currentTreeHandler: i.TreeHandler<TokenAnnotation, null> | null = treeHandler //becomes null when processed
+    let currentTreeHandler: i.ITreeHandler<TokenAnnotation, null> | null = treeHandler //becomes null when processed
     let currentContext: ContextType | null = null
     const stack: (ContextType)[] = []
 
@@ -189,7 +189,7 @@ export function createTreeParser<TokenAnnotation>(
             }
         }
     }
-    function getValueHandler(annotation: TokenAnnotation): i.ValueHandler<TokenAnnotation, null> {
+    function getValueHandler(annotation: TokenAnnotation): i.IValueHandler<TokenAnnotation, null> {
         if (currentContext === null) {
             if (currentTreeHandler === null) {
                 raiseError(["unexpected data after end"], annotation)

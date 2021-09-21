@@ -4,22 +4,22 @@ import * as tokens from "../types/tokens"
 export interface IObjectHandler<TokenAnnotation, NonTokenAnnotation> {
     property: ($: {
         token: tokens.SimpleStringToken<TokenAnnotation>
-    }) => RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
+    }) => IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
     objectEnd: ($: {
         token: tokens.CloseObjectToken<TokenAnnotation>
     }) => void
 }
 
-export interface ArrayHandler<TokenAnnotation, NonTokenAnnotation> {
+export interface IArrayHandler<TokenAnnotation, NonTokenAnnotation> {
     element: ($: {
         annotation: NonTokenAnnotation
-    }) => ValueHandler<TokenAnnotation, NonTokenAnnotation>
+    }) => IValueHandler<TokenAnnotation, NonTokenAnnotation>
     arrayEnd: ($: {
         token: tokens.CloseArrayToken<TokenAnnotation>
     }) => void
 }
 
-export interface TaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
+export interface ITaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
     option: OnOption<TokenAnnotation, NonTokenAnnotation>
     missingOption: () => void
     end: ($: {
@@ -33,7 +33,7 @@ export type OnObject<TokenAnnotation, NonTokenAnnotation> = ($: {
 
 export type OnArray<TokenAnnotation, NonTokenAnnotation> = ($: {
     token: tokens.OpenArrayToken<TokenAnnotation>
-}) => ArrayHandler<TokenAnnotation, NonTokenAnnotation>
+}) => IArrayHandler<TokenAnnotation, NonTokenAnnotation>
 
 export type OnSimpleString<TokenAnnotation> = ($: {
     token: tokens.SimpleStringToken<TokenAnnotation>
@@ -45,21 +45,21 @@ export type OnMultilineString<TokenAnnotation> = ($: {
 
 export type OnTaggedUnion<TokenAnnotation, NonTokenAnnotation> = ($: {
     token: tokens.TaggedUnionToken<TokenAnnotation>
-}) => TaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
+}) => ITaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>
 
 export type OnOption<TokenAnnotation, NonTokenAnnotation> = ($: {
     token: tokens.SimpleStringToken<TokenAnnotation>
-}) => RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
+}) => IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
 
 export type OnMissing = () => void
 
-export interface RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
-    exists: ValueHandler<TokenAnnotation, NonTokenAnnotation>
+export interface IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    exists: IValueHandler<TokenAnnotation, NonTokenAnnotation>
     missing: OnMissing
 }
 
 
-export interface ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+export interface IValueHandler<TokenAnnotation, NonTokenAnnotation> {
     object: OnObject<TokenAnnotation, NonTokenAnnotation>
     array: OnArray<TokenAnnotation, NonTokenAnnotation>
     multilineString: OnMultilineString<TokenAnnotation>
@@ -67,7 +67,7 @@ export interface ValueHandler<TokenAnnotation, NonTokenAnnotation> {
     taggedUnion: OnTaggedUnion<TokenAnnotation, NonTokenAnnotation>
 }
 
-export interface TreeHandler<TokenAnnotation, NonTokenAnnotation> {
-    root: RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
+export interface ITreeHandler<TokenAnnotation, NonTokenAnnotation> {
+    root: IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>
     onEnd: (annotation: TokenAnnotation) => void
 }

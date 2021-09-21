@@ -1,6 +1,6 @@
 import { IFlattenedHandler } from "../interfaces/IFlattenedHandler"
 import { StackContext } from "../types/StackContext"
-import { RequiredValueHandler, TreeHandler, ValueHandler } from "../../parser/interfaces/ITreeHandler"
+import { IRequiredValueHandler, ITreeHandler, IValueHandler } from "../../parser/interfaces/ITreeHandler"
 
 function assertUnreachable<RT>(_x: never): RT {
     throw new Error("unreachable")
@@ -8,7 +8,7 @@ function assertUnreachable<RT>(_x: never): RT {
 
 export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
     handler: IFlattenedHandler<InTokenAnnotation, InNonTokenAnnotation>,
-): TreeHandler<InTokenAnnotation, InNonTokenAnnotation> {
+): ITreeHandler<InTokenAnnotation, InNonTokenAnnotation> {
 
     let dictionaryDepth = 0
     let verboseGroupDepth = 0
@@ -26,7 +26,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
     }
 
     function createDecoratedValue(
-    ): ValueHandler<InTokenAnnotation, InNonTokenAnnotation> {
+    ): IValueHandler<InTokenAnnotation, InNonTokenAnnotation> {
         return {
             object: ($) => {
                 switch ($.token.data.type[0]) {
@@ -172,7 +172,7 @@ export function flatten<InTokenAnnotation, InNonTokenAnnotation>(
     }
 
     function createDecoratedRequiredValue(
-    ): RequiredValueHandler<InTokenAnnotation, InNonTokenAnnotation> {
+    ): IRequiredValueHandler<InTokenAnnotation, InNonTokenAnnotation> {
         return {
             exists: createDecoratedValue(),
             missing: () => { },

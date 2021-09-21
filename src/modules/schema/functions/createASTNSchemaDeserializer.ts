@@ -31,17 +31,17 @@ import {
     __options_T,
 } from "../types/schema_generated"
 
-import { RequiredValueHandler, TreeHandler, ValueHandler } from "../../parser/interfaces/ITreeHandler"
+import { IRequiredValueHandler, ITreeHandler, IValueHandler } from "../../parser/interfaces/ITreeHandler"
 import { IExpectContext } from "../../expect/interfaces/IExpectContext"
 
 export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation>(
     context: IExpectContext<TokenAnnotation, NonTokenAnnotation>,
     raiseValidationError: (message: string, annotation: TokenAnnotation) => void,
     callback: (result: __root_T | null) => void,
-): TreeHandler<TokenAnnotation, NonTokenAnnotation> {
+): ITreeHandler<TokenAnnotation, NonTokenAnnotation> {
     const resolveRegistry = createResolveRegistry<TokenAnnotation>()
 
-    function wrap(handler: ValueHandler<TokenAnnotation, NonTokenAnnotation>): RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    function wrap(handler: IValueHandler<TokenAnnotation, NonTokenAnnotation>): IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             exists: handler,
             missing: () => {
@@ -51,7 +51,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
     }
     function _generateHandler_root(
         callback: (out: __root_T) => void,
-    ): ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    ): IValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return ((callback: (out: __root_T) => void) => {
             let _root_type_v: AnnotatedString<TokenAnnotation> | null = null
             const _types_v = createDictionaryBuilder<__types_T>()
@@ -126,7 +126,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
 
     function _generateHandler_simple_string(
         callback: (out: __simple_string_T) => void,
-    ): ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    ): IValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return ((callback: (out: __simple_string_T) => void) => {
             let _default_value_v: string | null = null
             let _quoted_v: boolean | null = null
@@ -175,7 +175,7 @@ export function createASTNSchemaDeserializer<TokenAnnotation, NonTokenAnnotation
     function _generateHandler_value(
         callback: (out: __value_T) => void,
         types: IReadonlyLookup<__types_T>,
-    ): ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    ): IValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return ((callback: (out: __value_T) => void) => {
             let _type_v: __type_TU | null = null
             return context.expectVerboseGroup({

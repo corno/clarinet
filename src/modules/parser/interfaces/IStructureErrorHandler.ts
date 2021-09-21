@@ -1,7 +1,7 @@
 import { StructureErrorType } from "../types/StructureErrorType";
 import { TreeParserErrorType } from "../types/TreeParserError";
 
-export interface StructureErrorHandler<Annotation> {
+export interface IStructureErrorHandler<Annotation> {
     onTreeError: ($: {
         error: TreeParserErrorType
         annotation: Annotation

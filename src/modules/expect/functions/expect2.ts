@@ -35,7 +35,7 @@ export function createRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>(
     context: i.IExpectContext<TokenAnnotation, NonTokenAnnotation>,
     valueType: ValueType<TokenAnnotation, NonTokenAnnotation>,
     onMissing?: () => void
-): h.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         exists: createValueHandler(
             context,
@@ -50,7 +50,7 @@ export function createRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>(
 export function createValueHandler<TokenAnnotation, NonTokenAnnotation>(
     context: i.IExpectContext<TokenAnnotation, NonTokenAnnotation>,
     valueType: ValueType<TokenAnnotation, NonTokenAnnotation>,
-): h.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): h.IValueHandler<TokenAnnotation, NonTokenAnnotation> {
     switch (valueType[0]) {
         case "dicionary": {
             const $1 = valueType[1]

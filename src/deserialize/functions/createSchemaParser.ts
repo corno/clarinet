@@ -1,7 +1,7 @@
 
 import * as p from "pareto"
 import { SchemaError } from "../types/SchemaError"
-import { SchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
+import { ISchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
 import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
 import { createStructureParser } from "../../modules/parser/functions/createStructureParser"
 import { createDummyTreeHandler } from "../../modules/parser/functions/dummyHandlers"
@@ -12,7 +12,7 @@ export function createSchemaParser<TokenAnnotation>(
         name: string,
     ) => SchemaSchemaBuilder<TokenAnnotation, null> | null,
     onError: (error: SchemaError, annotation: TokenAnnotation) => void,
-    onSchema: (schema: SchemaAndSideEffects<TokenAnnotation, null> | null) => void,
+    onSchema: (schema: ISchemaAndSideEffects<TokenAnnotation, null> | null) => void,
 ): IParser<TokenAnnotation> {
     let foundError = false
 

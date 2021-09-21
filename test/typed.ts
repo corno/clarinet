@@ -6,7 +6,7 @@ import { tryToConsumeString } from "./consumeString"
 
 type ErrorLine = [string, string]
 
-type ParserRequiredValueHandler = astn.RequiredValueHandler<astn.TokenizerAnnotationData, null>
+type ParserRequiredValueHandler = astn.IRequiredValueHandler<astn.TokenizerAnnotationData, null>
 
 
 describe('typed', () => {

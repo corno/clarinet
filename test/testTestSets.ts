@@ -51,7 +51,7 @@ function createTestFunction(chunks: string[], test: TestDefinition, _strictJSON:
             }
         }
 
-        function createLogger(): astn.TreeHandler<astn.TokenizerAnnotationData, null> {
+        function createLogger(): astn.ITreeHandler<astn.TokenizerAnnotationData, null> {
             return astn.createLoggingHandler(
                 (event, annotation) => {
                     switch (event[0]) {

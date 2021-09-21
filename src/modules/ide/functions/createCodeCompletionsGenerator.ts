@@ -12,28 +12,28 @@ function cc<T, RT>(input: T, callback: (output: T) => RT): RT {
 }
 
 type GetCodeCompletions = () => string[]
-interface AlternativesRoot {
-    root: Line
+interface IAlternativesRoot {
+    root: ILine
     serialize: () => string[]
 }
 
-interface Step {
-    addOption: () => Line
+interface IStep {
+    addOption: () => ILine
 }
 
-interface Block {
-    addLine: () => Line
+interface IBlock {
+    addLine: () => ILine
 }
 
-interface Line {
+interface ILine {
     snippet(str: string): void
-    indent(callback: ($: Block) => void): void
-    addTaggedUnionStep: () => Step
+    indent(callback: ($: IBlock) => void): void
+    addTaggedUnionStep: () => IStep
 }
 
 function createCodeCompletionForValue(
     value: ValueDefinition,
-    sequence: Line,
+    sequence: ILine,
     onTaggedUnion: (def: TaggedUnionDefinition) => void,
     onGroup: (def: GroupDefinition) => void,
 ): void {
@@ -86,7 +86,7 @@ function createCodeCompletionForValue(
 
 function createCodeCompletionForShorthandValue(
     definition: ValueDefinition,
-    sequence: Line,
+    sequence: ILine,
 ): void {
     createCodeCompletionForValue(
         definition,
@@ -107,7 +107,7 @@ function createCodeCompletionForShorthandValue(
 
 function createCodeCompletionForShorthandGroup(
     group: GroupDefinition,
-    sequence: Line,
+    sequence: ILine,
 ): void {
     group.properties.forEach((prop, _propKey) => {
         createCodeCompletionForShorthandValue(
@@ -119,7 +119,7 @@ function createCodeCompletionForShorthandGroup(
 
 function createCodeCompletionsForTaggedUnion(
     $: TaggedUnionDefinition,
-    sequence: Line,
+    sequence: ILine,
 ): void {
     sequence.snippet(` '${$["default option"].name}'`)
     createCodeCompletionsForValue(
@@ -128,7 +128,7 @@ function createCodeCompletionsForTaggedUnion(
     )
 }
 
-function createCodeCompletionForVerboseValue(prop: ValueDefinition, sequence: Line): void {
+function createCodeCompletionForVerboseValue(prop: ValueDefinition, sequence: ILine): void {
     createCodeCompletionForValue(
         prop,
         sequence,
@@ -146,7 +146,7 @@ function createCodeCompletionForVerboseValue(prop: ValueDefinition, sequence: Li
 
 function createCodeCompletionForVerboseProperties(
     group: GroupDefinition,
-    sequence: Line,
+    sequence: ILine,
 ): void {
     let dirty = false
     sequence.indent(($) => {
@@ -168,7 +168,7 @@ export type OnToken<TokenAnnotation> = (
     getCodeCompletionsAfterToken: GetCodeCompletions | null,
 ) => void
 
-function createAlternativesRoot(): AlternativesRoot {
+function createAlternativesRoot(): IAlternativesRoot {
     type StepType =
         | ["block", {
             block: ABlock
@@ -187,7 +187,7 @@ function createAlternativesRoot(): AlternativesRoot {
 
     const rootSequence: ASequence = []
 
-    function createBlock(imp: ABlock): Block {
+    function createBlock(imp: ABlock): IBlock {
         return {
             addLine: () => {
                 const seq: ASequence = []
@@ -197,7 +197,7 @@ function createAlternativesRoot(): AlternativesRoot {
         }
     }
 
-    function createSequence(imp: ASequence): Line {
+    function createSequence(imp: ASequence): ILine {
         return {
             indent: (callback) => {
                 const block: ABlock = {
@@ -212,7 +212,7 @@ function createAlternativesRoot(): AlternativesRoot {
                 imp.push(["snippet", { value: str }])
             },
             addTaggedUnionStep: () => {
-                function createStep(sequence: ASequence): Step {
+                function createStep(sequence: ASequence): IStep {
                     const alts: ASequence[] = []
                     sequence.push(["tagged union", { alts: alts }])
                     return {
@@ -294,7 +294,7 @@ function createAlternativesRoot(): AlternativesRoot {
 
 function createCodeCompletionsForValue(
     definition: ValueDefinition,
-    line: Line,
+    line: ILine,
 ): void {
     createCodeCompletionForValue(
         definition,

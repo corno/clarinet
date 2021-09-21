@@ -16,13 +16,13 @@ function assertUnreachable<RT>(_x: never): RT {
 
 type CreateDummyOnProperty<TokenAnnotation, NonTokenAnnotation> = ($: {
     key: tokens.SimpleStringToken<TokenAnnotation>
-}) => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>
+}) => i.IValueHandler<TokenAnnotation, NonTokenAnnotation>
 
 interface ICreateContext<TokenAnnotation, NonTokenAnnotation> {
     createDictionaryHandler(
         onEntry: ($: {
             token: tokens.SimpleStringToken<TokenAnnotation>
-        }) => i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>,
+        }) => i.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>,
         onBegin?: ($: {
             token: tokens.OpenObjectToken<TokenAnnotation>
         }) => void,
@@ -41,7 +41,7 @@ interface ICreateContext<TokenAnnotation, NonTokenAnnotation> {
         }) => void,
         onUnexpectedProperty?: ($: {
             token: tokens.SimpleStringToken<TokenAnnotation>
-        }) => i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation>,
+        }) => i.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>,
     ): i.OnObject<TokenAnnotation, NonTokenAnnotation>
     createShorthandGroupHandler(
         expectedElements?: expect.ExpectedElements<TokenAnnotation, NonTokenAnnotation>,
@@ -53,7 +53,7 @@ interface ICreateContext<TokenAnnotation, NonTokenAnnotation> {
         }) => void
     ): i.OnArray<TokenAnnotation, NonTokenAnnotation>
     createListHandler(
-        onElement: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
+        onElement: () => i.IValueHandler<TokenAnnotation, NonTokenAnnotation>,
         onBegin?: ($: {
             token: tokens.OpenArrayToken<TokenAnnotation>
         }) => void,
@@ -101,7 +101,7 @@ interface ICreateContext<TokenAnnotation, NonTokenAnnotation> {
 function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
     issueHandler: ExpectIssueHandler<TokenAnnotation>,
     createDummyPropertyHandler: CreateDummyOnProperty<TokenAnnotation, NonTokenAnnotation>,
-    createDummyValueHandler: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
+    createDummyValueHandler: () => i.IValueHandler<TokenAnnotation, NonTokenAnnotation>,
     duplicateEntrySeverity: ExpectSeverity,
     onDuplicateEntry: OnDuplicateEntry,
 ): ICreateContext<TokenAnnotation, NonTokenAnnotation> {
@@ -121,7 +121,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
         })
     }
 
-    function createDummyRequiredValueHandler(): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    function createDummyRequiredValueHandler(): i.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             exists: createDummyValueHandler(),
             missing: () => {
@@ -143,7 +143,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                 const foundEntries: string[] = []
                 return {
                     property: (propertyData) => {
-                        const process = (): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
+                        const process = (): i.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
                             if (foundEntries.includes(propertyData.token.data.value)) {
                                 switch (duplicateEntrySeverity) {
                                     case ExpectSeverity.error:
@@ -196,7 +196,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                 let hasErrors = false
                 return {
                     property: ($$) => {
-                        const onProperty = (): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
+                        const onProperty = (): i.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
                             const expected = properties[$$.token.data.value]
                             if (expected === undefined) {
                                 hasErrors = true
@@ -219,7 +219,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
                             }
                             return expected.onExists($$)
                         }
-                        const process = (): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
+                        const process = (): i.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> => {
                             if (foundProperies.includes($$.token.data.value)) {
                                 switch (duplicateEntrySeverity) {
                                     case ExpectSeverity.error:
@@ -542,7 +542,7 @@ function createCreateContext<TokenAnnotation, NonTokenAnnotation>(
 export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
     issueHandler: ExpectIssueHandler<TokenAnnotation>,
     createDummyPropertyHandler: CreateDummyOnProperty<TokenAnnotation, NonTokenAnnotation>,
-    createDummyValueHandler: () => i.ValueHandler<TokenAnnotation, NonTokenAnnotation>,
+    createDummyValueHandler: () => i.IValueHandler<TokenAnnotation, NonTokenAnnotation>,
     duplicateEntrySeverity: ExpectSeverity,
     onDuplicateEntry: OnDuplicateEntry,
 ): expect.IExpectContext<TokenAnnotation, NonTokenAnnotation> {
@@ -576,7 +576,7 @@ export function createExpectContext<TokenAnnotation, NonTokenAnnotation>(
             token: tokens.SimpleStringToken<TokenAnnotation>
         }) => void,
         onInvalidType?: expect.OnInvalidType<TokenAnnotation>,
-    ): i.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+    ): i.IValueHandler<TokenAnnotation, NonTokenAnnotation> {
         return {
             array: createContext.createUnexpectedArrayHandler(expected, onInvalidType),
             object: createContext.createUnexpectedObjectHandler(expected, onInvalidType),

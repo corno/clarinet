@@ -8,7 +8,7 @@ export function formatCLI(
         indentationString: string,
         newline: string,
         write: (str: string) => void,
-        errorHandler: astn.StructureErrorHandler<astn.TokenizerAnnotationData>,
+        errorHandler: astn.IStructureErrorHandler<astn.TokenizerAnnotationData>,
     ) => astn.IParser<astn.TokenizerAnnotationData>
 ): IStreamConsumer<string, null, null> {
     return astn.createStreamPreTokenizer(

@@ -1,7 +1,7 @@
 import * as i from "../interfaces/ITreeHandler"
 
 export function createDummyRequiredValueHandler<TokenAnnotation, NonTokenAnnotation>(
-): i.RequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): i.IRequiredValueHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         exists: createDummyValueHandler(),
         missing: () => {
@@ -11,7 +11,7 @@ export function createDummyRequiredValueHandler<TokenAnnotation, NonTokenAnnotat
 }
 
 export function createDummyValueHandler<TokenAnnotation, NonTokenAnnotation>(
-): i.ValueHandler<TokenAnnotation, NonTokenAnnotation> {
+): i.IValueHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         array: () => createDummyArrayHandler(),
         object: () => createDummyObjectHandler(),
@@ -24,7 +24,7 @@ export function createDummyValueHandler<TokenAnnotation, NonTokenAnnotation>(
 }
 
 export function createDummyTaggedUnionHandler<TokenAnnotation, NonTokenAnnotation>(
-): i.TaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
+): i.ITaggedUnionHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         option: () => createDummyRequiredValueHandler(),
         missingOption: () => {
@@ -36,7 +36,7 @@ export function createDummyTaggedUnionHandler<TokenAnnotation, NonTokenAnnotatio
 }
 
 export function createDummyArrayHandler<TokenAnnotation, NonTokenAnnotation>(
-): i.ArrayHandler<TokenAnnotation, NonTokenAnnotation> {
+): i.IArrayHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         element: () => createDummyValueHandler(),
         arrayEnd: () => {
@@ -56,7 +56,7 @@ export function createDummyObjectHandler<TokenAnnotation, NonTokenAnnotation>(
 }
 
 export function createDummyTreeHandler<TokenAnnotation, NonTokenAnnotation>(
-): i.TreeHandler<TokenAnnotation, NonTokenAnnotation> {
+): i.ITreeHandler<TokenAnnotation, NonTokenAnnotation> {
     return {
         root: createDummyRequiredValueHandler(),
         onEnd: () => {},

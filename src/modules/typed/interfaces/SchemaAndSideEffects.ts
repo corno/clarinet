@@ -3,7 +3,7 @@ import { DiagnosticSeverity } from "../../diagnosticSeverity/types/DiagnosticSev
 
 import * as h from "./ITypedTreeHandler"
 
-export interface SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation> {
+export interface ISchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation> {
     getSchema: () => def.Schema
     createStreamingValidator: (
         onValidationError: (message: string, annotation: TokenAnnotation, severity: DiagnosticSeverity) => void,

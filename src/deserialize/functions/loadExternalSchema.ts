@@ -1,6 +1,6 @@
 
 import * as p from "pareto"
-import { SchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
+import { ISchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
 import { SchemaSchemaBuilder } from "../interfaces/SchemaSchemaBuilder"
 import { TokenizerAnnotationData } from "../../modules/tokenizer/types/TokenizerAnnotationData"
 import { createStreamPreTokenizer } from "../../modules/tokenizer/functions/createStreamPreTokenizer"
@@ -16,9 +16,9 @@ export function loadExternalSchema(
     onError: (
         error: ExternalSchemaResolvingError
     ) => void,
-): p.IUnsafeValue<SchemaAndSideEffects<TokenizerAnnotationData, null>, null> {
+): p.IUnsafeValue<ISchemaAndSideEffects<TokenizerAnnotationData, null>, null> {
     let foundErrors = false
-    let schema: SchemaAndSideEffects<TokenizerAnnotationData, null> | null = null
+    let schema: ISchemaAndSideEffects<TokenizerAnnotationData, null> | null = null
     return stream.consume<null>(
         null,
         createStreamPreTokenizer(

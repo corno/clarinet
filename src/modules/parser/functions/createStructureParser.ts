@@ -6,8 +6,8 @@ import { SimpleStringToken, Token } from "../types/tokens"
 import { StructureErrorType } from "../types/StructureErrorType"
 
 import { ITreeParser } from "../interfaces/ITreeParser"
-import { TreeHandler } from "../interfaces/ITreeHandler"
-import { StructureErrorHandler } from "../interfaces/IStructureErrorHandler"
+import { ITreeHandler } from "../interfaces/ITreeHandler"
+import { IStructureErrorHandler } from "../interfaces/IStructureErrorHandler"
 import { IParser } from "../interfaces/IParser"
 
 
@@ -23,16 +23,16 @@ export function createStructureParser<Annotation>($: {
         headerAnnotation: Annotation
         embeddedSchemaAnnotation: Annotation
         schemaSchemaReferenceToken: SimpleStringToken<Annotation>
-    }) => TreeHandler<Annotation, null>
+    }) => ITreeHandler<Annotation, null>
     onSchemaReference: ($: {
         headerAnnotation: Annotation
         token: SimpleStringToken<Annotation>
     }) => p.IValue<boolean>
     onBody: (
         annotation: Annotation,
-    ) => TreeHandler<Annotation, null>
+    ) => ITreeHandler<Annotation, null>
     onEnd: (endAnnotation: Annotation) => void
-    errors: StructureErrorHandler<Annotation>
+    errors: IStructureErrorHandler<Annotation>
 }): IParser<Annotation> {
 
     enum StructureState {
@@ -56,7 +56,7 @@ export function createStructureParser<Annotation>($: {
             embeddedSchemaAnnotation: Annotation
         }]
         | [StructureState.EXPECTING_EMBEDDED_SCHEMA, {
-            treeHandler: TreeHandler<Annotation, null>
+            treeHandler: ITreeHandler<Annotation, null>
         }]
         | [StructureState.PROCESSING_EMBEDDED_SCHEMA, {
             schemaParser: ITreeParser<Annotation>

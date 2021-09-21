@@ -91,7 +91,7 @@ export function createASTNUnmarshaller($: {
             function createRealTreeHandler(
                 schema: def.Schema,
                 schemaSpec: ResolvedSchema<TokenizerAnnotationData, null>,
-            ): th.TreeHandler<TokenizerAnnotationData, null> {
+            ): th.ITreeHandler<TokenizerAnnotationData, null> {
                 const handler = $.handlerBuilder(schemaSpec)
                 return createTreeUnmarshaller(
                     schema,

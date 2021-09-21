@@ -1,7 +1,7 @@
-import { SchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
+import { ISchemaAndSideEffects } from "../../modules/typed/interfaces/SchemaAndSideEffects"
 
 export type ContextSchema<TokenAnnotation, NonTokenAnnotation> =
     | ["ignored"]
     | ["not available"]
     | ["has errors"]
-    | ["available", SchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation>]
+    | ["available", ISchemaAndSideEffects<TokenAnnotation, NonTokenAnnotation>]

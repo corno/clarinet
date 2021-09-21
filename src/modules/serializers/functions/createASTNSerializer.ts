@@ -1,7 +1,7 @@
 import * as p from "pareto"
 
 import { IParser } from "../../parser/interfaces/IParser"
-import { StructureErrorHandler } from "../../parser/interfaces/IStructureErrorHandler"
+import { IStructureErrorHandler } from "../../parser/interfaces/IStructureErrorHandler"
 import { IFormatInstructionWriter } from "../interfaces/IFormatInstructionWriter"
 
 import { flatten } from "../../flattened/functions/flatten"
@@ -12,7 +12,7 @@ export function createASTNSerializer<TokenAnnotation>(
     indentationString: string,
     newline: string,
     write: (str: string) => void,
-    errorHandler: StructureErrorHandler<TokenAnnotation>,
+    errorHandler: IStructureErrorHandler<TokenAnnotation>,
 ): IParser<TokenAnnotation> {
     const writer: IFormatInstructionWriter<TokenAnnotation, null> = {
         token: (instruction) => {
