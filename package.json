@@ -44,7 +44,7 @@
     "build": "rm -rf ./dist && tsc",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "buildLintAndTest": "npm run build && npm run lint && npm run test",
-    "validatePublishReadiness": "git diff --exit-code && ncu -u --packageFile package.json --timeout 60000 && npm install && npm run buildLintAndTest",
+    "validatePublishReadiness": "git diff --exit-code && ncu -u --packageFile package.json --timeout 120000 && npm install && npm run buildLintAndTest",
     "pubMin": "npm run validatePublishReadiness && npm version minor && git push && npm publish",
     "pubPatch": "npm run validatePublishReadiness && npm version patch && git push && npm publish",
     "test": "tsc &&  npm run testJSONTestSuite && npm run testOwnSuite &&  npm run testFormatting &&  npm run testTyped2 &&  npm run testTyped",
